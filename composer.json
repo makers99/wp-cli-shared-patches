@@ -1,0 +1,18 @@
+{
+    "name": "makers99/wp-cli-shared-patches",
+    "type": "wp-cli-package",
+    "description": "Applies patches to WordPress plugins.",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "makers99",
+            "email": "hi@makers99.com",
+            "homepage": "https://makers99.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Makers99\\SharedPatches\\": "src/"
+        }
+    }
+}
