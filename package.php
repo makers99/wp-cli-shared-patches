@@ -31,8 +31,13 @@ function classloader($class) {
 }
 spl_autoload_register(__NAMESPACE__ . '\classloader');
 
-add_filter('upgrader_post_install', __NAMESPACE__ . '\CliCommand::post_install', 10, 3);
 
 if (is_callable('WP_CLI::add_command')) {
   WP_CLI::add_command('plugin patch', __NAMESPACE__ . '\CliCommand');
+  WP_CLI::add_hook('after_wp_load', function () {
+    add_filter('upgrader_post_install', __NAMESPACE__ . '\CliCommand::post_install', 10, 3);
+  });
+}
+elseif (is_callable('add_filter')) {
+  add_filter('upgrader_post_install', __NAMESPACE__ . '\CliCommand::post_install', 10, 3);
 }

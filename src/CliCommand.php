@@ -19,6 +19,7 @@ class CliCommand extends \WP_CLI_Command {
 
   /**
    * @implements upgrader_post_install
+   * @when after_wp_load
    */
   public static function post_install($response, $hook_extra, $result) {
     // var_dump(func_get_args());
@@ -38,6 +39,7 @@ class CliCommand extends \WP_CLI_Command {
     // - remote_destination: /htdocs/wp-content/plugins/gallerya/
     // - clear_destination: TRUE
     $extension_folder = $result['destination'];
+    $extension_folder = str_replace(ABSPATH, '', $extension_folder);
     $name = $result['destination_name'];
     // Sanitize the input for glob() filesystem operation.
     $name = preg_replace('@[^a-zA-Z0-9_-]@', '', $name);
