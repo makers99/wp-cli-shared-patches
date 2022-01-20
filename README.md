@@ -1,5 +1,5 @@
 === wp-cli-plugin-patch ===
-Contributors: makers99
+Contributors: makers99, netzstrategen
 Tags: wp-cli, plugin, patch, fix
 Stable tag: 1.0.0
 License: GPLv2 or later
@@ -23,7 +23,9 @@ $ wp plugin patch --all
 
 The patches are shared as part of this package, see folder `./patches/`.
 
-All patches must be "patch serials" in the format of `git format-patch`. They will be applied using `git am`. More details on this in the _Creating patches_ chapter.
+All patches must be "patch serials" in the format of `git format-patch`. They
+will be applied using `git am`. More details on this in the _Creating patches_
+chapter.
 
 ```console
 $ wp patch create example-plugin c03314 fix keywords-context-info
@@ -106,8 +108,9 @@ Notes
 - On GitHub, you can append `".patch"` to the end of the URL of a commit (or
   even whole PR) to get the change in the right format.
 
-  You have to adjust the file paths in the .patch file to be relative to the
-  plugin folder if the commit is from a website project repository and not a
-  plugin repository.
+  If the commit is from a website project repository and not a plugin repository,
+  adjust the file paths in the .patch file to be relative to the plugin folder.
 
-- `git format-patch` does not include merge commits. You can create a patch compatible with `git am` following the instructions in https://stackoverflow.com/a/8840381/811306.
+- `git format-patch` does not include merge commits. You can create a patch
+  compatible with `git am` following the instructions in
+  https://stackoverflow.com/a/8840381/811306.
