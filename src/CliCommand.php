@@ -104,38 +104,4 @@ class CliCommand extends \WP_CLI_Command {
     }
   }
 
-  /**
-   * @implements upgrader_post_install
-   * @when after_wp_load
-   */
-  public static function post_install($response, $hook_extra, $result) {
-    if ($response !== TRUE) {
-      return $response;
-    }
-    // Sample parameters:
-    // - type: plugin
-    // - action: install
-    if ($hook_extra['type'] !== 'plugin') {
-      return $response;
-    }
-    // Sample parameters:
-    // - destination: /htdocs/wp-content/plugins/gallerya/
-    // - destination_name: gallerya
-    // - local_destination: /htdocs/wp-content/plugins
-    // - remote_destination: /htdocs/wp-content/plugins/gallerya/
-    // - clear_destination: TRUE
-    $extension_folder = $result['destination'];
-    $extension_folder = str_replace(ABSPATH, '', $extension_folder);
-    $plugin_name = $result['destination_name'];
-    // Sanitize the input for glob() filesystem operation.
-    $plugin_name = preg_replace('@[^a-zA-Z0-9_-]@', '', $plugin_name);
-
-    $patches = static::getPatches($plugin_name);
-    foreach ($patches as $patch_filepath) {
-      static::applyPatch($plugin_name, $extension_folder, $patch_filepath);
-    }
-
-    return $response;
-  }
-
 }
