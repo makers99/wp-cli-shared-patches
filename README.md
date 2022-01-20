@@ -49,7 +49,7 @@ $ wp patch create example-plugin c03314 fix keywords-context-info
     ```
     ```yaml
     require:
-      - .wp-cli/packages/shared-patches/plugin.php
+      - .wp-cli/packages/shared-patches/package.php
     ```
 
 = Install with Composer =
