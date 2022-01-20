@@ -15,7 +15,7 @@
 
 namespace Makers99\SharedPatches;
 
-use \WP_CLI;
+use WP_CLI;
 
 /**
  * Loads PSR-4-style plugin classes.
