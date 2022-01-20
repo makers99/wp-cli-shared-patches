@@ -34,4 +34,5 @@ spl_autoload_register(__NAMESPACE__ . '\classloader');
 
 if (is_callable('WP_CLI::add_command')) {
   WP_CLI::add_command('plugin patch', __NAMESPACE__ . '\CliCommand');
+  WP_CLI::add_command('patch', __NAMESPACE__ . '\PatchCommand');
 }
