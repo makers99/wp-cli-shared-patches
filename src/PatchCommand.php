@@ -36,8 +36,8 @@ class PatchCommand extends \WP_CLI_Command {
       'patch',
     ]);
 
-    $command = 'git format-patch --relative --stdout %s~1..%s > %s/%s';
-    $command = Utils\esc_cmd($command, $commit, $commit, $patches_path, $patch_filename);
+    $command = 'cd %s; git format-patch --relative --stdout %s~1..%s > %s/%s';
+    $command = Utils\esc_cmd($command, $plugin_path, $commit, $commit, $patches_path, $patch_filename);
     $processrun = WP_CLI::launch($command, FALSE, TRUE);
     if ($processrun->return_code !== 0) {
       // @see WP_CLI\ProcessRun::__toString()
