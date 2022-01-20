@@ -114,3 +114,58 @@ Notes
 - `git format-patch` does not include merge commits. You can create a patch
   compatible with `git am` following the instructions in
   https://stackoverflow.com/a/8840381/811306.
+
+
+= Resolving patch conflicts =
+
+Repeat the failing command that you see in the error message; e.g.:
+
+```console
+$ git am --directory 'wp-content/plugins/woocommerce-german-market' --3way --keep-cr '.wp-cli/packages/shared-patches/patches/woocommerce-german-market.0001.feature.shop-standards-delivery-times.patch'
+```
+
+This results in a `git am` merge conflict, which you can resolve like any other
+merge or rebase conflict.
+
+```console
+$ git am --show-current-patch
+$ vi wp-content/plugins/woocommerce-german-market/inc/WGM_Template.php
+# Resolve conflict markers as with a regular merge
+
+$ git status
+$ git add wp-content/plugins/woocommerce-german-market/inc/WGM_Template.php
+$ git status
+
+$ git am --continue
+
+$ wp patch create woocommerce-german-market d8e0e9b67 feature shop-standards-delivery-times
+$ cd .wp-cli/packages/shared-patches/patches/
+$ rm woocommerce-german-market.0001.feature.shop-standards-delivery-times.patch
+$ mv woocommerce-german-market.0005.feature.shop-standards-delivery-times.patch woocommerce-german-market.0001.feature.shop-standards-delivery-times.patch
+$ git status
+$ git add woocommerce-german-market.0001.feature.shop-standards-delivery-times.patch
+$ git commit -m "Updated woocommerce-german-market shop-standards delivery times patch."
+$ git push
+$ cd -
+```
+
+However, if you see conflict markers but no actual changes (in all files affected by the patch), then the patch was incorporated into the new upstream release.
+
+```console
+$ git am --show-current-patch
+$ vi wp-content/plugins/woocommerce-german-market/inc/WGM_Installation.php
+# Search for conflict markers:
+/<<<<<
+
+$ vi wp-content/plugins/woocommerce-german-market/WooCommerce-German-Market.php
+# Search for conflict markers:
+/<<<<<
+
+$ git status
+$ git am --abort
+
+$ cd .wp-cli/packages/shared-patches/patches
+$ git rm woocommerce-german-market.0004.fix.performance-admin_url-string-translations.patch
+$ git commit -m "Removed obsolete patch (included in new release)."
+$ cd -
+```
