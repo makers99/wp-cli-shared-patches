@@ -9,7 +9,7 @@ use WP_CLI\Utils;
 /**
  * WP-CLI command for shared patches.
  */
-class CliCommand extends \WP_CLI_Command {
+class PluginCommand extends \WP_CLI_Command {
 
   /**
    * Prefix for hook names.

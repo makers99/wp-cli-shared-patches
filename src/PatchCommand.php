@@ -30,7 +30,7 @@ class PatchCommand extends \WP_CLI_Command {
 
     $patch_filename = implode('.', [
       $plugin_name,
-      str_pad(count(CliCommand::getPatches($plugin_name)) + 1, 4, '0', STR_PAD_LEFT),
+      str_pad(count(PluginCommand::getPatches($plugin_name)) + 1, 4, '0', STR_PAD_LEFT),
       $type,
       $keywords,
       'patch',
