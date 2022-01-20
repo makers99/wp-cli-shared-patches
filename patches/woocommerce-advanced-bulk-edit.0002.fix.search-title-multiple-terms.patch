@@ -1,0 +1,26 @@
+From b216f59eef8d7c5fac86e2aaa216dba4614a2b5f Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Mon, 14 Jun 2021 11:12:35 +0200
+Subject: [PATCH] Fixed multiple terms search does not work for titles with
+ woocommerce-advanced-bulk-edit plugin. (#664)
+
+---
+ ajax_handler.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ajax_handler.php b/ajax_handler.php
+index c4176cb4d..4d21ead51 100644
+--- a/ajax_handler.php
++++ b/ajax_handler.php
+@@ -1932,7 +1932,7 @@ class W3ExABulkEditAjaxHandler{
+ 				self::WriteDebugInfo( "catsquery", $curr_settings, array( $catsquery ) );
+                 //$query = mysql_escape_string($query);
+ 				if ( count( $arrsearchtitle ) > 0 ) {
+-					$ret = $wpdb->query( $wpdb->prepare( $query, $arrsearchtitle ) );
++					$ret = $wpdb->query( $wpdb->prepare( $query, array_merge( $arrsearchtitle, $arrsearchtitle ) ) );
+ 				} else {
+ 					$ret = $wpdb->query( $query );
+ 				}
+-- 
+2.30.1
+

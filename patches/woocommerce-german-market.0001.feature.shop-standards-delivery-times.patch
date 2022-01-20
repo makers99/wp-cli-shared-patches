@@ -1,0 +1,28 @@
+From 31c11ea187f2b970b2c9d633014f54825708e7e0 Mon Sep 17 00:00:00 2001
+From: Luca Pipolo <luca@netzstrategen.com>
+Date: Wed, 27 May 2020 11:26:35 +0200
+Subject: [PATCH] Applied woocommerce-german-market delivery times patch from
+ shop-standards.
+
+---
+ inc/WGM_Template.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/inc/WGM_Template.php b/inc/WGM_Template.php
+index d02b269d4..593f21ac4 100644
+--- a/inc/WGM_Template.php
++++ b/inc/WGM_Template.php
+@@ -2534,8 +2534,8 @@ class WGM_Template {
+ 		$lieferzeit_output = '';
+ 
+ 		$delivery_time_label = __( 'Delivery Time:', 'woocommerce-german-market' );
+-		$delivery_time_label = apply_filters( 'woocommerce_de_delivery_time_label_shop', $delivery_time_label );
+-		
++		$delivery_time_label = apply_filters( 'woocommerce_de_delivery_time_label_shop', $delivery_time_label, $product );
++
+ 		// If the product is a product variation, check if each variation has the same delivery time
+ 		// => if not, do not display delivery time!
+ 		// Add "add_filter( 'woocommerce_de_use_delivery_time_of_variable_product', '__return_true' );" to your functions.php to use the delivery time of the variable product (parent product)
+-- 
+2.30.1
+

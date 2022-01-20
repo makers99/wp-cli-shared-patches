@@ -1,0 +1,26 @@
+From 8bffe6672aa52a541b7f0ff62d15573a73763d32 Mon Sep 17 00:00:00 2001
+From: Luca Pipolo <luca@netzstrategen.com>
+Date: Mon, 10 Feb 2020 14:50:20 +0100
+Subject: [PATCH] Fixed shipping to different address field was always checked
+ on page load.
+
+---
+ gateways/WGM_Gateway_Purchase_On_Account.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gateways/WGM_Gateway_Purchase_On_Account.php b/gateways/WGM_Gateway_Purchase_On_Account.php
+index ad3678a10..f089f5d52 100644
+--- a/gateways/WGM_Gateway_Purchase_On_Account.php
++++ b/gateways/WGM_Gateway_Purchase_On_Account.php
+@@ -52,7 +52,7 @@ class WGM_Gateway_Purchase_On_Account extends WC_Payment_Gateway {
+ 		add_action( 'woocommerce_thankyou_german_market_purchase_on_account', array( $this, 'thankyou' ) );
+ 
+ 		if ( $this->deactivate_ship_to_different_address == 'yes' ) {
+-			add_action( 'woocommerce_after_checkout_billing_form', array( $this, 'hidden_field_for_deactivate_ship_to_different_address' ) );
++			add_action( 'woocommerce_checkout_before_customer_details', array( $this, 'hidden_field_for_deactivate_ship_to_different_address' ) );
+ 		}
+ 		
+ 	    // Customer Emails
+-- 
+2.30.1
+

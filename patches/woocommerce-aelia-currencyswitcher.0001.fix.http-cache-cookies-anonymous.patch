@@ -1,0 +1,44 @@
+From 7cd8b7e0e3f0e2aac2f263291a4a83d058c6ca65 Mon Sep 17 00:00:00 2001
+From: Luca Pipolo <luca@netzstrategen.com>
+Date: Mon, 20 Jul 2020 15:57:10 +0200
+Subject: [PATCH] Fixed aelia plugins send cookies for all visitors causing
+ cache misses in reverse proxy.
+
+---
+ src/plugin-main.php | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/src/plugin-main.php b/src/plugin-main.php
+index e960bb63f..b8432b92e 100644
+--- a/src/plugin-main.php
++++ b/src/plugin-main.php
+@@ -1337,9 +1337,12 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
+ 		}
+
+ 		// Store the selected currency in a cookie for 48 hours
+-		Aelia_SessionManager::set_cookie(Definitions::USER_CURRENCY,
+-																		 $selected_currency,
+-																		 time() + DAY_IN_SECONDS);
++		$is_cookie_set = Aelia_SessionManager::get_cookie(Definitions::USER_CURRENCY) !== NULL;
++		if($is_cookie_set || $selected_currency !== $this->base_currency()) {
++			Aelia_SessionManager::set_cookie(Definitions::USER_CURRENCY,
++																				$selected_currency,
++																				time() + DAY_IN_SECONDS);
++		}
+ 	}
+
+ 	/**
+@@ -2067,7 +2070,10 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
+ 	 * @since 4.0.0.150311
+ 	 */
+ 	protected function store_customer_country($customer_country) {
+-		Aelia_SessionManager::set_cookie(Definitions::SESSION_CUSTOMER_COUNTRY, $customer_country);
++		$is_cookie_set = Aelia_SessionManager::get_cookie(Definitions::SESSION_CUSTOMER_COUNTRY) !== NULL;
++		if($is_cookie_set || $customer_country !== (new \WC_Countries())->get_base_country()) {
++			Aelia_SessionManager::set_cookie(Definitions::SESSION_CUSTOMER_COUNTRY, $customer_country);
++		}
+ 	}
+
+ 	/**
+--
+2.30.1

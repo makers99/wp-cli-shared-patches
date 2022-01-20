@@ -1,0 +1,40 @@
+From 7cd8b7e0e3f0e2aac2f263291a4a83d058c6ca65 Mon Sep 17 00:00:00 2001
+From: Luca Pipolo <luca@netzstrategen.com>
+Date: Mon, 20 Jul 2020 15:57:10 +0200
+Subject: [PATCH] Fixed aelia plugins send cookies for all visitors causing
+ cache misses in reverse proxy.
+
+---
+ src/plugin-main.php | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/src/plugin-main.php b/src/plugin-main.php
+index aac284662..9f9cadeab 100644
+--- a/src/plugin-main.php
++++ b/src/plugin-main.php
+@@ -270,10 +270,13 @@ class WC_Aelia_Tax_Display_By_Country extends Aelia_Plugin {
+ 	 * @since 1.7.5.150728
+ 	 */
+ 	protected function store_customer_location(array $location) {
+-		if(isset($location['country'])) {
++		$countries = new \WC_Countries();
++		$is_cookie_set = Aelia_SessionManager::get_cookie(Definitions::SESSION_CUSTOMER_COUNTRY) !== NULL;
++		if($is_cookie_set || isset($location['country']) && $location['country'] !== $countries->get_base_country()) {
+ 			Aelia_SessionManager::set_cookie(Definitions::SESSION_CUSTOMER_COUNTRY, $location['country']);
+ 		}
+-		if(isset($location['state'])) {
++		$is_cookie_set = Aelia_SessionManager::get_cookie(Definitions::SESSION_CUSTOMER_STATE) !== NULL;
++		if($is_cookie_set || isset($location['state']) && $location['state'] !== $countries->get_base_state()) {
+ 			Aelia_SessionManager::set_cookie(Definitions::SESSION_CUSTOMER_STATE, $location['state']);
+ 		}
+ 	}
+@@ -1327,4 +1330,4 @@ class WC_Aelia_Tax_Display_By_Country extends Aelia_Plugin {
+ 	}
+ }
+ 
+-$GLOBALS[WC_Aelia_Tax_Display_By_Country::$plugin_slug] = WC_Aelia_Tax_Display_By_Country::factory();
+\ No newline at end of file
++$GLOBALS[WC_Aelia_Tax_Display_By_Country::$plugin_slug] = WC_Aelia_Tax_Display_By_Country::factory();
+-- 
+2.30.1
+

@@ -1,0 +1,38 @@
+From 962ad019c1cdbae16e60f627b66873455da58719 Mon Sep 17 00:00:00 2001
+From: Mauricio Urrego <mauricio@netzstrategen.com>
+Date: Thu, 20 Jan 2022 15:14:33 +0100
+Subject: [PATCH] Fixed temporary CSV files are written into plugin folder
+ instead of uploads folder. (#4)
+
+Co-authored-by: Daniel Kudwien <daniel@netzstrategen.com>
+---
+ ajax_handler.php | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/ajax_handler.php b/ajax_handler.php
+index c4176cb..4d3d487 100644
+--- a/ajax_handler.php
++++ b/ajax_handler.php
+@@ -7484,8 +7484,11 @@ public static function HandleSaleRemove($parentid)
+ 	
+ 	public static function exportProducts(&$data,&$children)
+ 	{
+-		$dir = dirname(__FILE__);
+-		$dh  = opendir($dir);
++		$dir = wp_upload_dir()['basedir'] . '/woocommerce-advanced-bulk-edit';
++		if (!is_dir($dir)) {
++			wp_mkdir_p($dir);
++		}
++		$dh = opendir($dir);
+ 		while (false !== ($filename = readdir($dh))) {
+ 			$ibegin = strpos($filename,"temp.csv",0);
+ 	 		if( $ibegin !== FALSE)
+@@ -9130,7 +9133,7 @@ public static function ajax()
+ 			case 'exportproducts':
+ 			{
+ 				$filename = self::exportProducts($data,$children);
+-				$arr['products'] = plugin_dir_url(__FILE__).$filename;
++				$arr['products'] = wp_upload_dir()['baseurl'] . '/woocommerce-advanced-bulk-edit/' . $filename;
+ 			}break;
+ 			case 'setthumb':
+ 			{

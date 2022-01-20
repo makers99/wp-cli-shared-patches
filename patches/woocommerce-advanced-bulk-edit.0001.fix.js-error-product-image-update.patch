@@ -1,0 +1,35 @@
+From f62c30a3d7484cb094e83155e80bf8251b7dae99 Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Thu, 10 Jun 2021 14:54:53 +0200
+Subject: [PATCH] Fixed JavaScript error on product image update with
+ woocommerce-advanced-bulk-edit. (#665)
+
+---
+ woocommerce-advanced-bulk-edit.php | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/woocommerce-advanced-bulk-edit.php b/woocommerce-advanced-bulk-edit.php
+index 371b975e6..efc4dd8b9 100644
+--- a/woocommerce-advanced-bulk-edit.php
++++ b/woocommerce-advanced-bulk-edit.php
+@@ -133,12 +133,12 @@ class W3ExAdvancedBulkEditMain {
+ //        wp_deregister_script('jquery-ui-draggable');
+ //        wp_deregister_script('jquery-ui-datepicker');
+ 
+-		//wp_register_script('jquery', $purl.'lib/jquery-1.12.4.min.js', false, '1.12.4');
+-		//wp_register_script('jquery-ui', $purl.'lib/jquery-ui-1.12.1.min.js', false, '1.12.1');
+-		wp_register_script('jquery-all', $purl.'lib/jquery-all.min.js', false, '1.12.4');
++		wp_register_script('jquery', $purl.'lib/jquery-1.12.4.min.js', false, '1.12.4');
++		wp_register_script('jquery-ui', $purl.'lib/jquery-ui-1.12.1.min.js', false, '1.12.1');
++		// wp_register_script('jquery-all', $purl.'lib/jquery-all.min.js', false, '1.12.4');
+ //		wp_enqueue_script('jquery-ui-core');
+-		//wp_enqueue_script('jquery');
+-		//wp_enqueue_script('jquery-ui');
++		wp_enqueue_script('jquery');
++		wp_enqueue_script('jquery-ui');
+ 		wp_enqueue_script('jquery-all');
+ 		wp_enqueue_script('jquery-ui-dialog', array(), $ver, true);
+ 		wp_enqueue_script('jquery-ui-tabs', array(), $ver, true);
+-- 
+2.30.1
+

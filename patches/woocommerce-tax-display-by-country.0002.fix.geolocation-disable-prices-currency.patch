@@ -1,0 +1,62 @@
+From 4cedee7dcda3b5a21e6920290562dcd4cc7db185 Mon Sep 17 00:00:00 2001
+From: Luca Pipolo <luca@netzstrategen.com>
+Date: Mon, 20 Jul 2020 15:59:36 +0200
+Subject: [PATCH] Fixed was not possible to disable geolocation for prices and
+ currency.
+
+---
+ src/plugin-main.php | 36 +++++++++++++++++++++++-------------
+ 1 file changed, 23 insertions(+), 13 deletions(-)
+
+diff --git a/src/plugin-main.php b/src/plugin-main.php
+index 9f9cadeab..e37ae3c22 100644
+--- a/src/plugin-main.php
++++ b/src/plugin-main.php
+@@ -431,21 +431,31 @@ class WC_Aelia_Tax_Display_By_Country extends Aelia_Plugin {
+ 				}
+ 			}
+ 
+-			// If no valid currency could be retrieved from customer's details, detect
++						// If no valid currency could be retrieved from customer's details, detect
+ 			// it using visitor's IP address
+ 			if(empty($location['country'])) {
+-				// Fetch the details of the city
+-				// @since 1.9.6.170828
+-				$city_data = $this->ip2location()->get_visitor_city();
+-
+-				$location = array(
+-					'country' => $this->ip2location()->get_visitor_country(),
+-					'state' => $this->ip2location()->get_visitor_state(),
+-					// Try to detect city and postcode
+-					// @since 1.9.6.170828
+-					'city' => is_object($city_data) ? $city_data->city->name : '',
+-					'postcode' => is_object($city_data) ? $city_data->postal->code : '',
+-				);
++				// When woocommerce-tax-display-by-country plugin is enabled,
++				// the aelia_customer_country cookie always contains the geolocated
++				// country even if geolocation is disabled by the
++				// woocommerce-aelia-currencyswitcher backend settings.
++				// In conseguence, the displayed information (i.e. prices and currency
++				// switcher selected country) is wrong.
++				if(class_exists('Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher')) {
++					if(\Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher::settings()->currency_geolocation_enabled()) {
++						// Fetch the details of the city
++						// @since 1.9.6.170828
++						$city_data = $this->ip2location()->get_visitor_city();
++
++						$location = array(
++							'country' => $this->ip2location()->get_visitor_country(),
++							'state' => $this->ip2location()->get_visitor_state(),
++							// Try to detect city and postcode
++							// @since 1.9.6.170828
++							'city' => is_object($city_data) ? $city_data->city->name : '',
++							'postcode' => is_object($city_data) ? $city_data->postal->code : '',
++						);
++					}
++				}
+ 			}
+ 
+ 			// If everything fails, take shop's base country
+-- 
+2.30.1
+

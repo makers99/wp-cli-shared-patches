@@ -1,0 +1,26 @@
+From fb13cd0ac864c7f70b619a619360c56a21e9e291 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Wed, 17 Feb 2021 16:52:11 +0100
+Subject: [PATCH] Fixed webappick-product-feed-for-woocommerce-pro does not
+ generate product feeds on cron runs.
+
+---
+ includes/cron-helper.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/cron-helper.php b/includes/cron-helper.php
+index 59b991f38..988acce25 100644
+--- a/includes/cron-helper.php
++++ b/includes/cron-helper.php
+@@ -60,7 +60,7 @@ if ( ! function_exists( 'woo_feed_cron_update_feed' ) ) {
+ 		}
+ 	}
+ 
+-	// add_action( 'woo_feed_update', 'woo_feed_cron_update_feed' );
++	add_action( 'woo_feed_update', 'woo_feed_cron_update_feed' );
+ }
+ 
+ // Single Feed Update Cron
+-- 
+2.30.1
+

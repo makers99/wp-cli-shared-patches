@@ -1,0 +1,27 @@
+From cf4619ee50b2b0b0024b80bff42f3a9dea77a046 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Mon, 25 Jan 2021 18:40:03 +0100
+Subject: [PATCH] Fixed deprecation warning for $order::get_product_from_item()
+ to be replaced by $item->get_product().
+
+---
+ .../application/modules/woocommerce/application/general.php    | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/addons/slack-connector/application/modules/woocommerce/application/general.php b/src/addons/slack-connector/application/modules/woocommerce/application/general.php
+index 3c5296e90..73e859c59 100644
+--- a/src/addons/slack-connector/application/modules/woocommerce/application/general.php
++++ b/src/addons/slack-connector/application/modules/woocommerce/application/general.php
+@@ -327,7 +327,8 @@ function slack_connector_woocommerce_list_items_light_version( $items, $channel,
+  */
+ function slack_connector_woocommerce_list_items_get_attributs( $item, $order ) {
+ 	
+-	$_product 	= apply_filters( 'woocommerce_order_item_product', $order->get_product_from_item( $item ), $item );
++	$_product = version_compare( WC_VERSION, '3.0', '<' ) ? $order->get_product_from_item( $item ) : $item->get_product();
++	$_product = apply_filters( 'woocommerce_order_item_product', $_product, $item );
+ 	$item_meta = new WC_Order_Item_Meta( $item, $_product );
+ 	$attributes = $item_meta->display( true, true, '_', ', ' );
+ 	if ( $attributes != '' ) {
+-- 
+2.30.1
+
