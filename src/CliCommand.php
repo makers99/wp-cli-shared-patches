@@ -95,12 +95,14 @@ class CliCommand extends \WP_CLI_Command {
    *   The filepath of the patch to apply.
    */
   public static function applyPatch(string $plugin_name, string $plugin_folder, string $patch_filepath): void {
-    $command = 'git apply --directory %s --3way --intent-to-add %s';
+    // --keep-cr retains Windows line endings in the patch, if any.
+    $command = 'git am --directory %s --3way --keep-cr %s';
     $command = Utils\esc_cmd($command, $plugin_folder, $patch_filepath);
     $processrun = WP_CLI::launch($command, FALSE, TRUE);
     if ($processrun->return_code !== 0) {
       // @see WP_CLI\ProcessRun::__toString()
       WP_CLI::error((string) $processrun, false);
+      WP_CLI::launch('git am --abort', FALSE, TRUE);
     }
   }
 

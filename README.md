@@ -103,4 +103,11 @@ $ git format-patch --relative --stdout $COMMIT~1..$COMMIT > \
 
 Notes
 
+- On GitHub, you can append `".patch"` to the end of the URL of a commit (or
+  even whole PR) to get the change in the right format.
+
+  You have to adjust the file paths in the .patch file to be relative to the
+  plugin folder if the commit is from a website project repository and not a
+  plugin repository.
+
 - `git format-patch` does not include merge commits. You can create a patch compatible with `git am` following the instructions in https://stackoverflow.com/a/8840381/811306.
