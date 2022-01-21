@@ -1,0 +1,33 @@
+From b18d3e32df3bdb7d973b285b0f5b6d8ab9abee7a Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Wed, 13 Oct 2021 11:55:38 +0200
+Subject: [PATCH] Fixed resend nonce may not be always enforced.
+
+---
+ includes/class-alg-wc-ev-core.php | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/includes/class-alg-wc-ev-core.php b/includes/class-alg-wc-ev-core.php
+index ceffc851c..08537305b 100644
+--- a/includes/class-alg-wc-ev-core.php
++++ b/includes/class-alg-wc-ev-core.php
+@@ -595,14 +595,8 @@ class Alg_WC_Email_Verification_Core {
+ 	function resend() {
+ 		if (
+ 			isset( $_GET['alg_wc_ev_user_id'] ) &&
+-			(
+-				(
+-					( $nonce_required = true ) &&
+-					! empty( $resend_timestamp = get_user_meta( $_GET['alg_wc_ev_user_id'], 'alg_wc_ev_activation_email_sent', true ) ) &&
+-					isset( $_GET['alg_wc_ev_nonce'] ) && wp_verify_nonce( $_GET['alg_wc_ev_nonce'], 'resend-' . $_GET['alg_wc_ev_user_id'] . '-' . $resend_timestamp )
+-				) ||
+-				! $nonce_required
+-			)
++			$resend_timestamp = get_user_meta( $_GET['alg_wc_ev_user_id'], 'alg_wc_ev_activation_email_sent', true ) &&
++			isset( $_GET['alg_wc_ev_nonce'] ) && wp_verify_nonce( $_GET['alg_wc_ev_nonce'], 'resend-' . $_GET['alg_wc_ev_user_id'] . '-' . $resend_timestamp )
+ 		) {
+ 			$this->emails->reset_and_mail_activation_link( $_GET['alg_wc_ev_user_id'] );
+ 			alg_wc_ev_add_notice( $this->messages->get_resend_message() );
+-- 
+2.30.1 (Apple Git-130)
+
