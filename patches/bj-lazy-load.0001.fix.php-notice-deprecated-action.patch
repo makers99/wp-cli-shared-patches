@@ -1,0 +1,23 @@
+From 6b94e6337e58a5c3205b028a190abebdcb2cc28c Mon Sep 17 00:00:00 2001
+From: Joan Lopez <joan@netzstrategen.com>
+Date: Mon, 11 May 2020 17:58:29 +0200
+Subject: [PATCH] Fixed PHP notice caused by deprecated action in plugin
+ bj-lazy-load.
+
+---
+ inc/scb/AdminPage.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/inc/scb/AdminPage.php b/inc/scb/AdminPage.php
+index 48c9d16..2cce2e4 100644
+--- a/inc/scb/AdminPage.php
++++ b/inc/scb/AdminPage.php
+@@ -119,7 +119,7 @@ function __construct( $file = false, $options = null ) {
+ 		}
+ 
+ 		add_action( 'admin_menu', array( $this, 'page_init' ), $this->args['admin_action_priority'] );
+-		add_filter( 'contextual_help', array( $this, '_contextual_help' ), 10, 2 );
++		add_filter( 'add_help_tab', array( $this, '_contextual_help' ), 10, 2 );
+ 
+ 		if ( $file ) {
+ 			$this->file = $file;
