@@ -13,14 +13,12 @@ index be724d7ae..9aae0639b 100644
 +++ b/includes/class-wcs-cart-resubscribe.php
 @@ -335,7 +335,8 @@ class WCS_Cart_Resubscribe extends WCS_Cart_Renewal {
  	public function order_button_text( $place_order_text ) {
- 
+
  		if ( isset( WC()->cart ) && count( wcs_get_order_type_cart_items( 'resubscribe' ) ) === count( WC()->cart->get_cart() ) ) {
 -			$place_order_text = _x( 'Resubscribe', 'The place order button text while resubscribing to a subscription', 'woocommerce-subscriptions' );
-+			// $place_order_text = _x( 'Resubscribe', 'The place order button text while resubscribing to a subscription', 'woocommerce-subscriptions' );
 +			$place_order_text = __( 'Resubscribe', 'woocommerce-subscriptions' );
  		}
- 
- 		return $place_order_text;
--- 
-2.30.1 (Apple Git-130)
 
+ 		return $place_order_text;
+--
+2.30.1 (Apple Git-130)
