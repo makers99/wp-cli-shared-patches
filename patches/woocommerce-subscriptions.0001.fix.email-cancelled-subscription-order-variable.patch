@@ -1,0 +1,33 @@
+From d55fa3480fcd1220cfcb9be207a8e9c29651062f Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Fri, 18 Dec 2020 09:47:11 +0100
+Subject: [PATCH] Fixed missing placeholder variables in subscription cancelled
+ email. (#809)
+
+---
+ includes/emails/class-wcs-email-cancelled-subscription.php | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/includes/emails/class-wcs-email-cancelled-subscription.php b/includes/emails/class-wcs-email-cancelled-subscription.php
+index db12fc3b2..425d6293c 100644
+--- a/includes/emails/class-wcs-email-cancelled-subscription.php
++++ b/includes/emails/class-wcs-email-cancelled-subscription.php
+@@ -98,6 +98,7 @@ class WCS_Email_Cancelled_Subscription extends WC_Email {
+ 			$this->template_html,
+ 			array(
+ 				'subscription'       => $this->object,
++				'order'              => $this->object,
+ 				'email_heading'      => $this->get_heading(),
+ 				'additional_content' => is_callable( array( $this, 'get_additional_content' ) ) ? $this->get_additional_content() : '', // WC 3.7 introduced an additional content field for all emails.
+ 				'sent_to_admin'      => true,
+@@ -120,6 +121,7 @@ class WCS_Email_Cancelled_Subscription extends WC_Email {
+ 			$this->template_plain,
+ 			array(
+ 				'subscription'       => $this->object,
++				'order'              => $this->object,
+ 				'email_heading'      => $this->get_heading(),
+ 				'additional_content' => is_callable( array( $this, 'get_additional_content' ) ) ? $this->get_additional_content() : '', // WC 3.7 introduced an additional content field for all emails.
+ 				'sent_to_admin'      => true,
+-- 
+2.30.1 (Apple Git-130)
+
