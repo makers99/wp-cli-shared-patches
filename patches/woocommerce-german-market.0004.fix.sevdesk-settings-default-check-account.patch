@@ -1,0 +1,41 @@
+From 94dcf3ddfb5754160fb3d63c1a9520883b368cb5 Mon Sep 17 00:00:00 2001
+From: joram77 <joram@netzstrategen.com>
+Date: Thu, 10 Jun 2021 14:53:32 +0200
+Subject: [PATCH] Fix php notice that appeared when saving woocommerce payment
+ settings.
+
+Notice appeared because no default check_accounts option was provided in woocommerce_de_sevdesk_gateway_check_accounts_field.
+---
+ add-ons/sevdesk/application/backend/settings.php | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/add-ons/sevdesk/application/backend/settings.php b/add-ons/sevdesk/application/backend/settings.php
+index e8db106..5be5010 100644
+--- a/add-ons/sevdesk/application/backend/settings.php
++++ b/add-ons/sevdesk/application/backend/settings.php
+@@ -536,10 +536,10 @@ function woocommerce_de_sevdesk_gateway_check_accounts_field( $settings ) {
+ 	curl_close( $ch );
+ 
+ 	$check_accounts = array();
+-	
+-	if ( isset ( $result_array[ 'objects' ] ) ) {
++	$check_accounts[ 'default' ] = __( 'Default Check Account', 'woocommerce-german-market' );
++
+ 
+-		$check_accounts[ 'default' ] = __( 'Default Check Account', 'woocommerce-german-market' );
++	if ( isset ( $result_array[ 'objects' ] ) ) {
+ 
+ 		foreach ( $result_array[ 'objects' ] as $check_account ) {
+ 			$check_accounts[ $check_account [ 'id' ] ] = $check_account[ 'name' ];
+@@ -551,7 +551,9 @@ function woocommerce_de_sevdesk_gateway_check_accounts_field( $settings ) {
+ 		'title'				=> __( 'Check Account', 'woocommerce-german-market' ),
+ 		'id'				=> 'woocommerce_de_sevdesk_check_account',
+ 		'type'				=> 'select',
+-		'options'			=> $check_accounts
++		'options'			=> $check_accounts,
++		'default'			=> $check_accounts[ 'default' ]
++
+ 
+ 	);
+ 
+
