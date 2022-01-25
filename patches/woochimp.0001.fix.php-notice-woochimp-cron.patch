@@ -1,0 +1,26 @@
+From 353b631a862fc4710d7e29588f30c06802a603b8 Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Mon, 24 Jan 2022 22:06:49 +0200
+Subject: [PATCH] Fixed PHP notice triggered by woochimp plugin on invocation
+ of wp-cron.php.
+
+---
+ woochimp.class.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/woochimp.class.php b/woochimp.class.php
+index 0fe680bf2..7fde32390 100644
+--- a/woochimp.class.php
++++ b/woochimp.class.php
+@@ -3675,7 +3675,7 @@ class WooChimp
+         }
+ 
+         // Maybe get items and totals from cart instead of order
+-        if ($is_cart || empty($items)) {
++        if (!empty($GLOBALS['woocommerce']) && ($is_cart || empty($items))) {
+             global $woocommerce;
+             $items = $woocommerce->cart->cart_contents;
+             $total = $woocommerce->cart->total;
+-- 
+2.30.1 (Apple Git-130)
+

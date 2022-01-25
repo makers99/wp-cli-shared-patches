@@ -1,0 +1,26 @@
+From 469e26a7b4a3121b3289deefa224709a6b41d4c3 Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Mon, 24 Jan 2022 22:52:36 +0200
+Subject: [PATCH] Fixed multiple Amazon pay buttons when changing shipping
+ method in plugin woocommerce-gateway-amazon-payments-advanced.
+
+---
+ assets/js/legacy/amazon-app-widgets.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/assets/js/legacy/amazon-app-widgets.js b/assets/js/legacy/amazon-app-widgets.js
+index ecec50558..aa2194884 100644
+--- a/assets/js/legacy/amazon-app-widgets.js
++++ b/assets/js/legacy/amazon-app-widgets.js
+@@ -264,7 +264,7 @@ jQuery( function( $ ) {
+ 			return;
+ 		}
+ 
+-		if ( 0 !== $( '#pay_with_amazon' ).length ) {
++		if ( 0 !== $( '#pay_with_amazon' ).length && 0 === $( '.amazonpay-button-inner-image' ).length ) {
+ 			var popup = true;
+ 			if ( 'optimal' === amazon_payments_advanced_params.redirect_authentication && isSmallScreen() ) {
+ 				popup = false;
+-- 
+2.30.1 (Apple Git-130)
+
