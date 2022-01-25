@@ -1,0 +1,25 @@
+From 45960110d9bd8a9532cc1cfb5523fe696d9f3f4f Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 25 Jan 2022 10:32:15 +0100
+Subject: [PATCH] Fixed auto-update fails due to PHP errors on vendor website.
+
+---
+ woocommerce-google-address.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/woocommerce-google-address.php b/woocommerce-google-address.php
+index 6927205eb..120852cc6 100644
+--- a/woocommerce-google-address.php
++++ b/woocommerce-google-address.php
+@@ -30,7 +30,7 @@ function WooCommerce_Google_Address_Loader()
+ add_action( 'plugins_loaded' , 'WooCommerce_Google_Address_Loader');
+ 
+ // Auto updatder
+-add_action( 'admin_init', 'mbc_woogoogad_autoupdate' ); 
++//add_action( 'admin_init', 'mbc_woogoogad_autoupdate' );
+ function mbc_woogoogad_autoupdate()
+ {
+ 	if(!class_exists('WPMBC_AutoUpdate'))
+-- 
+2.30.1
+

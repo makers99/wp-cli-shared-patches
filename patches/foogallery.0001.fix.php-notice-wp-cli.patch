@@ -1,0 +1,25 @@
+From 701a0a2240058b8ca1db56691e01296757d841f5 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 25 Jan 2022 10:44:45 +0100
+Subject: [PATCH] Fixed PHP notice on WP-CLI.
+
+---
+ freemius/includes/class-freemius.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/freemius/includes/class-freemius.php b/freemius/includes/class-freemius.php
+index dc03551fa..3113c1a91 100644
+--- a/freemius/includes/class-freemius.php
++++ b/freemius/includes/class-freemius.php
+@@ -3994,7 +3994,7 @@
+ 
+             $this->_storage->connectivity_test = array(
+                 'is_connected' => $is_connected,
+-                'host'         => $_SERVER['HTTP_HOST'],
++                'host'         => isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : '',
+                 'server_ip'    => WP_FS__REMOTE_ADDR,
+                 'is_active'    => $is_active,
+                 'timestamp'    => WP_FS__SCRIPT_START_TIME,
+-- 
+2.30.1
+
