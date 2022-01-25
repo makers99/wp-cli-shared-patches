@@ -1,18 +1,17 @@
-From 1ca921c4c38b46bfb046d972826e67560da3a2d3 Mon Sep 17 00:00:00 2001
-From: Bogdan Arizancu <bogdan@netzstrategen.com>
-Date: Mon, 24 Jan 2022 22:21:20 +0200
-Subject: [PATCH] Fixed PHP notice caused by woochimp when empty groups appear
- on checkout.
+From 2ae2aa5ea6842feb5ad525221072035bb3f26d2f Mon Sep 17 00:00:00 2001
+From: joram77 <56529054+joram77@users.noreply.github.com>
+Date: Wed, 9 Jun 2021 18:36:43 +0200
+Subject: [PATCH] Fixed PHP notice when empty groups appear on checkout.
 
 ---
  woochimp.class.php | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/woochimp.class.php b/woochimp.class.php
-index 7fde32390..a3acff694 100644
+index 0fe680b..85e25e6 100644
 --- a/woochimp.class.php
 +++ b/woochimp.class.php
-@@ -4790,7 +4790,9 @@ class WooChimp
+@@ -4790,7 +4790,9 @@ public function add_permission_question()
          // Display the html
          if ($already_subscribed === false || ($already_subscribed && ($this->opt['woochimp_hide_checkbox'] == '2' || ($this->opt['woochimp_hide_checkbox'] == '3' && !empty($groups['data']) && !empty($groups['html']))))) {
              echo $checkbox_block;
@@ -23,6 +22,4 @@ index 7fde32390..a3acff694 100644
          }
  
          // Load assets
--- 
-2.30.1 (Apple Git-130)
 
