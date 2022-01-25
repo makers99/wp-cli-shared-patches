@@ -4,6 +4,7 @@ Date: Mon, 24 Jan 2022 22:52:36 +0200
 Subject: [PATCH] Fixed multiple Amazon pay buttons when changing shipping
  method in plugin woocommerce-gateway-amazon-payments-advanced.
 
+Upstream: https://github.com/woocommerce/woocommerce-gateway-amazon-pay/pull/90
 ---
  assets/js/legacy/amazon-app-widgets.js | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

@@ -4,6 +4,7 @@ Date: Mon, 24 Jan 2022 22:46:15 +0200
 Subject: [PATCH] Fixed PHP notice caused by
  woocommerce-gateway-amazon-payments-advanced on admin pages.
 
+Upstream: https://github.com/woocommerce/woocommerce-gateway-amazon-pay/pull/72
 ---
  .../admin/class-wc-amazon-payments-advanced-order-admin.php   | 4 ++++
  1 file changed, 4 insertions(+)
