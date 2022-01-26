@@ -14,7 +14,7 @@ Allows plugins to be updated to later versions while retaining bugfixes that
 have not been included into the upstream versions by the maintainers yet.
 
 The command follows the synopsis of `wp plugin patch`. It accepts one or more
-plugin names for which to apply patches, or the option `--all`.
+plugin names for which to apply patches, or the option `--all`:
 
 ```console
 $ wp plugin patch example-plugin other-plugin
@@ -23,20 +23,21 @@ $ wp plugin patch --all
 
 The patches are shared as part of this package, see folder `./patches/`.
 
-All patches must be "patch serials" in the format of `git format-patch`. They
-will be applied using `git am`. More details on this in the _Creating patches_
-chapter.
-
+There is also command to create a new patch:
 ```console
 $ wp patch create example-plugin c03314 fix keywords-context-info
 ```
+
+All patches must be "patch serials" in the format of `git format-patch`. They
+will be applied using `git am`. More details on this in the _Creating patches_
+chapter.
 
 
 == Installation ==
 
 = Install as Git submodule =
 
-1. Add the package as submodule.
+1. In the root folder of your project, add the package as submodule.
     ```sh
     git submodule add --name wp-cli-shared-patches git@github.com:makers99/wp-cli-shared-patches.git .wp-cli/packages/shared-patches
     ```
@@ -86,13 +87,24 @@ $ wp patch create example-plugin c03314 fix keywords-context-info
 All patches are created from an existing commit, so that the author, committer,
 date, and further context is included in the patch file.
 
+Only the changes of the specified commit are included in the patch file. Squash
+your changes into a single commit if you have multiple commits.
+
 Each patch filename must be in the following structure, delimited by dots:
 
 1. Name of the plugin (folder).
-2. Patch number, starting from `0000`.
+2. Patch number, starting from `0000`. Automatically generated.
 3. Type of change, either `"fix"` or `"feature"`.
 4. Keywords to provide approximate context, delimited by hyphens.
 
+```console
+$ wp patch create example-plugin c03314 fix keywords-context-info
+```
+
+This will create a new patch file in the [`/patches`](patches) folder, which you
+can then add to the repository.
+
+Here is how the comand works in detail:
 
 ```console
 $ export PATCHES_DIR=.wp-cli/packages/shared-patches/patches
@@ -106,10 +118,16 @@ $ git format-patch --relative --stdout $COMMIT~1..$COMMIT > \
 Notes
 
 - On GitHub, you can append `".patch"` to the end of the URL of a commit (or
-  even whole PR) to get the change in the right format.
+  PR) to get the changes in the patch serial format. ([example](https://github.com/netzstrategen/wordpress-core-standards/commit/dc95a2eac5d565675c1c1c5fb008c9ebbc8ed8e0.patch))
 
-  If the commit is from a website project repository and not a plugin repository,
-  adjust the file paths in the .patch file to be relative to the plugin folder.
+  - If the commit is from a website project repository and not a plugin
+    repository, you need to adjust the file paths in the .patch file to be
+    relative to the plugin folder.
+
+  - Ensure to download the original raw file content and do not copy/paste what
+    you see in the browser page, because the HTML/web formatting in the browser
+    does not include crucial whitespace characters. You can use the _Sources_
+    tab in the browser console to download the original raw response.
 
 - `git format-patch` does not include merge commits. You can create a patch
   compatible with `git am` following the instructions in
