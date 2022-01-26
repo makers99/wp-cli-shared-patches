@@ -1,0 +1,28 @@
+From b8ccca0bb7876223009b2a9694a1606177d9eeb9 Mon Sep 17 00:00:00 2001
+From: Andres A <andres@netzstrategen.com>
+Date: Mon, 20 Dec 2021 19:08:54 +0100
+Subject: [PATCH] Added order param to filter hook to amazon lister plugin.
+
+---
+ classes/integration/Woo_OrderBuilder.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/classes/integration/Woo_OrderBuilder.php b/classes/integration/Woo_OrderBuilder.php
+index 96348a299..818992737 100644
+--- a/classes/integration/Woo_OrderBuilder.php
++++ b/classes/integration/Woo_OrderBuilder.php
+@@ -740,9 +740,9 @@ class WPLA_OrderBuilder {
+ 
+ 		// shipping method
+ 		$details = $item['details'];
+-		$shipping_method_id_map    = apply_filters( 'wpla_shipping_service_id_map', array() );
++		$shipping_method_id_map    = apply_filters( 'wpla_shipping_service_id_map', array(), $order );
+ 		$shipping_method_id        = array_key_exists($details->ShipServiceLevel, $shipping_method_id_map) ? $shipping_method_id_map[$details->ShipServiceLevel] : $details->ShipServiceLevel;
+-		$shipping_method_title_map = apply_filters( 'wpla_shipping_service_title_map', array() );
++		$shipping_method_title_map = apply_filters( 'wpla_shipping_service_title_map', array(), $order );
+ 		$shipping_method_title     = array_key_exists($details->ShipServiceLevel, $shipping_method_title_map) ? $shipping_method_title_map[$details->ShipServiceLevel] : $details->ShipServiceLevel;
+ 
+         // Added for #40816
+-- 
+2.30.1 (Apple Git-130)
+
