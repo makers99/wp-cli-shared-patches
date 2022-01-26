@@ -27,14 +27,10 @@ All patches must be "patch serials" in the format of `git format-patch`. They
 will be applied using `git am`. More details on this in the _Creating patches_
 chapter.
 
-```console
-$ wp patch create example-plugin c03314 fix keywords-context-info
-```
-
 
 == Installation ==
 
-= Install as Git submodule =
+= In the root folder of your project, install as Git submodule =
 
 1. Add the package as submodule.
     ```sh
@@ -86,6 +82,8 @@ $ wp patch create example-plugin c03314 fix keywords-context-info
 All patches are created from an existing commit, so that the author, committer,
 date, and further context is included in the patch file.
 
+Please note that only the changes of THAT specific commit will be taken into consideration. Make sure to squash if you have mutiple commits.
+
 Each patch filename must be in the following structure, delimited by dots:
 
 1. Name of the plugin (folder).
@@ -93,6 +91,11 @@ Each patch filename must be in the following structure, delimited by dots:
 3. Type of change, either `"fix"` or `"feature"`.
 4. Keywords to provide approximate context, delimited by hyphens.
 
+```console
+$ wp patch create example-plugin c03314 fix keywords-context-info
+```
+
+The command will then create a new file inside the `/patches` folder following the information entered above.
 
 ```console
 $ export PATCHES_DIR=.wp-cli/packages/shared-patches/patches
