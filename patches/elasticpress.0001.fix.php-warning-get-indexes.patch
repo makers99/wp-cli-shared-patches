@@ -1,0 +1,24 @@
+From 499cf5ac0b8fd5c9982ed66aee09cfea8220fb9c Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 1 Feb 2022 16:28:06 +0100
+Subject: [PATCH] Fixed PHP warning Trying to access array offset on value of
+ type int in get_index_names().
+
+Upstream: https://github.com/10up/ElasticPress/pull/2580
+---
+ includes/classes/Command.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/classes/Command.php b/includes/classes/Command.php
+index e4e113433..778ba5a27 100644
+--- a/includes/classes/Command.php
++++ b/includes/classes/Command.php
+@@ -411,7 +411,7 @@ public function get_indexes( $args, $assoc_args ) {
+ 	 * @return array
+ 	 */
+ 	protected function get_index_names() {
+-		$sites = ( is_multisite() ) ? Utils\get_sites() : array( 'blog_id' => get_current_blog_id() );
++		$sites = ( is_multisite() ) ? Utils\get_sites() : array( array( 'blog_id' => get_current_blog_id() ) );
+ 
+ 		$all_indexables = Indexables::factory()->get_all();
+ 
