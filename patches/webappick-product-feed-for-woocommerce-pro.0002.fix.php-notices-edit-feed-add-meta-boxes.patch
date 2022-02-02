@@ -1,8 +1,9 @@
 From 1cbe126932c3e3bd4185e870c62d3f531386c078 Mon Sep 17 00:00:00 2001
 From: Bogdan Arizancu <bogdan@netzstrategen.com>
 Date: Wed, 26 Jan 2022 16:51:01 +0200
-Subject: [PATCH] Fixed PHP notices caused by
- webappick-product-feed-for-woocommerce-pro on the edit feed settings page.
+Subject: [PATCH] Fixed various PHP notices in other plugins on edit feed
+ settings page caused by incompatible invocation of add_meta_boxes hook in
+ webappick-product-feed-for-woocommerce-pro.
 
 ---
  libs/webappick-product-feed-for-woocommerce/includes/helper.php | 1 -
