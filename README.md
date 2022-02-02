@@ -37,6 +37,14 @@ chapter.
 
 ## Installation
 
+### Install as WP-CLI package (user-specific)
+
+1. Ensure you have [WP-CLI](http://wp-cli.org/) installed and set up in your `$PATH`.
+2. Install the package for the currently logged in system user.
+    ```sh
+    wp package install makers99/wp-cli-shared-patches
+    ```
+
 ### Install as Git submodule
 
 1. In the root folder of your project, add the package as submodule.
@@ -61,7 +69,6 @@ chapter.
 
 1. Install the package with Composer.
     ```sh
-    composer config repositories.wp-cli-shared-patches git https://github.com/makers99/wp-cli-shared-patches.git
     composer require --dev makers99/wp-cli-shared-patches:dev-master
     ```
 
