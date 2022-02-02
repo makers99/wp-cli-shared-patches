@@ -1,0 +1,26 @@
+From ed7c6b539354ee531f3932985542138cba65ff88 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Wed, 9 Dec 2020 17:47:58 +0100
+Subject: [PATCH] Fixed fatal error in cron jobs updating products.
+
+---
+ inc/class-swatches.php | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/inc/class-swatches.php b/inc/class-swatches.php
+index 8c461843..af76f828 100644
+--- a/inc/class-swatches.php
++++ b/inc/class-swatches.php
+@@ -175,6 +175,9 @@ class Iconic_WAS_Swatches {
+ 	public static function get_swatch_value( $attribute_type, $swatch_type, $term ) {
+ 		global $iconic_was;
+ 
++		if ( ! isset( $iconic_was ) ) {
++			return false;
++		}
+ 		if ( $attribute_type === "taxonomy" ) {
+ 			if ( ! is_object( $term ) ) {
+ 				return false;
+-- 
+2.30.1
+
