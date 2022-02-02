@@ -1,19 +1,19 @@
-=== wp-cli-plugin-patch ===
-Contributors: makers99, netzstrategen
-Tags: wp-cli, plugin, patch, fix
-Stable tag: 1.0.0
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+# makers99/wp-cli-shared-patches
 
-== Description ==
+The shared-patches WP-CLI package introduces patches into WordPress. It allows you to update your plugins to new versions without losing the hotfixes that you previously applied to them, if they were not incorporated into the new official release by the plugin vendor.
 
-Adds the WP-CLI command `wp plugin patch` to apply patches to one or more
-plugins.
+This is especially useful if you are maintaining many WordPress sites in a team in parallel, without knowing which hotfixes were applied in other projects that you are not working on. The team can share the patches and have them automatically re-applied when installing updates.
+
+## Commands
+
+### `wp plugin patch [<plugin...> | --all]`
+
+Apply patches to one or more plugins.
 
 Allows plugins to be updated to later versions while retaining bugfixes that
 have not been included into the upstream versions by the maintainers yet.
 
-The command follows the synopsis of `wp plugin patch`. It accepts one or more
+The command follows the synopsis of `wp plugin update`. It accepts one or more
 plugin names for which to apply patches, or the option `--all`:
 
 ```console
@@ -23,7 +23,9 @@ $ wp plugin patch --all
 
 The patches are shared as part of this package, see folder `./patches/`.
 
-There is also command to create a new patch:
+### `wp patch create <plugin> <commit> <type> <keywords>`
+
+Creates a new patch file from a Git commit.
 ```console
 $ wp patch create example-plugin c03314 fix keywords-context-info
 ```
@@ -33,9 +35,17 @@ will be applied using `git am`. More details on this in the _Creating patches_
 chapter.
 
 
-== Installation ==
+## Installation
 
-= Install as Git submodule =
+### Install as WP-CLI package (user-specific)
+
+1. Ensure you have [WP-CLI](http://wp-cli.org/) installed and set up in your `$PATH`.
+2. Install the package for the currently logged in system user.
+    ```sh
+    wp package install makers99/wp-cli-shared-patches
+    ```
+
+### Install as Git submodule
 
 1. In the root folder of your project, add the package as submodule.
     ```sh
@@ -55,11 +65,10 @@ chapter.
       - .wp-cli/packages/shared-patches/package.php
     ```
 
-= Install with Composer =
+### Install with Composer
 
 1. Install the package with Composer.
     ```sh
-    composer config repositories.wp-cli-shared-patches git https://github.com/makers99/wp-cli-shared-patches.git
     composer require --dev makers99/wp-cli-shared-patches:dev-master
     ```
 
@@ -77,12 +86,12 @@ chapter.
     ```
 
 
-= Requirements =
+### Requirements
 
 * PHP 7.4 or later.
 
 
-= Creating patches =
+## Creating patches
 
 All patches are created from an existing commit, so that the author, committer,
 date, and further context is included in the patch file.
@@ -104,7 +113,7 @@ $ wp patch create example-plugin c03314 fix keywords-context-info
 This will create a new patch file in the [`/patches`](patches) folder, which you
 can then add to the repository.
 
-Here is how the comand works in detail:
+Here is how the comand works under the hood:
 
 ```console
 $ export PATCHES_DIR=.wp-cli/packages/shared-patches/patches
@@ -134,7 +143,20 @@ Notes
   https://stackoverflow.com/a/8840381/811306.
 
 
-= Resolving patch conflicts =
+Documenting upstream
+
+If there is a public issue or PR in the upstream vendor repository or issue
+tracker, then ensure to add it to the commit description of the patch:
+
+```
+Upstream: https://github.com/makers99/wp-cli-shared-patches/pull/10
+```
+(The URL should point to the upstream vendor issue, of course.)
+
+Ideally add this info in the initial/original commit message already.
+
+
+## Resolving patch conflicts
 
 Repeat the failing command that you see in the error message; e.g.:
 
@@ -184,6 +206,6 @@ $ git am --abort
 
 $ cd .wp-cli/packages/shared-patches/patches
 $ git rm woocommerce-german-market.0004.fix.performance-admin_url-string-translations.patch
-$ git commit -m "Removed obsolete patch (included in new release)."
+$ git commit -m "Removed patch woocommerce-german-market.0004.fix.performance-admin_url-string-translations."
 $ cd -
 ```
