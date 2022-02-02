@@ -10,20 +10,26 @@ Upstream: https://github.com/woocommerce/woocommerce-gateway-amazon-pay/pull/72
  1 file changed, 4 insertions(+)
 
 diff --git a/includes/admin/class-wc-amazon-payments-advanced-order-admin.php b/includes/admin/class-wc-amazon-payments-advanced-order-admin.php
-index bf05adfec..85e488695 100644
+index bf05adf..b1a0c2d 100644
 --- a/includes/admin/class-wc-amazon-payments-advanced-order-admin.php
 +++ b/includes/admin/class-wc-amazon-payments-advanced-order-admin.php
-@@ -108,6 +108,10 @@ class WC_Amazon_Payments_Advanced_Order_Admin {
+@@ -108,6 +108,9 @@ class WC_Amazon_Payments_Advanced_Order_Admin {
  	public function meta_box() {
  		global $post, $wpdb;
  
 +		if ( empty( $post->ID ) ) {
 +			return;
 +		}
-+
  		$order_id = absint( $post->ID );
  		$order    = wc_get_order( $order_id );
  		if ( ! $order ) {
--- 
-2.30.1 (Apple Git-130)
-
+@@ -131,6 +134,9 @@ class WC_Amazon_Payments_Advanced_Order_Admin {
+ 	public function authorization_box() {
+ 		global $post, $wpdb;
+ 
++		if ( empty( $post->ID ) ) {
++			return;
++		}
+ 		$order_id = absint( $post->ID );
+ 		$order    = wc_get_order( $order_id );
+ 
