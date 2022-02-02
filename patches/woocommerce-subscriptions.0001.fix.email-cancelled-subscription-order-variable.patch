@@ -1,9 +1,10 @@
 From d55fa3480fcd1220cfcb9be207a8e9c29651062f Mon Sep 17 00:00:00 2001
 From: Bogdan Arizancu <bogdan@netzstrategen.com>
 Date: Fri, 18 Dec 2020 09:47:11 +0100
-Subject: [PATCH] Fixed missing placeholder variables in subscription cancelled
- email. (#809)
+Subject: [PATCH] Fixed missing order placeholder variables in subscription cancelled admin
+ email template. (#809)
 
+Upstream: https://github.com/Automattic/woocommerce-subscriptions-core/pull/106
 ---
  includes/emails/class-wcs-email-cancelled-subscription.php | 2 ++
  1 file changed, 2 insertions(+)
