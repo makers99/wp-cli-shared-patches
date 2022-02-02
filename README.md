@@ -104,7 +104,7 @@ $ wp patch create example-plugin c03314 fix keywords-context-info
 This will create a new patch file in the [`/patches`](patches) folder, which you
 can then add to the repository.
 
-Here is how the comand works in detail:
+Here is how the comand works under the hood:
 
 ```console
 $ export PATCHES_DIR=.wp-cli/packages/shared-patches/patches
@@ -132,6 +132,18 @@ Notes
 - `git format-patch` does not include merge commits. You can create a patch
   compatible with `git am` following the instructions in
   https://stackoverflow.com/a/8840381/811306.
+
+Documenting upstream
+
+If there is a public issue or PR in the upstream vendor repository or issue
+tracker, then ensure to add it to the commit description of the patch:
+
+```
+Upstream: https://github.com/makers99/wp-cli-shared-patches/pull/10
+```
+(The URL should point to the upstream vendor issue, of course.)
+
+Ideally add this info in the initial/original commit message already.
 
 
 = Resolving patch conflicts =
