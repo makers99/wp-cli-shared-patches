@@ -1,0 +1,30 @@
+From c23ee764136d2291b6cd9e1d49c44ada28132abd Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Wed, 26 Jan 2022 20:46:56 +0100
+Subject: [PATCH] Fixed PHP notice on order review page caused by
+ woocommerce-aelia-currencyswitcher.
+
+---
+ src/plugin-main.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugin-main.php b/src/plugin-main.php
+index 42ffd55b5..b3d5c2e86 100644
+--- a/src/plugin-main.php
++++ b/src/plugin-main.php
+@@ -1706,10 +1706,10 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
+ 			if(self::doing_ajax() && ($ajax_action === 'update_order_review') && check_ajax_referer('update-order-review', 'security', false)) {
+ 				// Extract the selected country from the datap assed with the call
+ 				if($force_currency_by_country === Settings::OPTION_SHIPPING_COUNTRY) {
+-					$selected_country = $_POST[Definitions::ARG_CHECKOUT_REVIEW_SHIPPING_COUNTRY];
++					$selected_country = isset($_POST[Definitions::ARG_CHECKOUT_REVIEW_SHIPPING_COUNTRY]) ? $_POST[Definitions::ARG_CHECKOUT_REVIEW_SHIPPING_COUNTRY] : NULL;
+ 				}
+ 				else {
+-					$selected_country = $_POST[Definitions::ARG_CHECKOUT_REVIEW_BILLING_COUNTRY];
++					$selected_country = isset($_POST[Definitions::ARG_CHECKOUT_REVIEW_BILLING_COUNTRY]) ? $_POST[Definitions::ARG_CHECKOUT_REVIEW_BILLING_COUNTRY] : NULL;
+ 				}
+ 
+ 				// If user is on checkout page and changes the  country, return the new value
+-- 
+2.30.1 (Apple Git-130)
+
