@@ -1,8 +1,8 @@
 From c23ee764136d2291b6cd9e1d49c44ada28132abd Mon Sep 17 00:00:00 2001
 From: Bogdan Arizancu <bogdan@netzstrategen.com>
 Date: Wed, 26 Jan 2022 20:46:56 +0100
-Subject: [PATCH] Fixed notice caused by woocommerce-aelia-currencyswitcher
- plugin on order review page.
+Subject: [PATCH] Fixed PHP notice on order review page caused by
+ woocommerce-aelia-currencyswitcher.
 
 ---
  src/plugin-main.php | 4 ++--
