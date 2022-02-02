@@ -1,8 +1,9 @@
 From ba10098c0f248064d5411cd07d42fd323556da07 Mon Sep 17 00:00:00 2001
 From: Bogdan Arizancu <bogdan@netzstrategen.com>
 Date: Wed, 26 Jan 2022 20:51:24 +0200
-Subject: [PATCH] Fixed elasticpress terms sync manager is causing fatal error.
+Subject: [PATCH] Fixed elasticpress product terms update fails when editing variations with woocommerce-advanced-bulk-edit.
 
+Upstream: https://github.com/10up/ElasticPress/issues/2005#issuecomment-771772253
 ---
  includes/classes/Indexable/Term/SyncManager.php | 4 ++++
  1 file changed, 4 insertions(+)
