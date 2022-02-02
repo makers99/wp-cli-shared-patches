@@ -184,6 +184,6 @@ $ git am --abort
 
 $ cd .wp-cli/packages/shared-patches/patches
 $ git rm woocommerce-german-market.0004.fix.performance-admin_url-string-translations.patch
-$ git commit -m "Removed obsolete patch (included in new release)."
+$ git commit -m "Removed patch woocommerce-german-market.0004.fix.performance-admin_url-string-translations."
 $ cd -
 ```
