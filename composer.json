@@ -1,7 +1,7 @@
 {
     "name": "makers99/wp-cli-shared-patches",
     "type": "wp-cli-package",
-    "description": "Applies patches to WordPress plugins.",
+    "description": "Applies patches to WordPress plugins to allow updating to new vendor releases.",
     "license": "GPL-2.0-or-later",
     "homepage": "https://github.com/makers99/wp-cli-shared-patches",
     "authors": [
