@@ -1,0 +1,83 @@
+From b971735ed630c1e4d1d60db8b6142652d9404636 Mon Sep 17 00:00:00 2001
+From: Andres A <andres@netzstrategen.com>
+Date: Wed, 9 Feb 2022 10:49:24 +0100
+Subject: [PATCH] Fixed function call on null when cart does not exist in session.
+
+---
+ woocommerce-force-sells.php | 32 +++++++++++++++++++++++---------
+ 1 file changed, 23 insertions(+), 9 deletions(-)
+
+diff --git a/woocommerce-force-sells.php b/woocommerce-force-sells.php
+index 7c8856667..203a642f6 100644
+--- a/woocommerce-force-sells.php
++++ b/woocommerce-force-sells.php
+@@ -68,8 +68,8 @@ if ( ! class_exists( 'WC_Force_Sells' ) ) :
+ 			// Keep force sell data in the cart.
+ 			add_filter( 'woocommerce_get_cart_item_from_session', array( $this, 'get_cart_item_from_session' ), 10, 2 );
+ 			add_filter( 'woocommerce_get_item_data', array( $this, 'get_linked_to_product_data' ), 10, 2 );
+-			add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'remove_orphan_force_sells' ) );
+-			add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'maybe_remove_duplicate_force_sells' ) );
++			add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'remove_orphan_force_sells' ), 10, 1 );
++			add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'maybe_remove_duplicate_force_sells' ), 10, 1 );
+ 
+ 			// Don't allow synced force sells to be removed or change quantity.
+ 			add_filter( 'woocommerce_cart_item_remove_link', array( $this, 'cart_item_remove_link' ), 10, 2 );
+@@ -102,14 +102,21 @@ if ( ! class_exists( 'WC_Force_Sells' ) ) :
+ 		/**
+ 		 * Looks to see if a product with the key of 'forced_by' actually exists and
+ 		 * deletes it if not.
++		 *
++		 * @param WP_Cart $cart WC_Cart object.
+ 		 */
+-		public function remove_orphan_force_sells() {
+-			$cart_contents = WC()->cart->get_cart();
++		public function remove_orphan_force_sells( $cart ) {
++
++			if ( !$cart ) {
++				return;
++			}
++
++			$cart_contents = $cart->get_cart();
+ 
+ 			foreach ( $cart_contents as $key => $value ) {
+ 				if ( isset( $value['forced_by'] ) ) {
+ 					if ( ! array_key_exists( $value['forced_by'], $cart_contents ) ) {
+-						WC()->cart->remove_cart_item( $key );
++						$cart->remove_cart_item( $key );
+ 					}
+ 				}
+ 			}
+@@ -120,9 +127,16 @@ if ( ! class_exists( 'WC_Force_Sells' ) ) :
+ 		 * have duplicated force sell products.
+ 		 *
+ 		 * @since 1.1.19
++		 *
++		 * @param WP_Cart $cart WC_Cart object.
+ 		 */
+-		public function maybe_remove_duplicate_force_sells() {
+-			$cart_contents = WC()->cart->get_cart();
++		public function maybe_remove_duplicate_force_sells( $cart ) {
++
++			if ( !$cart ) {
++				return;
++			}
++
++			$cart_contents = $cart->get_cart();
+ 			$product_ids   = array();
+ 
+ 			foreach ( $cart_contents as $key => $value ) {
+@@ -131,9 +145,9 @@ if ( ! class_exists( 'WC_Force_Sells' ) ) :
+ 				}
+ 			}
+ 
+-			foreach ( WC()->cart->get_cart() as $key => $value ) {
++			foreach ( $cart->get_cart() as $key => $value ) {
+ 				if ( ! isset( $value['forced_by'] ) && in_array( $value['product_id'], $product_ids, true ) ) {
+-					WC()->cart->remove_cart_item( $key );
++					$cart->remove_cart_item( $key );
+ 				}
+ 			}
+ 		}
+-- 
+2.30.1 (Apple Git-130)
+
