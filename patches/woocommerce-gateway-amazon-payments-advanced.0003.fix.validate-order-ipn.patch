@@ -15,7 +15,7 @@ index 126c8042..3cd5e66d 100644
  			throw new Exception( 'Invalid order ID ' . $order_id );
  		}
  
-+    if (! $order instanceof \WC_Order) {
++    if ( ! $order instanceof \WC_Order ) {
 +      throw new Exception( 'Unable to load order ID ' . $order_id );
 +    }
 +
