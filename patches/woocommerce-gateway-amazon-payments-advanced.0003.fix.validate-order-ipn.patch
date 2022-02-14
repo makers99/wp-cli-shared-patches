@@ -1,0 +1,27 @@
+From af493cca8e1890a9e7c470d31e392e4721bce37d Mon Sep 17 00:00:00 2001
+From: Christian <christian@netzstrategen.com>
+Date: Wed, 9 Feb 2022 15:55:53 +0100
+Subject: [PATCH] Fixed PHP error during IPN validation if order does not exist.
+
+---
+ includes/class-wc-amazon-payments-advanced-ipn-handler.php | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/includes/class-wc-amazon-payments-advanced-ipn-handler.php b/includes/class-wc-amazon-payments-advanced-ipn-handler.php
+index 126c8042..3cd5e66d 100644
+--- a/includes/class-wc-amazon-payments-advanced-ipn-handler.php
++++ b/includes/class-wc-amazon-payments-advanced-ipn-handler.php
+@@ -464,6 +464,10 @@ class WC_Amazon_Payments_Advanced_IPN_Handler extends WC_Amazon_Payments_Advance
+ 			throw new Exception( 'Invalid order ID ' . $order_id );
+ 		}
+ 
++		if ( ! $order instanceof \WC_Order ) {
++			throw new Exception( 'Unable to load order ID ' . $order_id );
++		}
++
+ 		$order    = apply_filters( 'woocommerce_amazon_pa_ipn_notification_order', $order, $notification );
+ 		$order_id = $order->get_id(); // Refresh variable, in case it changed.
+ 
+-- 
+2.30.1 (Apple Git-130)
+
