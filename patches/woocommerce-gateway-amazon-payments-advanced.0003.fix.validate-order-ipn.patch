@@ -1,7 +1,7 @@
 From af493cca8e1890a9e7c470d31e392e4721bce37d Mon Sep 17 00:00:00 2001
 From: Christian <christian@netzstrategen.com>
 Date: Wed, 9 Feb 2022 15:55:53 +0100
-Subject: [PATCH] Applied fix to validate order for IPN amazon pay.
+Subject: [PATCH] Fixed error during IPN validation if order does not exist.
 
 ---
  includes/class-wc-amazon-payments-advanced-ipn-handler.php | 4 ++++
