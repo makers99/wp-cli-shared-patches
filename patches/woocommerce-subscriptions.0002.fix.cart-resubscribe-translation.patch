@@ -1,24 +1,25 @@
-From 9e3181c4d0ed230d09ad0f2108f7f753683a2042 Mon Sep 17 00:00:00 2001
+From 840953efc8dcca9b5381fb5e3fed526f6c443446 Mon Sep 17 00:00:00 2001
 From: Bogdan Arizancu <bogdan@netzstrategen.com>
 Date: Wed, 30 Jun 2021 18:23:44 +0300
-Subject: [PATCH] Fixed woocommerce-subscriptions bug.
+Subject: [PATCH] Fixed missing translation of resubscribe button in cart.
 
 ---
- includes/class-wcs-cart-resubscribe.php | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ .../subscriptions-core/includes/class-wcs-cart-resubscribe.php  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/includes/class-wcs-cart-resubscribe.php b/includes/class-wcs-cart-resubscribe.php
-index be724d7ae..9aae0639b 100644
---- a/includes/class-wcs-cart-resubscribe.php
-+++ b/includes/class-wcs-cart-resubscribe.php
-@@ -335,7 +335,8 @@ class WCS_Cart_Resubscribe extends WCS_Cart_Renewal {
+diff --git a/vendor/woocommerce/subscriptions-core/includes/class-wcs-cart-resubscribe.php b/vendor/woocommerce/subscriptions-core/includes/class-wcs-cart-resubscribe.php
+index 3e6b5ec52..33ba400bf 100644
+--- a/vendor/woocommerce/subscriptions-core/includes/class-wcs-cart-resubscribe.php
++++ b/vendor/woocommerce/subscriptions-core/includes/class-wcs-cart-resubscribe.php
+@@ -335,7 +335,7 @@ class WCS_Cart_Resubscribe extends WCS_Cart_Renewal {
  	public function order_button_text( $place_order_text ) {
-
+ 
  		if ( isset( WC()->cart ) && count( wcs_get_order_type_cart_items( 'resubscribe' ) ) === count( WC()->cart->get_cart() ) ) {
 -			$place_order_text = _x( 'Resubscribe', 'The place order button text while resubscribing to a subscription', 'woocommerce-subscriptions' );
 +			$place_order_text = __( 'Resubscribe', 'woocommerce-subscriptions' );
  		}
-
+ 
  		return $place_order_text;
---
-2.30.1 (Apple Git-130)
+-- 
+2.25.1
+
