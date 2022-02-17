@@ -1,0 +1,33 @@
+From 91f788dc6ee1989e881953facbe94527a0ac5252 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Thu, 17 Feb 2022 10:45:14 +0100
+Subject: [PATCH] Fixed PHP Notice due to undefined variable isS3Enabled in
+ file upload notifications.
+
+---
+ includes/class-notifications.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/includes/class-notifications.php b/includes/class-notifications.php
+index ce482ac8d..a7a52c5c0 100644
+--- a/includes/class-notifications.php
++++ b/includes/class-notifications.php
+@@ -18,13 +18,13 @@ class Notifications {
+ 
+ 			$fileuploadfields = GFCommon::get_fields_by_type( $form, array( 'fileupload' ) );
+ 
++			$isS3Enabled = false;
++
+ 			if ( is_array( $fileuploadfields ) && ! empty( $fileuploadfields ) ) {
+ 
+ 				$attachments = array();
+ 				$upload_root = RGFormsModel::get_upload_root();
+ 
+-				$isS3Enabled = false;
+-
+ 				foreach ( $fileuploadfields as $field ) {
+ 					$url = $entry[ $field['id'] ];
+ 
+-- 
+2.25.1
+
