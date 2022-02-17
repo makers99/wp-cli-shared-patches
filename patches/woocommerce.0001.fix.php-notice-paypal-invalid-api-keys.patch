@@ -1,0 +1,31 @@
+From 8cc6f9296c6852ca005b77ec41e6f3dd99449076 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Thu, 17 Feb 2022 10:56:38 +0100
+Subject: [PATCH] Fixed PHP Notice due to undefined index pending_reason if
+ PayPal sandbox mode setup failed.
+
+---
+ .../paypal/includes/class-wc-gateway-paypal-pdt-handler.php   | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/includes/gateways/paypal/includes/class-wc-gateway-paypal-pdt-handler.php b/includes/gateways/paypal/includes/class-wc-gateway-paypal-pdt-handler.php
+index c37d4d146..bdd03caf6 100644
+--- a/includes/gateways/paypal/includes/class-wc-gateway-paypal-pdt-handler.php
++++ b/includes/gateways/paypal/includes/class-wc-gateway-paypal-pdt-handler.php
+@@ -124,11 +124,11 @@ class WC_Gateway_Paypal_PDT_Handler extends WC_Gateway_Paypal_Response {
+ 					$this->payment_complete( $order, $transaction, __( 'PDT payment completed', 'woocommerce' ) );
+ 				}
+ 			} else {
+-				if ( 'authorization' === $transaction_result['pending_reason'] ) {
++				if ( isset( $transaction_result['pending_reason'] ) && 'authorization' === $transaction_result['pending_reason'] ) {
+ 					$this->payment_on_hold( $order, __( 'Payment authorized. Change payment status to processing or complete to capture funds.', 'woocommerce' ) );
+ 				} else {
+ 					/* translators: 1: Pending reason */
+-					$this->payment_on_hold( $order, sprintf( __( 'Payment pending (%s).', 'woocommerce' ), $transaction_result['pending_reason'] ) );
++					$this->payment_on_hold( $order, sprintf( __( 'Payment pending (%s).', 'woocommerce' ), isset( $transaction_result['pending_reason'] ) ? $transaction_result['pending_reason'] : 'n/a' ) );
+ 				}
+ 			}
+ 		} else {
+-- 
+2.25.1
+
