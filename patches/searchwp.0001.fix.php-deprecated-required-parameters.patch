@@ -1,0 +1,67 @@
+From e4bd44eebadc979b3a2457661295d93c089f08d4 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Wed, 23 Feb 2022 18:55:59 +0100
+Subject: [PATCH] Fixed PHP deprecated warnings due to required parameters
+ following optional parameters.
+
+---
+ includes/class.indexer.php | 4 ++--
+ searchwp.php               | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/includes/class.indexer.php b/includes/class.indexer.php
+index 515b2213..ae367cbd 100644
+--- a/includes/class.indexer.php
++++ b/includes/class.indexer.php
+@@ -2267,7 +2267,7 @@ class SearchWPIndexer {
+ 	 * @return array|bool Terms and their associated counts
+ 	 * @since 1.0
+ 	 */
+-	function index_custom_field( $customFieldName = null, $customFieldValue ) {
++	function index_custom_field( $customFieldName, $customFieldValue ) {
+ 		// custom fields can be pretty much anything, so we need to make sure we're unserializing, json_decoding, etc.
+ 		$customFieldValue = $this->parse_variable_for_terms( $customFieldValue );
+ 
+@@ -2529,7 +2529,7 @@ class SearchWPIndexer {
+ 	 *
+ 	 * @return array|bool
+ 	 */
+-	function indexCustomField( $name = null, $value ) {
++	function indexCustomField( $name, $value ) {
+ 		return $this->index_custom_field( $name, $value );
+ 	}
+ 
+diff --git a/searchwp.php b/searchwp.php
+index 60142556..166ff0de 100644
+--- a/searchwp.php
++++ b/searchwp.php
+@@ -1677,7 +1677,7 @@ if ( is_array( $diagnostics['posts'] ) && isset( $diagnostics['posts'][0] ) ) {
+ 	 *
+ 	 * @since 1.0
+ 	 */
+-	function plugin_row( $plugin_file = null, $plugin_data, $status = null ) {
++	function plugin_row( $plugin_file, $plugin_data, $status = null ) {
+ 		if ( ! is_null( $plugin_file ) ) {
+ 			$plugin_file = null;
+ 		}
+@@ -1885,7 +1885,7 @@ if ( is_array( $diagnostics['posts'] ) && isset( $diagnostics['posts'][0] ) ) {
+ 	 * @uses  SearchWPSearch
+ 	 * @since 1.0
+ 	 */
+-	function search( $engine = 'default', $terms, $page = 1 ) {
++	function search( $engine, $terms, $page = 1 ) {
+ 
+ 		do_action( 'searchwp_log', 'search()' );
+ 
+@@ -5882,7 +5882,7 @@ add_filter( 'searchwp_file_content_limit', 'my_searchwp_file_content_limit' );</
+ 	 * @param $plugin_data
+ 	 * @param null $status
+ 	 */
+-	function pluginRow( $plugin_file = null, $plugin_data, $status = null ) {
++	function pluginRow( $plugin_file, $plugin_data, $status = null ) {
+ 		$this->plugin_row( $plugin_file, $plugin_data, $status );
+ 	}
+ 
+-- 
+2.24.4
+
