@@ -1,0 +1,28 @@
+From cca7df80a08042cd23d56de1f5f8139f24b39b7b Mon Sep 17 00:00:00 2001
+From: Fabian Marz <fabian@netzstrategen.com>
+Date: Thu, 24 Feb 2022 16:14:08 +0100
+Subject: [PATCH] Fixed plugin wpml-all-import throws error when used via CLI.
+
+---
+ wpml-all-import.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/wpml-all-import.php b/wpml-all-import.php
+index 97fe2a51..4aabef60 100644
+--- a/wpml-all-import.php
++++ b/wpml-all-import.php
+@@ -9,9 +9,9 @@
+ 	Author URI: http://www.onthegosystems.com/
+ */
+ 
+-require_once "includes/rapid-addon.php";
++require_once  __DIR__ . "/includes/rapid-addon.php";
+ 
+-require_once "vendor/autoload.php";
++require_once  __DIR__ . "/vendor/autoload.php";
+ 
+ if ( ! class_exists('WPAI_WPML') )
+ {
+-- 
+2.28.0
+
