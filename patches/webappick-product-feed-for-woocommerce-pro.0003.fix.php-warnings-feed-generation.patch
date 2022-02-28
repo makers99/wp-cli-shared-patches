@@ -1,0 +1,62 @@
+From 7d23797cd06990df0940568e717d7aa9f9cf2008 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Mon, 28 Feb 2022 16:51:25 +0100
+Subject: [PATCH] Fixed PHP warnings reported during product feed generation.
+
+---
+ .../classes/class-woo-feed-products-v3.php         |  4 ++--
+ .../includes/helper.php                            | 14 ++++++++++++--
+ 2 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php b/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php
+index 3c6d271fc..f0fe30281 100755
+--- a/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php
++++ b/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php
+@@ -2477,10 +2477,10 @@ class Woo_Feed_Products_v3
+             // Variation product type
+             if (has_post_thumbnail( $product->get_id() ) ) {
+                 $getImage = wp_get_attachment_image_src( get_post_thumbnail_id( $product->get_id() ), 'single-post-thumbnail' );
+-                $image = woo_feed_get_formatted_url($getImage[0]);
++                $image = isset( $getImage[0] ) ? woo_feed_get_formatted_url($getImage[0]) : '';
+             } elseif ( has_post_thumbnail( $product->get_parent_id() ) ) {
+                 $getImage = wp_get_attachment_image_src(get_post_thumbnail_id($product->get_parent_id()), 'single-post-thumbnail');
+-                $image = woo_feed_get_formatted_url($getImage[0]);
++                $image = isset( $getImage[0] ) ? woo_feed_get_formatted_url($getImage[0]) : '';
+             }
+         } else if ( has_post_thumbnail( $product->get_id() ) ) { // All product type except variation
+             $getImage = wp_get_attachment_image_src( get_post_thumbnail_id( $product->get_id() ), 'single-post-thumbnail' );
+diff --git a/libs/webappick-product-feed-for-woocommerce/includes/helper.php b/libs/webappick-product-feed-for-woocommerce/includes/helper.php
+index ff87721f3..74be16d16 100755
+--- a/libs/webappick-product-feed-for-woocommerce/includes/helper.php
++++ b/libs/webappick-product-feed-for-woocommerce/includes/helper.php
+@@ -2214,7 +2214,12 @@ if (!function_exists('woo_feed_parse_string')) {
+             // loop through each pair
+             foreach ($pairs as $i) {
+                 // split into name and value
+-                list($name, $value) = explode('=', $i, 2);
++                if (strpos($i, '=') !== false) {
++                  list($name, $value) = explode('=', $i, 2);
++                } else {
++                  $name = $i;
++                  $value = null;
++                }
+ 
+                 // if name already exists
+                 if (isset($arr[$name])) {
+@@ -2230,7 +2235,12 @@ if (!function_exists('woo_feed_parse_string')) {
+                 }
+             }
+         } elseif (!empty($str)) {
+-            list($name, $value) = explode('=', $str, 2);
++            if (strpos($str, '=') !== false) {
++              list($name, $value) = explode('=', $str, 2);
++            } else {
++              $name = $str;
++              $value = null;
++            }
+             $arr[$name] = $value;
+         }
+ 
+-- 
+2.24.4
+
