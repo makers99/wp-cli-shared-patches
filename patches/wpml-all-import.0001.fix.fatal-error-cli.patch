@@ -1,7 +1,7 @@
 From cca7df80a08042cd23d56de1f5f8139f24b39b7b Mon Sep 17 00:00:00 2001
 From: Fabian Marz <fabian@netzstrategen.com>
 Date: Thu, 24 Feb 2022 16:14:08 +0100
-Subject: [PATCH] Fixed plugin wpml-all-import throws error when used via CLI.
+Subject: [PATCH] Fixed fatal error when running import with wpml-all-import on CLI.
 
 Upstream: https://wpml.org/forums/topic/fatal-error-when-running-an-import-using-wp-cli/#post-7636799
 ---
