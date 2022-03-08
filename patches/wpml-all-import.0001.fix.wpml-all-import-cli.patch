@@ -3,6 +3,7 @@ From: Fabian Marz <fabian@netzstrategen.com>
 Date: Thu, 24 Feb 2022 16:14:08 +0100
 Subject: [PATCH] Fixed plugin wpml-all-import throws error when used via CLI.
 
+Upstream: https://wpml.org/forums/topic/fatal-error-when-running-an-import-using-wp-cli/#post-7636799
 ---
  wpml-all-import.php | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
