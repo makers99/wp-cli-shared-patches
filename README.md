@@ -209,3 +209,29 @@ $ git rm woocommerce-german-market.0004.fix.performance-admin_url-string-transla
 $ git commit -m "Removed patch woocommerce-german-market.0004.fix.performance-admin_url-string-translations."
 $ cd -
 ```
+
+## Resolving patch errors
+
+Sometimes a patch might error due to other changes in the diff context.  Test the following options of git am to see whether the patch can still be applied:
+
+```
+    --ignore-whitespace   ignore changes in whitespace when finding context
+    -C <n>                ensure at least <n> lines of context match
+```
+
+Example:
+
+```console
+$ git am --directory local-plugins/wp-lister-amazon --3way --keep-cr .wp-cli/packages/shared-patches/patches/wp-lister-amazon.0001.*.patch
+Applying: Added order param to filter hook to amazon lister plugin.
+error: sha1 information is lacking or useless (local-plugins/wp-lister-amazon/classes/integration/Woo_OrderBuilder.php).
+error: could not build fake ancestor
+Patch failed at 0001 Added order param to filter hook to amazon lister plugin.
+hint: Use 'git am --show-current-patch=diff' to see the failed patch
+When you have resolved this problem, run "git am --continue".
+If you prefer to skip this patch, run "git am --skip" instead.
+To restore the original branch and stop patching, run "git am --abort".
+
+$ git am --directory local-plugins/wp-lister-amazon --3way --keep-cr --ignore-whitespace -C 0 .wp-cli/packages/shared-patches/patches/wp-lister-amazon.0001.*.patch
+Applying: Added order param to filter hook to amazon lister plugin.
+```
