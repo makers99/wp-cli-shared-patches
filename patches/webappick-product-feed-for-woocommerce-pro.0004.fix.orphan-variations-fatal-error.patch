@@ -1,0 +1,28 @@
+From 80dbb6796aa18fa609f23320848abe32dd6ea1c0 Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Fri, 25 Mar 2022 10:16:13 +0200
+Subject: [PATCH] Fixed fatal error during feed generation for orphan product
+ variations.
+
+---
+ .../includes/classes/class-woo-feed-products-v3.php           | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php b/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php
+index f0fe30281..b03f06799 100755
+--- a/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php
++++ b/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php
+@@ -3855,7 +3855,9 @@ class Woo_Feed_Products_v3
+             // if empty get attribute of parent post
+             if ('' === $value && $product->is_type('variation')) {
+                 $product = wc_get_product($product->get_parent_id());
+-                $value = $product->get_attribute($attr);
++                if ($product) {
++                  $value = $product->get_attribute($attr);
++                }
+             }
+ 
+             $getproductattribute = $value;
+-- 
+2.32.0 (Apple Git-132)
+
