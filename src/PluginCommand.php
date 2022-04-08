@@ -19,6 +19,13 @@ class PluginCommand extends \WP_CLI_Command {
   const PREFIX = 'shared-patches';
 
   /**
+   * Plugins directory path.
+   *
+   * @var string
+   */
+  private $plugins_path;
+
+  /**
    * Applies patches for one or more plugins.
    *
    * @subcommand patch
@@ -28,11 +35,12 @@ class PluginCommand extends \WP_CLI_Command {
     if (empty($args) && !isset($options['all'])) {
       WP_CLI::error('Please specify one or more plugins, or use --all.');
     }
+    self::$plugins_path = $options['plugins-path'] ?? WP_PLUGIN_DIR;
     $plugins = [];
     if (!empty($options['all'])) {
       // Retrieve all plugins with their folders relative from the project root.
       // get_plugins() retrieves additional metadata that is not necessary here.
-      foreach (new DirectoryIterator(WP_PLUGIN_DIR) as $fileinfo) {
+      foreach (new DirectoryIterator(self::$plugins_path) as $fileinfo) {
         if ($fileinfo->isDir() && !$fileinfo->isDot()) {
           // Single file plugins (like the default hello.php) are not supported.
           $plugins[$fileinfo->getFilename()] = str_replace(ABSPATH, '', $fileinfo->getPathname());
@@ -43,7 +51,7 @@ class PluginCommand extends \WP_CLI_Command {
       // Retrieve the folders for each passed plugin, relative from the project
       // root.
       foreach ($args as $plugin_name) {
-        if (file_exists($plugin_path = WP_PLUGIN_DIR . '/' . $plugin_name)) {
+        if (file_exists($plugin_path = self::$plugins_path . '/' . $plugin_name)) {
           $plugins[$plugin_name] = str_replace(ABSPATH, '', $plugin_path);
         }
         else {
@@ -52,7 +60,7 @@ class PluginCommand extends \WP_CLI_Command {
       }
     }
     if (empty($plugins)) {
-      WP_CLI::error(sprintf('No plugins found in %s', WP_PLUGIN_DIR));
+      WP_CLI::error(sprintf('No plugins found in %s', self::$plugins_path));
     }
 
     foreach ($plugins as $plugin_name => $plugin_folder) {
