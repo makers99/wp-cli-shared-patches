@@ -29,7 +29,7 @@ class PluginCommand extends \WP_CLI_Command {
    * Applies patches for one or more plugins.
    *
    * @subcommand patch
-   * @synopsis [<plugin>...] [--all]
+   * @synopsis [<plugin>...] [--all] [--plugins-path]
    */
   public function __invoke(array $args, array $options): void {
     if (empty($args) && !isset($options['all'])) {
