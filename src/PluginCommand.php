@@ -23,7 +23,7 @@ class PluginCommand extends \WP_CLI_Command {
    *
    * @var string
    */
-  protected $plugins_path;
+  protected static $plugins_path;
 
   /**
    * Applies patches for one or more plugins.
