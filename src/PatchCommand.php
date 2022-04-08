@@ -45,4 +45,21 @@ class PatchCommand extends \WP_CLI_Command {
     }
   }
 
+
+  /**
+   * Exports a json file mapping all patches.
+   *
+   * This can then be used with composer-patches on all of our Flynt based
+   * projects.
+   *
+   * @synopsis
+   */
+  public static function exportJson(): void {
+    WP_CLI::success("Hi");
+    // $filepaths = [];
+    // foreach (glob(dirname(__DIR__) . "/patches/{$plugin_name}.*.patch") as $filepath) {
+    //   $filepaths[basename($filepath)] = $filepath;
+    // }
+  }
+
 }
