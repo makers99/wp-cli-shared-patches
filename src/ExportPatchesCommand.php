@@ -30,7 +30,8 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     foreach (glob(dirname(__DIR__) . "/patches/*.patch") as $patch) {
       $patch_parts = explode('.', basename($patch));
       $plugin = reset($patch_parts);
-      $plugin_name = reset(array_filter($dependencies, fn($dependency) => strpos($dependency, $plugin) !== FALSE));
+      $plugin_name = (array) array_filter($dependencies, fn($dependency) => strpos($dependency, $plugin) !== FALSE);
+      $plugin_name = reset($plugin_name);
       if (!$plugin_name) {
         continue;
       }
