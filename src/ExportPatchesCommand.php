@@ -2,19 +2,16 @@
 
 namespace Makers99\SharedPatches;
 
-use DirectoryIterator;
-use WP_CLI;
-
 /**
  * WP-CLI command for shared patches.
+ *
+ * Exports a json file mapping all patches, to be used with composer-patches on
+ * Flynt based projects.
  */
 class ExportPatchesCommand extends \WP_CLI_Command {
 
   /**
-   * Exports a json file mapping all patches.
-   *
-   * This can then be used with composer-patches on all of our Flynt based
-   * projects.
+   * Invoke to regenerate patches.json.
    *
    * @synopsis
    */
@@ -24,10 +21,8 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     if (!file_exists($composer_path)) {
       return;
     }
+    // Read project root composer.json, to only include relevant patches.
     $composer_json = json_decode(file_get_contents($composer_path), TRUE);
-    // foreach ($composer_json['require'] as $dependency => $version) {
-    //   $dependencies[] = $dependency;
-    // }
     $dependencies = array_keys($composer_json['require']);
     $patches = [];
     foreach (glob(dirname(__DIR__) . "/patches/*.patch") as $patch) {
@@ -40,6 +35,10 @@ class ExportPatchesCommand extends \WP_CLI_Command {
       end($patch_parts);
       $patches[$plugin_name][prev($patch_parts)] = $patch;
     }
+    // Map all references to 'patches.json', and then reference this as
+    // `patches-file` in the root composer.json.
+    // The file is not tracked with Git since it would differ from project to
+    // project.
     file_put_contents(dirname(__DIR__) . '/patches/patches.json', json_encode(['patches' => $patches]));
   }
 
