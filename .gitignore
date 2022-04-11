@@ -1,1 +1,2 @@
 !/patches/*.patch
+/patches/patches.json
