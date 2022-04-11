@@ -2,6 +2,8 @@
 
 namespace Makers99\SharedPatches;
 
+use WP_CLI;
+
 /**
  * WP-CLI command for shared patches.
  *
@@ -19,7 +21,7 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     // Return if this is not Flynt based.
     $composer_path = dirname(ABSPATH) . '/../composer.json';
     if (!file_exists($composer_path)) {
-      return;
+      WP_CLI::error('No root composer.json was found (path was: ' . $composer_path . ').');
     }
     // Read project root composer.json, to only include relevant patches.
     $composer_json = json_decode(file_get_contents($composer_path), TRUE);
