@@ -25,6 +25,9 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     }
     // Read project root composer.json, to only include relevant patches.
     $composer_json = json_decode(file_get_contents($composer_path), TRUE);
+    if (!$composer_json) {
+      return;
+    }
     $dependencies = array_keys($composer_json['require']);
     $patches = [];
     foreach (glob(dirname(__DIR__) . "/patches/*.patch") as $patch) {
