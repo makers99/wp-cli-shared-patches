@@ -25,12 +25,16 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     }
     // Read project root composer.json, to only include relevant patches.
     $composer_json = json_decode(file_get_contents($composer_path), TRUE);
+    if (!$composer_json) {
+      return;
+    }
     $dependencies = array_keys($composer_json['require']);
     $patches = [];
     foreach (glob(dirname(__DIR__) . "/patches/*.patch") as $patch) {
       $patch_parts = explode('.', basename($patch));
       $plugin = reset($patch_parts);
-      $plugin_name = reset(array_filter($dependencies, fn($dependency) => strpos($dependency, $plugin) !== FALSE));
+      $plugin_name = (array) array_filter($dependencies, fn($dependency) => strpos($dependency, $plugin) !== FALSE);
+      $plugin_name = reset($plugin_name);
       if (!$plugin_name) {
         continue;
       }
@@ -39,9 +43,9 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     }
     // Map all references to 'patches.json', and then reference this as
     // `patches-file` in the root composer.json.
-    // The file is not tracked with Git since it would differ from project to
-    // project.
-    file_put_contents(dirname(__DIR__) . '/patches/patches.json', json_encode(['patches' => $patches]));
+    if (file_put_contents(dirname(ABSPATH) . '/../patches.json', json_encode(['patches' => $patches]))) {
+      WP_CLI::success('Patches successfully mapped at ' . dirname(__DIR__) . '/patches/patches.json');
+    };
   }
 
 }
