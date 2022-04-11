@@ -45,7 +45,9 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     // `patches-file` in the root composer.json.
     // The file is not tracked with Git since it would differ from project to
     // project.
-    file_put_contents(dirname(__DIR__) . '/patches/patches.json', json_encode(['patches' => $patches]));
+    if (file_put_contents(dirname(__DIR__) . '/patches/patches.json', json_encode(['patches' => $patches]))) {
+      WP_CLI::success('Patches successfully mapped at ' . dirname(__DIR__) . '/patches/patches.json');
+    };
   }
 
 }
