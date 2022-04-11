@@ -39,7 +39,7 @@ class ExportPatchesCommand extends \WP_CLI_Command {
         continue;
       }
       end($patch_parts);
-      $patches[$plugin_name][prev($patch_parts)] = $patch;
+      $patches[$plugin_name][prev($patch_parts)] = './.wp-cli/packages/shared-patches/patches/' . basename($patch);
     }
     // Map all references to 'patches.json', and then reference this as
     // `patches-file` in the root composer.json.
