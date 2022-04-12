@@ -1,0 +1,26 @@
+From 461c2526d6234f8dc21895737c7eb77320c0f01a Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Tue, 12 Apr 2022 17:22:16 +0200
+Subject: [PATCH] Fixed PHP warning caused by
+ iconic-woo-attribute-swatches-premium undefined index.
+
+---
+ inc/class-attributes.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/inc/class-attributes.php b/inc/class-attributes.php
+index 742853214..6d85804c4 100644
+--- a/inc/class-attributes.php
++++ b/inc/class-attributes.php
+@@ -1117,7 +1117,7 @@ class Iconic_WAS_Attributes {
+ 
+ 		$swatch_data = $iconic_was->swatches_class()->get_attribute_swatch_data( $attribute );
+ 
+-		if ( empty( $swatch_data ) || ! $swatch_data['filters'] ) {
++		if ( empty( $swatch_data ) || empty( $swatch_data['filters'] ) ) {
+ 			return $params;
+ 		}
+ 
+-- 
+2.24.4
+
