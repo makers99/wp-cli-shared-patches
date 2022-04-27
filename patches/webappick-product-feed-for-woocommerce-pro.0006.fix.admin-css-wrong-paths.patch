@@ -1,0 +1,35 @@
+From ddec95f8039e1913b4b305478b07080cd83c0f71 Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Wed, 27 Apr 2022 12:51:19 +0300
+Subject: [PATCH] Fixed webappick-product-feed-for-woocommerce wrong admin css
+ paths.
+
+---
+ admin/class-woo-feed-admin.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/admin/class-woo-feed-admin.php b/admin/class-woo-feed-admin.php
+index a6b25336..1f1522f2 100755
+--- a/admin/class-woo-feed-admin.php
++++ b/admin/class-woo-feed-admin.php
+@@ -78,7 +78,7 @@ class Woo_Feed_Admin {
+ 			wp_enqueue_style(
+ 			    'fancy-select',
+                 plugin_dir_url( __FILE__ )
+-                . '../libs/webappick-product-feed-for-woocommerce/admin/css/fancy-select' . $ext,
++                . 'css/fancy-select' . $ext,
+                 array(),
+                 $this->version
+             );
+@@ -89,7 +89,7 @@ class Woo_Feed_Admin {
+ 		wp_register_style(
+ 		    $this->woo_feed,
+             plugin_dir_url( __FILE__ )
+-            . '../libs/webappick-product-feed-for-woocommerce/admin/css/woo-feed-admin' . $ext,
++            . 'css/woo-feed-admin' . $ext,
+             $mainDeps,
+             $this->version,
+             'all'
+-- 
+2.32.0 (Apple Git-132)
+
