@@ -1,0 +1,33 @@
+From 3c3b3090fc70591dc343dde42039bb09fcd1e3f4 Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Thu, 28 Apr 2022 11:24:46 +0300
+Subject: [PATCH] Fixed fatal error triggered by advanced-bulk-edit wp-load
+ wrong path assumption.
+
+---
+ main-dyn-css.php | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/main-dyn-css.php b/main-dyn-css.php
+index ce20198d3..1bdbc4f14 100644
+--- a/main-dyn-css.php
++++ b/main-dyn-css.php
+@@ -1,6 +1,14 @@
+ <?php
+ header('Content-type: text/css');
+-require_once __DIR__."/../../../wp-load.php";
++if (file_exists(__DIR__."/../../../wp-load.php")) {
++    require_once __DIR__."/../../../wp-load.php";
++}
++elseif (file_exists(__DIR__."/../../web/wp/wp-load.php")) {
++    require_once __DIR__."/../../web/wp/wp-load.php";
++}
++else {
++    return;
++}
+ 
+ $settings = get_option('w3exabe_settings');
+ $line_height = 'line-height: 20px';
+-- 
+2.32.0 (Apple Git-132)
+
