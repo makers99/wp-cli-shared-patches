@@ -1,0 +1,25 @@
+From 794badcdc90614c763d35f461e75a6aeacd96cc9 Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Tue, 3 May 2022 08:03:16 +0300
+Subject: [PATCH] Fixed warning from Elasticpress for PHP >= 8.0.
+
+---
+ includes/classes/Command.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/classes/Command.php b/includes/classes/Command.php
+index 928758ac2..c06dd4368 100644
+--- a/includes/classes/Command.php
++++ b/includes/classes/Command.php
+@@ -1310,7 +1310,7 @@ class Command extends WP_CLI_Command {
+ 		if ( 'index_next_batch' === $context ) {
+ 			$counter++;
+ 			if ( ( $counter % 10 ) === 0 ) {
+-				$time_elapsed_diff = $time_elapsed > 0 ? ' (+' . (string) ( timer_stop( 0, 2 ) - $time_elapsed ) . ')' : '';
++				$time_elapsed_diff = (int) $time_elapsed > 0 ? ' (+' . (string) ( timer_stop( 0, 2 ) - (int) $time_elapsed ) . ')' : '';
+ 				$time_elapsed      = timer_stop( 0, 2 );
+ 				WP_CLI::log( WP_CLI::colorize( '%Y' . esc_html__( 'Time elapsed: ', 'elasticpress' ) . '%N' . $time_elapsed . $time_elapsed_diff ) );
+ 
+-- 
+2.32.0 (Apple Git-132)
+
