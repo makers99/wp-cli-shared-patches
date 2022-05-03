@@ -1,0 +1,26 @@
+From 6b7d21e22cb2d29d984a9730bb44926592b005bf Mon Sep 17 00:00:00 2001
+From: Andres A <andres@netzstrategen.com>
+Date: Tue, 3 May 2022 10:10:30 +0200
+Subject: [PATCH] Fixed fatal error plugin woocommerce wrong argument type in
+ array_slice.
+
+---
+ includes/wc-template-functions.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/wc-template-functions.php b/includes/wc-template-functions.php
+index 22dc1ca9..6465732a 100644
+--- a/includes/wc-template-functions.php
++++ b/includes/wc-template-functions.php
+@@ -2072,7 +2072,7 @@ if ( ! function_exists( 'woocommerce_upsell_display' ) ) {
+ 
+ 		// Get visible upsells then sort them at random, then limit result set.
+ 		$upsells = wc_products_array_orderby( array_filter( array_map( 'wc_get_product', $product->get_upsell_ids() ), 'wc_products_array_filter_visible' ), $orderby, $order );
+-		$upsells = $limit > 0 ? array_slice( $upsells, 0, $limit ) : $upsells;
++		$upsells = $limit > 0 ? array_slice( $upsells, 0, (int) $limit ) : $upsells;
+ 
+ 		wc_get_template(
+ 			'single-product/up-sells.php',
+-- 
+2.30.1 (Apple Git-130)
+
