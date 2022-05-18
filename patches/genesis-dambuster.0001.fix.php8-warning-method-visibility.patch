@@ -1,0 +1,33 @@
+From 4dd8a75672cc4a1cdc6cf464651506dd0248d595 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joan=20L=C3=B3pez?= <joan@somoscuatro.es>
+Date: Tue, 17 May 2022 10:49:22 +0200
+Subject: [PATCH] Fixed deprecation warning in plugin genesis-dambuster caused
+ by wrong visibility of method.
+
+---
+ classes/class-plugin.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/classes/class-plugin.php b/classes/class-plugin.php
+index 43fe4cbdd..6ce56f81a 100644
+--- a/classes/class-plugin.php
++++ b/classes/class-plugin.php
+@@ -119,7 +119,7 @@ class Genesis_Dambuster_Plugin {
+ 
+   	private function __clone() {}
+ 
+-  	private function __wakeup() {}
++  	public function __wakeup() {}
+ 
+ 	public function get_help(){
+ 		return $this->help;
+@@ -245,4 +245,4 @@ class Genesis_Dambuster_Plugin {
+ 		wp_die(  __( sprintf('Sorry, you cannot use %1$s unless you are using a child theme based on the StudioPress Genesis theme framework. The %1$s plugin has been deactivated. Go to the WordPress <a href="%2$s"><em>Plugins page</em></a>.',
+ 			$this->name, get_admin_url(null, 'plugins.php')), GENESIS_DAMBUSTER_DOMAIN ));       
+ 	}
+-}
+\ No newline at end of file
++}
+-- 
+2.32.1 (Apple Git-133)
+
