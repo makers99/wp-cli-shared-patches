@@ -1,0 +1,28 @@
+From 93be48c8cd22dd7f7644522738cd59bd6fb93d20 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joan=20L=C3=B3pez?= <joan@somoscuatro.es>
+Date: Tue, 17 May 2022 16:13:30 +0200
+Subject: [PATCH] Fixed deprecation warning in plugin genesis-dambuster due to
+ required parameters following optional parameters.
+
+---
+ classes/class-utils.php | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/classes/class-utils.php b/classes/class-utils.php
+index a9bf59c28..b59aca971 100644
+--- a/classes/class-utils.php
++++ b/classes/class-utils.php
+@@ -83,7 +83,9 @@ class Genesis_Dambuster_Utils {
+         return $result;
+     }
+ 
+-	function update_meta( $type = 'post', $id = false, $metakey, $vals, $defaults = false) {
++	function update_meta( $type, $id, $metakey, $vals, $defaults = false) {
++        $post = empty($post) ? 'post': $post;
++        if (empty($id)) return;
+         if (!$defaults) $defaults = array();	
+         if (is_array($vals)) {
+             foreach ($vals as $k => $v) if (!is_array($v)) $vals[$k] = stripslashes(trim($v));
+-- 
+2.32.1 (Apple Git-133)
+
