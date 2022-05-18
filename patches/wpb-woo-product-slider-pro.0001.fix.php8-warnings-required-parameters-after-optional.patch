@@ -1,0 +1,50 @@
+From e4e3ccb4b13311cb4ca38496a6fe1c855bc851cc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joan=20L=C3=B3pez?= <joan@somoscuatro.es>
+Date: Tue, 17 May 2022 15:37:15 +0200
+Subject: [PATCH] Fixed deprecation warnings in plugin
+ wpb-woo-product-slider-pro due to required parameters following optional
+ parameters.
+
+---
+ admin/metaboxes/meta_box.php | 4 ++--
+ inc/wpb_wps_functions.php    | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/admin/metaboxes/meta_box.php b/admin/metaboxes/meta_box.php
+index 430bc472d..65e7f43a4 100644
+--- a/admin/metaboxes/meta_box.php
++++ b/admin/metaboxes/meta_box.php
+@@ -384,7 +384,7 @@ if( !function_exists('wpb_wps_custom_meta_box') ){
+ 		 *
+ 		 * @return	bool				whether or not the type is in the provided array
+ 		 */
+-		function wpb_wps_meta_box_find_repeatable( $needle = 'repeatable', $haystack ) {
++		function wpb_wps_meta_box_find_repeatable( $needle = 'repeatable', $haystack = array() ) {
+ 			foreach ( $haystack as $h )
+ 				if ( isset( $h['type'] ) && $h['type'] == $needle )
+ 					return true;
+@@ -695,4 +695,4 @@ if( !function_exists('wpb_wps_custom_meta_box') ){
+ 
+ 
+ 	}
+-}
+\ No newline at end of file
++}
+diff --git a/inc/wpb_wps_functions.php b/inc/wpb_wps_functions.php
+index 111c67e76..65bb7ef26 100644
+--- a/inc/wpb_wps_functions.php
++++ b/inc/wpb_wps_functions.php
+@@ -548,8 +548,8 @@ if( function_exists('buddyboss_bm_init') ){
+ add_filter( 'product_cat_row_actions', 'wpb_wps_show_term_id', 10, 2 );
+ add_filter( 'product_tag_row_actions', 'wpb_wps_show_term_id', 10, 2 );
+ 
+-function wpb_wps_show_term_id(  $actions = array(), $term ){
+-
++function wpb_wps_show_term_id(  $actions, $term ){
++	$actions = empty( $actions ) ? array() : $actions;
+ 	$actions['id'] = esc_html__( 'ID: ', 'wpb-woocommerce-product-slider' ) . esc_html( $term->term_id );
+ 
+ 	return $actions;
+-- 
+2.32.1 (Apple Git-133)
+
