@@ -1,0 +1,33 @@
+From 0db2e0f8d5ea192a5ffb762ec69b5a8ff20217d1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joan=20L=C3=B3pez?= <joan@somoscuatro.es>
+Date: Tue, 17 May 2022 16:15:27 +0200
+Subject: [PATCH] Fixed deprecation warning in plugin woocommerce-quotation due
+ to required parameters following optional parameters.
+
+---
+ modules/product-bundles.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/product-bundles.php b/modules/product-bundles.php
+index d4a8b88df..683ea0954 100644
+--- a/modules/product-bundles.php
++++ b/modules/product-bundles.php
+@@ -615,7 +615,7 @@ class ADQ_PB extends WC_PB_Cart {
+ 	 * @param array        $cart_item_data
+ 	 * @return bool
+ 	 */
+-	public function bundled_add_to_cart( $bundle_id, $product_id, $quantity = 1, $variation_id = '', $variation = '', $cart_item_data ) {
++	public function bundled_add_to_cart( $bundle_id, $product_id, $quantity = 1, $variation_id = '', $variation = '', $cart_item_data = array() ) {
+ 
+ 		if ( $quantity <= 0 ) {
+ 			return false;
+@@ -1233,4 +1233,4 @@ class ADQ_PB extends WC_PB_Cart {
+ }
+ endif;
+ 
+-return new ADQ_PB();
+\ No newline at end of file
++return new ADQ_PB();
+-- 
+2.32.1 (Apple Git-133)
+
