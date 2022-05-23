@@ -1,0 +1,49 @@
+From 307b4ead2a05438382468b54565b01f5e9bbf275 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joan=20L=C3=B3pez?= <joan@somoscuatro.es>
+Date: Mon, 23 May 2022 09:42:33 +0200
+Subject: [PATCH] Fixed notice caused by wrong use of method wp_localize_script
+ in plugin woocommerce-quotation.
+
+---
+ assets/js/email-settings.js | 4 ++--
+ classes/class-adq-email.php | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/assets/js/email-settings.js b/assets/js/email-settings.js
+index 2192704b8..fc443fae3 100644
+--- a/assets/js/email-settings.js
++++ b/assets/js/email-settings.js
+@@ -36,13 +36,13 @@
+             currentRequest && currentRequest.abort();            
+             currentRequest = $.ajax({
+                 type: "get",
+-                url: adminAjax,
++                url: adminAjax.url,
+                 data: {action: 'verify_id', email_id: $_this.val(), current_section: data.section},
+                 dataType: "json",
+                 success: function (response) {
+                     if (response.has_email) {
+                         $_this.siblings('.fa').removeClass('fa-spinner fa-spin').addClass('fa-close red');
+-                        $_this.siblings('.error').text(textIdInUse);
++                        $_this.siblings('.error').text(textIdInUse.message);
+                         $_this.addClass('has_error');
+                     } else {
+                         $_this.siblings('.fa').removeClass('fa-spinner fa-spin').addClass('fa-check green');
+diff --git a/classes/class-adq-email.php b/classes/class-adq-email.php
+index d2cb4d94b..296690cc6 100644
+--- a/classes/class-adq-email.php
++++ b/classes/class-adq-email.php
+@@ -80,8 +80,8 @@ if ( ! class_exists( 'ADQ_Email' ) ) {
+                     'pluginId'  => $this->plugin_id,
+                     'section'   => ($current_section === 'adq_new_email') ? '' : $current_section
+                 ) );
+-                wp_localize_script( 'email-settings', 'adminAjax', admin_url( 'admin-ajax.php' ) );
+-                wp_localize_script( 'email-settings', 'textIdInUse', __( 'This id is in use', 'woocommerce-quotation' ) );
++                wp_localize_script( 'email-settings', 'adminAjax', array( 'url' => admin_url( 'admin-ajax.php' ) ) );
++                wp_localize_script( 'email-settings', 'textIdInUse', array( 'message' => __( 'This id is in use', 'woocommerce-quotation' ) ) );
+             }            
+         }
+ 
+-- 
+2.32.1 (Apple Git-133)
+
