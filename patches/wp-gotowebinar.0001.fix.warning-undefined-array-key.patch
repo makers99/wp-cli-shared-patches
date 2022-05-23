@@ -1,0 +1,25 @@
+From 080cb595c19141e187cf520fb8e6c6ea48f35829 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joan=20L=C3=B3pez?= <joan@somoscuatro.es>
+Date: Mon, 23 May 2022 17:46:49 +0200
+Subject: [PATCH] Fixed undefined array key warning in plugin wp-gotowebinar.
+
+---
+ inc/shortcode-registration.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/inc/shortcode-registration.php b/inc/shortcode-registration.php
+index d9db8c33e..72c8323e9 100644
+--- a/inc/shortcode-registration.php
++++ b/inc/shortcode-registration.php
+@@ -221,7 +221,7 @@ function go_to_webinar_registration( $atts ) {
+                 $html .= '</div>';     
+             }
+             //if timezone conversion is enabled show the conversion link
+-            if($options['gotowebinar_enable_timezone_conversion'] == 1){
++            if(isset($options['gotowebinar_enable_timezone_conversion']) && $options['gotowebinar_enable_timezone_conversion'] == 1){
+                 $html .= '<p><a class="timezone-convert-link-registration">'.__( 'Convert to my timezone', 'wp-gotowebinar' ).'</a></p>';
+                 $html .= '<span id="timezone_error_message" style="display:none;">';
+                 
+-- 
+2.32.1 (Apple Git-133)
+
