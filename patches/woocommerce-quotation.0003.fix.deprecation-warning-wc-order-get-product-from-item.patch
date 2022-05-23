@@ -1,0 +1,64 @@
+From c0f7a15f72b6922353be588c5cd0eeb9963fa72f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joan=20L=C3=B3pez?= <joan@somoscuatro.es>
+Date: Mon, 23 May 2022 12:05:08 +0200
+Subject: [PATCH] Fixed deprecation warning in plugin woocommerce-quotation for
+ WC_Order::get_product_from_item().
+
+---
+ classes/class.static.quote.php           | 4 +++-
+ functions/adq-frontend-quote-request.php | 4 +++-
+ templates/order-details.php              | 8 +++++++-
+ 3 files changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/classes/class.static.quote.php b/classes/class.static.quote.php
+index 3ecd7555b..1415a9237 100644
+--- a/classes/class.static.quote.php
++++ b/classes/class.static.quote.php
+@@ -95,7 +95,9 @@ if ( !class_exists( 'StaticQuoteRequest' ) ) {
+         {
+ 
+             foreach ( $order->get_items() as $item ) {
+-                $_product = $order->get_product_from_item( $item );
++                $_product = version_compare( WC_VERSION, '3.0', '<' ) ?
++                    $order->get_product_from_item( $item ) :
++                    $item->get_product();
+ 
+                 if ( !self::can_show_price( $_product ) ) {
+                     return false;
+diff --git a/functions/adq-frontend-quote-request.php b/functions/adq-frontend-quote-request.php
+index 7dff87814..7b33a76bc 100644
+--- a/functions/adq-frontend-quote-request.php
++++ b/functions/adq-frontend-quote-request.php
+@@ -435,7 +435,9 @@ if( !function_exists( 'adq_my_account_order_total' ) ) {
+ if( !function_exists( 'adq_formatted_line_subtotal' ) ) {
+     function adq_formatted_line_subtotal ($subtotal, $item, $order) {
+         
+-            $_product = $order->get_product_from_item( $item );
++            $_product = version_compare( WC_VERSION, '3.0', '<' ) ?
++                $order->get_product_from_item( $item ) :
++                $item->get_product();
+             
+             if ( ( $order->get_status() == 'proposal' || $order->get_status() == 'request' ) 
+                     && !StaticAdqQuoteRequest::can_show_price( $_product ) ) {
+diff --git a/templates/order-details.php b/templates/order-details.php
+index e644babda..749d5bec7 100644
+--- a/templates/order-details.php
++++ b/templates/order-details.php
+@@ -30,7 +30,13 @@ if ( $order->get_status() != 'proposal-sent' ) { ?>
+ 	<tbody>
+ 		<?php
+ 			foreach( $order->get_items() as $item_id => $item ) {
+-				$product = apply_filters( 'woocommerce_order_item_product', $order->get_product_from_item( $item ), $item );
++				$product = apply_filters(
++					'woocommerce_order_item_product',
++					version_compare( WC_VERSION, '3.0', '<' ) ?
++						$order->get_product_from_item( $item ) :
++						$item->get_product(),
++					$item
++				);
+ 
+ 				wc_get_template( 'order/order-details-item.php', array(
+ 					'order'			     => $order,
+-- 
+2.32.1 (Apple Git-133)
+
