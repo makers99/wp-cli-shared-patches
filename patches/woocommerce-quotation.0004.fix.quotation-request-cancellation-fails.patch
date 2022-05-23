@@ -1,0 +1,26 @@
+From 49474875ffbe70a17aed86a1b93e2f503f8acac7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joan=20L=C3=B3pez?= <joan@somoscuatro.es>
+Date: Mon, 23 May 2022 18:22:21 +0200
+Subject: [PATCH] Fixed quotation requests could not be cancelled from user
+ account.
+
+---
+ functions/adq-frontend-quote-request.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/functions/adq-frontend-quote-request.php b/functions/adq-frontend-quote-request.php
+index 7b33a76bc..3f6b7973a 100644
+--- a/functions/adq-frontend-quote-request.php
++++ b/functions/adq-frontend-quote-request.php
+@@ -495,7 +495,7 @@ if( !function_exists( 'adq_process_order_actions' ) ) {
+                     global $wpdb;
+                     
+                     $order_key      = base64_decode( $_GET['order_key'] );
+-                    $email          = sanitize_email ( urldecode( $_GET['email'] ) );
++                    $email          = sanitize_email ( rawurldecode( $_GET['email'] ) );
+                     $adq_action     = $_GET['adq_action'];                    
+                                        
+                     $query = "
+-- 
+2.32.1 (Apple Git-133)
+
