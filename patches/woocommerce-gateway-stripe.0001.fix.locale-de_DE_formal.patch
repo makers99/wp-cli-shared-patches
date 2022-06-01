@@ -1,9 +1,9 @@
 From 67620e9bf5fdd16938c45527e9eab7e97ee202dd Mon Sep 17 00:00:00 2001
 From: Bogdan Arizancu <bogdan@netzstrategen.com>
 Date: Tue, 31 May 2022 17:45:15 +0200
-Subject: [PATCH] Fixed woocommerce-gateway-stripe ignores 'de_DE_formal' user
- locale.
+Subject: [PATCH] Fixed woocommerce-gateway-stripe ignores locale 'de_DE_formal'.
 
+Upstream: https://github.com/woocommerce/woocommerce-gateway-stripe/pull/2357
 ---
  includes/class-wc-stripe-customer.php | 1 +
  1 file changed, 1 insertion(+)
