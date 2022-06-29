@@ -1,0 +1,26 @@
+From 7606a060a75c09b49ab9f5cea254e3302d7dd92d Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Wed, 29 Jun 2022 18:04:31 +0200
+Subject: [PATCH] Fixed PHP 8 compatibility; required parameter follows
+ optional.
+
+---
+ am/wsl-wc-am-client-launcher.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/am/wsl-wc-am-client-launcher.php b/am/wsl-wc-am-client-launcher.php
+index dea59cf6a..3933d91d4 100644
+--- a/am/wsl-wc-am-client-launcher.php
++++ b/am/wsl-wc-am-client-launcher.php
+@@ -12,7 +12,7 @@ if ( ! class_exists( 'WSL_WC_Am_Client_Launcher' ) ) {
+ 	class WSL_WC_Am_Client_Launcher { 
+ 
+ 
+-	public function __construct( $file, $product_id, $software_version, $plugin_or_theme, $api_url, $software_title = '', $text_domain = '', $plugin_basename ) {
++	public function __construct( $file, $product_id, $software_version, $plugin_or_theme, $api_url, $software_title, $text_domain, $plugin_basename ) {
+ 		
+ 		/**
+ 		 * Load WC_AM_Client and its own specific addition
+-- 
+2.24.4
+
