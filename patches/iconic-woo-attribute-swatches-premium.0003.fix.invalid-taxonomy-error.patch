@@ -1,0 +1,26 @@
+From 0e240d1ebad1c069f13ebfdddd50b33736654a35 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 28 Jun 2022 16:33:39 +0200
+Subject: [PATCH] Fixed PHP warning: Attempt to read property 'slug'/'name' on
+ array.
+
+---
+ inc/class-swatches.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/inc/class-swatches.php b/inc/class-swatches.php
+index d5811014d..7f41ce42c 100644
+--- a/inc/class-swatches.php
++++ b/inc/class-swatches.php
+@@ -326,7 +326,7 @@ class Iconic_WAS_Swatches {
+ 								'hide_empty' => true,
+ 							) );
+ 
+-							if ( $attribute_terms && ! empty( $attribute_terms ) ) {
++							if ( $attribute_terms && ! is_wp_error( $attribute_terms ) ) {
+ 								foreach ( $attribute_terms as $attribute_term ) {
+ 									$attribute_swatch_data['values'][ $attribute_term->slug ] = array(
+ 										'label' => apply_filters( 'woocommerce_variation_option_name', $attribute_term->name, $attribute_term, $attribute_slug, $product ),
+-- 
+2.24.4
+
