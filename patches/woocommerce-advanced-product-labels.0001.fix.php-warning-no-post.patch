@@ -1,0 +1,30 @@
+From 07da178828e22539719eff8a43f9cbcca3f3b946 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 28 Jun 2022 18:03:45 +0200
+Subject: [PATCH] =?UTF-8?q?Fixed=20PHP=20Warning:=C2=A0Attempt=20to=20read?=
+ =?UTF-8?q?=20property=20'ID'=20on=20null.?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ class-wapl-single-labels.php | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/class-wapl-single-labels.php b/class-wapl-single-labels.php
+index d2cfbb1d6..f2780d5e6 100644
+--- a/class-wapl-single-labels.php
++++ b/class-wapl-single-labels.php
+@@ -137,6 +137,9 @@ class WAPL_Single_Labels {
+ 
+ 		if ( ! $product_id ) {
+ 			global $post;
++			if ( ! isset( $post->ID ) ) {
++				return array();
++			}
+ 			$product_id = $post->ID;
+ 		}
+ 
+-- 
+2.24.4
+
