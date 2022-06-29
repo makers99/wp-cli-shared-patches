@@ -1,0 +1,40 @@
+From f57fdf3e860c4e4b068abfc0df0948748593259c Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Wed, 29 Jun 2022 16:08:58 +0200
+Subject: [PATCH] Fixed PHP 8 compatibility; required parameter follows
+ optional parameter.
+
+---
+ inc/scb/Cron.php  | 2 +-
+ inc/scb/Forms.php | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/inc/scb/Cron.php b/inc/scb/Cron.php
+index ff242fdb8..47f3ccaaa 100644
+--- a/inc/scb/Cron.php
++++ b/inc/scb/Cron.php
+@@ -20,7 +20,7 @@ class scbCron {
+ 	 *                          string $schedule OR number $interval
+ 	 *                          array $callback_args (optional)
+ 	 */
+-	function __construct( $file = false, $args ) {
++	function __construct( $file, $args ) {
+ 
+ 		// Set time & schedule
+ 		if ( isset( $args['time'] ) )
+diff --git a/inc/scb/Forms.php b/inc/scb/Forms.php
+index 1fb05e480..9f11214d5 100644
+--- a/inc/scb/Forms.php
++++ b/inc/scb/Forms.php
+@@ -58,7 +58,7 @@ class scbForms {
+ 	 *
+ 	 * @return string
+ 	 */
+-	static function form( $inputs, $formdata = null, $nonce ) {
++	static function form( $inputs, $formdata, $nonce ) {
+ 		$output = '';
+ 		foreach ( $inputs as $input )
+ 			$output .= self::input( $input, $formdata );
+-- 
+2.24.4
+
