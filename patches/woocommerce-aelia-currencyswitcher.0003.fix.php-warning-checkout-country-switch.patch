@@ -1,0 +1,34 @@
+From b99d00708c285f4f095b714da2e7b1097f809e1a Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Wed, 29 Jun 2022 10:10:30 +0200
+Subject: [PATCH] =?UTF-8?q?Fixed=20PHP=20Warning:=C2=A0Undefined=20array?=
+ =?UTF-8?q?=20key=20'shipping=5Fcountry'=20when=20changing=20country=20on?=
+ =?UTF-8?q?=20checkout=20page.?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ src/plugin-main.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugin-main.php b/src/plugin-main.php
+index 9594791a8..ad48de3d8 100644
+--- a/src/plugin-main.php
++++ b/src/plugin-main.php
+@@ -1751,10 +1751,10 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
+ 
+ 				if(!empty($checkout_nonce_value) && wp_verify_nonce($checkout_nonce_value, 'woocommerce-process_checkout')) {
+ 					if($force_currency_by_country === Settings::OPTION_SHIPPING_COUNTRY) {
+-						$selected_country = $_POST[Definitions::ARG_CHECKOUT_SHIPPING_COUNTRY];
++						$selected_country = isset($_POST[Definitions::ARG_CHECKOUT_SHIPPING_COUNTRY]) ? $_POST[Definitions::ARG_CHECKOUT_SHIPPING_COUNTRY] : NULL;
+ 					}
+ 					else {
+-						$selected_country = $_POST[Definitions::ARG_CHECKOUT_BILLING_COUNTRY];
++						$selected_country = isset($_POST[Definitions::ARG_CHECKOUT_BILLING_COUNTRY]) ? $_POST[Definitions::ARG_CHECKOUT_BILLING_COUNTRY] : NULL;
+ 					}
+ 
+ 					// If user is on checkout page and changes the  country, return the new value
+-- 
+2.24.4
+
