@@ -49,7 +49,7 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     // Map all references to 'patches.json', and then reference this as
     // `patches-file` in the root composer.json.
     if (file_put_contents(dirname(ABSPATH) . '/../patches.json', json_encode(['patches' => $patches], JSON_PRETTY_PRINT))) {
-      WP_CLI::success('Patches successfully mapped at ' . dirname(ABSPATH) . '/patches.json');
+      WP_CLI::success('Patches successfully mapped at ' . realpath(dirname(ABSPATH) . '/../patches.json'));
     };
   }
 
