@@ -18,7 +18,7 @@ class ExportPatchesCommand extends \WP_CLI_Command {
    * @synopsis
    */
   public function __invoke(): void {
-    // Return if composer.json not found at root.
+    // Return if this is not Flynt based.
     $composer_path = dirname(ABSPATH) . '/../composer.json';
     if (!file_exists($composer_path)) {
       WP_CLI::error('No root composer.json was found (path was: ' . $composer_path . ').');
