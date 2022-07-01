@@ -28,7 +28,6 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     if (!$composer_json) {
       return;
     }
-
     $dependencies = array_map(
       fn ($dependency) => basename($dependency),
       array_keys($composer_json['require'])
