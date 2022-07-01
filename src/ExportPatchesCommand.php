@@ -18,7 +18,7 @@ class ExportPatchesCommand extends \WP_CLI_Command {
    * @synopsis
    */
   public function __invoke(): void {
-    // Return if this is not Flynt based.
+    // Return if composer.json is not was at root.
     $composer_path = dirname(ABSPATH) . '/../composer.json';
     if (!file_exists($composer_path)) {
       WP_CLI::error('No root composer.json was found (path was: ' . $composer_path . ').');
@@ -28,12 +28,17 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     if (!$composer_json) {
       return;
     }
-    $dependencies = array_keys($composer_json['require']);
+
+    $dependencies = array_map(
+      fn ($dependency) => basename($dependency),
+      array_keys($composer_json['require'])
+    );
+
     $patches = [];
     foreach (glob(dirname(__DIR__) . "/patches/*.patch") as $patch) {
       $patch_parts = explode('.', basename($patch));
       $plugin = reset($patch_parts);
-      $plugin_name = (array) array_filter($dependencies, fn($dependency) => end(explode('/', $dependency)) === $plugin);
+      $plugin_name = (array) array_filter($dependencies, fn($dependency) => $dependency === $plugin);
       $plugin_name = reset($plugin_name);
       if (!$plugin_name) {
         continue;
@@ -43,8 +48,8 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     }
     // Map all references to 'patches.json', and then reference this as
     // `patches-file` in the root composer.json.
-    if (file_put_contents(dirname(ABSPATH) . '/../patches.json', json_encode(['patches' => $patches]))) {
-      WP_CLI::success('Patches successfully mapped at ' . dirname(__DIR__) . '/patches/patches.json');
+    if (file_put_contents(dirname(ABSPATH) . '/../patches.json', json_encode(['patches' => $patches], JSON_PRETTY_PRINT))) {
+      WP_CLI::success('Patches successfully mapped at ' . dirname(ABSPATH) . '/patches.json');
     };
   }
 
