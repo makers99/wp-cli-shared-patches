@@ -3,7 +3,7 @@
 // phpcs:disable
 /*
   Plugin Name: WP-CLI Shared Patches
-  Version: 1.0.0
+  Version: 1.0.1
   Text Domain: shared-patches
   Description: Applies patches to WordPress plugins.
   Author: makers99

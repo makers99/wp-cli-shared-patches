@@ -2,13 +2,11 @@
 
 namespace Makers99\SharedPatches;
 
-use WP_CLI;
-
 /**
  * WP-CLI command for shared patches.
  *
  * Exports a json file mapping all patches, to be used with composer-patches on
- * Flynt based projects.
+ * Bedrock based projects.
  */
 class ExportPatchesCommand extends \WP_CLI_Command {
 
@@ -18,33 +16,37 @@ class ExportPatchesCommand extends \WP_CLI_Command {
    * @synopsis
    */
   public function __invoke(): void {
-    // Return if this is not Flynt based.
+    // Return if this is not Bedrock based.
     $composer_path = dirname(ABSPATH) . '/../composer.json';
     if (!file_exists($composer_path)) {
-      WP_CLI::error('No root composer.json was found (path was: ' . $composer_path . ').');
+      \WP_CLI::error('No root composer.json was found (path was: ' . $composer_path . ').');
     }
     // Read project root composer.json, to only include relevant patches.
     $composer_json = json_decode(file_get_contents($composer_path), TRUE);
     if (!$composer_json) {
       return;
     }
-    $dependencies = array_keys($composer_json['require']);
+    $dependencies = array_map(
+      fn($dependency) => basename($dependency),
+      array_keys($composer_json['require'])
+    );
+    $dependencies = array_combine($dependencies, $dependencies);
+
     $patches = [];
     foreach (glob(dirname(__DIR__) . "/patches/*.patch") as $patch) {
       $patch_parts = explode('.', basename($patch));
-      $plugin = reset($patch_parts);
-      $plugin_name = (array) array_filter($dependencies, fn($dependency) => end(explode('/', $dependency)) === $plugin);
-      $plugin_name = reset($plugin_name);
-      if (!$plugin_name) {
+      $plugin_name = $patch_parts[0];
+      $keywords = $patch_parts[3];
+      if (!isset($dependencies[$plugin_name])) {
         continue;
       }
-      end($patch_parts);
-      $patches[$plugin_name][prev($patch_parts)] = './.wp-cli/packages/shared-patches/patches/' . basename($patch);
+      $patches[$plugin_name][$keywords] = './.wp-cli/packages/shared-patches/patches/' . basename($patch);
     }
     // Map all references to 'patches.json', and then reference this as
     // `patches-file` in the root composer.json.
-    if (file_put_contents(dirname(ABSPATH) . '/../patches.json', json_encode(['patches' => $patches]))) {
-      WP_CLI::success('Patches successfully mapped at ' . dirname(__DIR__) . '/patches/patches.json');
+    $patchesfile = dirname(ABSPATH) . '/../patches.json';
+    if (file_put_contents($patchesfile, json_encode(['patches' => $patches], JSON_PRETTY_PRINT))) {
+      \WP_CLI::success('Patches successfully mapped at ' . realpath($patchesfile));
     };
   }
 
