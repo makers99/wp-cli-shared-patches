@@ -6,7 +6,7 @@ namespace Makers99\SharedPatches;
  * WP-CLI command for shared patches.
  *
  * Exports a json file mapping all patches, to be used with composer-patches on
- * Flynt based projects.
+ * Bedrock based projects.
  */
 class ExportPatchesCommand extends \WP_CLI_Command {
 
@@ -16,7 +16,7 @@ class ExportPatchesCommand extends \WP_CLI_Command {
    * @synopsis
    */
   public function __invoke(): void {
-    // Return if this is not Flynt based.
+    // Return if this is not Bedrock based.
     $composer_path = dirname(ABSPATH) . '/../composer.json';
     if (!file_exists($composer_path)) {
       \WP_CLI::error('No root composer.json was found (path was: ' . $composer_path . ').');
@@ -27,10 +27,9 @@ class ExportPatchesCommand extends \WP_CLI_Command {
       return;
     }
     $dependencies = array_map(
-      fn ($dependency) => basename($dependency),
+      fn($dependency) => basename($dependency),
       array_keys($composer_json['require'])
     );
-
     $dependencies = array_combine($dependencies, $dependencies);
 
     $patches = [];
@@ -45,8 +44,9 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     }
     // Map all references to 'patches.json', and then reference this as
     // `patches-file` in the root composer.json.
-    if (file_put_contents(dirname(ABSPATH) . '/../patches.json', json_encode(['patches' => $patches], JSON_PRETTY_PRINT))) {
-      \WP_CLI::success('Patches successfully mapped at ' . realpath(dirname(ABSPATH) . '/../patches.json'));
+    $patchesfile = dirname(ABSPATH) . '/../patches.json';
+    if (file_put_contents($patchesfile, json_encode(['patches' => $patches], JSON_PRETTY_PRINT))) {
+      \WP_CLI::success('Patches successfully mapped at ' . realpath($patchesfile));
     };
   }
 
