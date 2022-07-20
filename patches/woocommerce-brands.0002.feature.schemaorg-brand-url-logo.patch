@@ -1,0 +1,25 @@
+From 40333d37cbfc8728ead3a7a71fd0e20aa010f801 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Wed, 20 Jul 2022 11:38:49 +0200
+Subject: [PATCH] Added URL and logo to product brand schema markup. (#810)
+
+---
+ includes/class-wc-brands.php | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/includes/class-wc-brands.php b/includes/class-wc-brands.php
+index 4b43cecf4..693d1ab2a 100644
+--- a/includes/class-wc-brands.php
++++ b/includes/class-wc-brands.php
+@@ -367,6 +367,8 @@ class WC_Brands {
+ 			$markup['brand'] = array(
+ 				'@type' => 'Brand',
+ 				'name'  => $brands[0]->name,
++				'url' => get_term_link( $brands[0]->slug, 'product_brand' ),
++				'logo' => get_brand_thumbnail_url( $brands[0]->term_id ),
+ 			);
+ 		}
+ 
+-- 
+2.24.4
+
