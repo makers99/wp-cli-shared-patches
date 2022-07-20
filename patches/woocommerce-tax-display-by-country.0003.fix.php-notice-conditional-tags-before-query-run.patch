@@ -1,18 +1,18 @@
-From eb9a9e3cae5f57910f332b38aacba6e4e5644b19 Mon Sep 17 00:00:00 2001
+From 5a0fedfe5db50e5db7e8d9a0478e8377a2528de6 Mon Sep 17 00:00:00 2001
 From: Bogdan Arizancu <bogdan@netzstrategen.com>
 Date: Tue, 12 Apr 2022 20:18:22 +0300
 Subject: [PATCH] Fixed PHP notice from Aelia for using conditional tags before
  the query is run.
 
 ---
- src/plugin-main.php | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ src/plugin-main.php | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/plugin-main.php b/src/plugin-main.php
-index 51188e57c..a74b7b749 100644
+index 466811d32..02d9c07fc 100644
 --- a/src/plugin-main.php
 +++ b/src/plugin-main.php
-@@ -844,8 +844,9 @@ class WC_Aelia_Tax_Display_By_Country extends Aelia_Plugin {
+@@ -853,8 +853,9 @@ class WC_Aelia_Tax_Display_By_Country extends Aelia_Plugin {
  	 * @return string
  	 */
  	public function get_user_metadata($value, $user_id, $meta_key, $single) {
@@ -23,15 +23,6 @@ index 51188e57c..a74b7b749 100644
  			 ($user_id === wp_get_current_user()->ID)) {
  			// If we are on checkout page and the billing country is requested for
  			// current user, retrieve the one he (eventually) selected
-@@ -1312,7 +1313,7 @@ class WC_Aelia_Tax_Display_By_Country extends Aelia_Plugin {
- 		return $result;
- 	}
- 
--	
-+
- 	/**
- 	 * Initializes the Freemius library.
- 	 *
 -- 
 2.24.4
 

@@ -12,10 +12,10 @@ Upstream PR: https://github.com/keycdn/wp-optimus/pull/7
  3 files changed, 194 insertions(+), 90 deletions(-)
 
 diff --git a/inc/optimus_cli.class.php b/inc/optimus_cli.class.php
-index 433c4b9fe..a9927998f 100644
+index 433c4b9..a08eb77 100644
 --- a/inc/optimus_cli.class.php
 +++ b/inc/optimus_cli.class.php
-@@ -51,6 +51,36 @@ class Optimus_CLI extends WP_CLI_Command
+@@ -51,6 +51,37 @@ public static function optimize( $args, $assoc_args ) {
          $formatter->display_items( $assets );
      }
  
@@ -23,52 +23,53 @@ index 433c4b9fe..a9927998f 100644
 +     * webp sync command.
 +     *
 +     * Checks if all the registered files really have the optimized version.
-+     * Note: only works with convert to webp is enabled.
++     * Note: Only works if convert to webp is enabled.
 +     */
-+    public static function webpSync () {
-+      $options = Optimus::get_options();
-+      if ($options['webp_convert'] == 0) {
-+        WP_CLI::error('webp sync command only syncs webp missing images. Looks like you don\'t have this setting enabled.', TRUE);
-+      }
-+
-+      // Retrieves the post ids with optimized assets registered in the DB.
-+      $posts = Optimus_Management::bulk_optimized_assets();
-+
-+      foreach ($posts as $key => $post) {
-+        $assets = Optimus_Request::get_files_paths($post['ID']);
-+        foreach($assets as $asset_path) {
-+          if (stream_resolve_include_path($asset_path) === FALSE) {
-+            $metadata = wp_get_attachment_metadata($post['ID']);
-+            // Unregister the optimus flags when the file is not longer there.
-+            unset($metadata['optimus']);
-+            update_post_meta($post['ID'], '_wp_attachment_metadata', $metadata);
-+            // Registries works at post level.
-+            break;
-+          }
++    public static function syncMissingWebp () {
++        $options = Optimus::get_options();
++        if ($options['webp_convert'] == 0) {
++            WP_CLI::error('webp sync command synchronizes the optimization status of attachments with actual files in the filesystem, but the webp feature is not enabled.', TRUE);
 +        }
-+      }
++
++        // Retrieve all post IDs with positive optimization status in database.
++        $posts = Optimus_Management::bulk_optimized_assets();
++
++        foreach ($posts as $key => $post) {
++            $assets = Optimus_Request::get_files_paths($post['ID']);
++            foreach ($assets as $asset_path) {
++                if (stream_resolve_include_path($asset_path) === FALSE) {
++                    $metadata = wp_get_attachment_metadata($post['ID']);
++                    // Remove the optimus metadata when the file does not exist.
++                    unset($metadata['optimus']);
++                    update_post_meta($post['ID'], '_wp_attachment_metadata', $metadata);
++                    // No need to check further files as the whole attachment
++                    // will be re-optimized.
++                    break;
++                }
++            }
++        }
 +    }
 +
      private static function _optimize_image($img) {
          /* get metadata */
          $metadata = wp_get_attachment_metadata($img['ID']);
-@@ -99,6 +129,11 @@ class Optimus_CLI extends WP_CLI_Command
+@@ -99,6 +130,11 @@ public static function add_commands() {
                  ),
              ),
          ));
 +
-+        $cmd_webpsync = function() { self::webpSync(); };
-+        WP_CLI::add_command( 'optimus webp sync', $cmd_webpsync, array(
-+            'shortdesc' => 'Detects missing optimized assets.',
++        $cmd_syncmissing = function() { self::syncMissingWebp(); };
++        WP_CLI::add_command( 'optimus webp sync', $cmd_syncmissing, array(
++            'shortdesc' => 'Synchronizes actual webp file optimization status and missing files on disk with database.',
 +        ));
      }
  }
  
 diff --git a/inc/optimus_management.class.php b/inc/optimus_management.class.php
-index d3ac8f5d0..19a2cccc5 100644
+index d3ac8f5..de93045 100644
 --- a/inc/optimus_management.class.php
 +++ b/inc/optimus_management.class.php
-@@ -61,15 +61,10 @@ class Optimus_Management
+@@ -61,15 +57,10 @@ public static function add_bulk_optimizer_page()
          );
      }
  
@@ -87,7 +88,7 @@ index d3ac8f5d0..19a2cccc5 100644
          global $wpdb;
  
          /* Get plugin options */
-@@ -78,7 +73,7 @@ class Optimus_Management
+@@ -78,7 +69,7 @@ public static function bulk_optimizer_assets() {
          /* Supported image types */
          $imageTypes = ['jpeg', 'png'];
          foreach ($imageTypes as &$imageType) {
@@ -96,7 +97,7 @@ index d3ac8f5d0..19a2cccc5 100644
          }
          $queryImageTypes = "(". join(" OR ", $imageTypes) .")";
  
-@@ -97,6 +92,20 @@ class Optimus_Management
+@@ -97,6 +88,20 @@ public static function bulk_optimizer_assets() {
              $id_query = "";
          }
  
@@ -104,11 +105,11 @@ index d3ac8f5d0..19a2cccc5 100644
 +    }
 +
 +    /**
-+    * Bulk optimizer collect assets
-+    *
-+    * @since   1.5.0
-+    *
-+    */
++     * Bulk optimizer collect assets
++     *
++     * @since   1.5.0
++     *
++     */
 +    public static function bulk_optimizer_assets() {
 +        global $wpdb;
 +
@@ -117,16 +118,23 @@ index d3ac8f5d0..19a2cccc5 100644
          /* Image query */
          $query = "SELECT $wpdb->posts.ID, $wpdb->posts.post_title, $wpdb->posts.post_mime_type
              FROM $wpdb->posts, $wpdb->postmeta
-@@ -112,6 +121,28 @@ class Optimus_Management
+@@ -112,15 +117,36 @@ public static function bulk_optimizer_assets() {
          return $wpdb->get_results($query, ARRAY_A);
      }
  
-+    /**
-+    * Gets all assets registered as already optimized.
-+    */
+-
+     /**
+-    * Bulk optimizer page
+-    *
+-    * @since   1.3.8
+-    * @change  1.5.0
+-    *
+-    */
++     * Gets all assets registered as already optimized.
++     */
 +    public static function bulk_optimized_assets() {
 +        global $wpdb;
-+
+ 
 +        list($queryImageTypes, $optimus_query, $id_query) = self::_get_optimus_query_variables();
 +
 +        /* Image query */
@@ -143,14 +151,22 @@ index d3ac8f5d0..19a2cccc5 100644
 +        return $wpdb->get_results($query, ARRAY_A);
 +
 +    }
- 
-     /**
-     * Bulk optimizer page
++
++    /**
++     * Bulk optimizer page
++     *
++     * @since   1.3.8
++     * @change  1.5.0
++     *
++     */
+     public static function bulk_optimizer_page() {
+         $assets = self::bulk_optimizer_assets();
+         $count = count($assets);
 diff --git a/inc/optimus_request.class.php b/inc/optimus_request.class.php
-index 2ac5117ac..43b8e268b 100644
+index 2ac5117..e5818d1 100644
 --- a/inc/optimus_request.class.php
 +++ b/inc/optimus_request.class.php
-@@ -170,72 +170,14 @@ class Optimus_Request
+@@ -170,72 +163,14 @@ public static function optimize_upload_images($upload_data, $attachment_id) {
              return $upload_data;
          }
  
@@ -222,11 +238,11 @@ index 2ac5117ac..43b8e268b 100644
 -        }
 +        /* Get all images from the attachment */
 +        $diff_filesizes = array();
-+        $todo_files = self::_get_files($upload_data, $attachment_id);
++        list($todo_files, $mime_type) = self::_get_files($upload_data, $attachment_id);
  
          /* No images to process */
          if ( empty($todo_files) ) {
-@@ -245,8 +187,8 @@ class Optimus_Request
+@@ -245,8 +180,8 @@ public static function optimize_upload_images($upload_data, $attachment_id) {
          /* Loop todo files */
          foreach ($todo_files as $file) {
              /* Merge path & file */
@@ -237,34 +253,49 @@ index 2ac5117ac..43b8e268b 100644
  
              /* skip loop iteration if file doesn't exist */
              if ( ! file_exists($upload_path_file) ) {
-@@ -368,6 +310,101 @@ class Optimus_Request
+@@ -368,21 +303,118 @@ public static function optimize_upload_images($upload_data, $attachment_id) {
          return $upload_data;
      }
  
 +    /**
-+    * Gets all the files paths of the optimized images.
-+    */
++     * Gets all the files paths of the optimized images.
++     */
 +    public static function get_files_paths($post_id) {
-+       if ( empty( $metadata = wp_get_attachment_metadata( $post_id ) ) ) {
++       if ( empty ( $metadata = wp_get_attachment_metadata( $post_id ) ) ) {
 +         return array();
 +       }
-+       $files = self::_get_files($metadata, $post_id);
++       list($files, $mime_type) = self::_get_files($metadata, $post_id);
 +       $post_files = array();
 +
-+       foreach( $files as $file ) {
++       foreach ( $files as $file ) {
 +           $post_files[] = self::_get_webp_file_path($file['upload_path']);
 +       }
 +
 +       return $post_files;
 +    }
-+
-+    /**
-+    * Gets files information from the upload data.
-+    */
+ 
+     /**
+-    * Handle image actions
+-    *
+-    * @since   1.1.4
+-    * @change  1.4.8
+-    *
+-    * @param   string  $file  Image file
+-    * @param   array   $args  Request arguments
+-    * @return  array          Request failed with an error code
+-    * @return  false          An error has occurred
+-    * @return  null           Empty response with 204 status code
+-    * @return  intval         Response content length
+-    */
++     * Gets files information from the upload data.
++     *
++     * @return array
++     *   Array containing the array of files and the mime type.
++     */
 +    private static function _get_files(&$upload_data, $attachment_id) {
 +        /* Get plugin options */
 +        $options = Optimus::get_options();
-+
+ 
 +        /* WP upload folder */
 +        $upload_dir = wp_upload_dir();
 +
@@ -316,7 +347,7 @@ index 2ac5117ac..43b8e268b 100644
 +
 +        /* Search for thumbs */
 +        if ( ! empty($upload_data['sizes']) ) {
-+            foreach( $upload_data['sizes'] as $thumb ) {
++            foreach ( $upload_data['sizes'] as $thumb ) {
 +                if ( $thumb['file'] && ( empty($thumb['mime-type']) || self::_allowed_mime_type($thumb['mime-type']) ) ) {
 +                    $upload_url_file = path_join($upload_url, $thumb['file']);
 +                    $upload_path_file = path_join($upload_path, $thumb['file']);
@@ -334,12 +365,26 @@ index 2ac5117ac..43b8e268b 100644
 +            $todo_files = array_reverse($todo_files);
 +        }
 +
-+        return $todo_files;
++        return array($todo_files, $mime_type);
 +    }
- 
-     /**
-     * Handle image actions
-@@ -421,18 +458,9 @@ class Optimus_Request
++
++    /**
++     * Handle image actions
++     *
++     * @since   1.1.4
++     * @change  1.4.8
++     *
++     * @param   string  $file  Image file
++     * @param   array   $args  Request arguments
++     * @return  array          Request failed with an error code
++     * @return  false          An error has occurred
++     * @return  null           Empty response with 204 status code
++     * @return  intval         Response content length
++     */
+     private static function _do_image_action($file, $args)
+     {
+         /* Start request */
+@@ -421,18 +453,9 @@ private static function _do_image_action($file, $args)
              return __("Mime type not supported", "optimus");
          }
  
@@ -359,13 +404,22 @@ index 2ac5117ac..43b8e268b 100644
          }
  
          /* Rewrite image file */
-@@ -520,6 +548,23 @@ class Optimus_Request
+@@ -520,17 +537,32 @@ private static function _replace_file_extension($file, $extension)
          );
      }
  
-+    /**
-+    * Gets the webp file path.
-+    */
+-
+     /**
+-    * Prüfung des erlaubten Bildtyps pro Datei
+-    *
+-    * @since   1.1.0
+-    * @change  1.1.7
+-    *
+-    * @param   string   $mime_type  Mime Type
+-    * @return  boolean              TRUE bei bestehender Prüfung
+-    */
++     * Gets the webp file path.
++     */
 +    private static function _get_webp_file_path($file) {
 +        $options = Optimus::get_options();
 +        if ( $options['webp_keeporigext'] == 1 ) {
@@ -379,11 +433,20 @@ index 2ac5117ac..43b8e268b 100644
 +
 +        return $file;
 +    }
-+
  
-     /**
-     * Prüfung des erlaubten Bildtyps pro Datei
-@@ -650,14 +695,7 @@ class Optimus_Request
++    /**
++     * Prüfung des erlaubten Bildtyps pro Datei
++     *
++     * @since   1.1.0
++     * @change  1.1.7
++     *
++     * @param   string   $mime_type  Mime Type
++     * @return  boolean              TRUE bei bestehender Prüfung
++     */
+     private static function _allowed_mime_type($mime_type)
+     {
+         /* Leer? */
+@@ -650,14 +676,7 @@ public static function delete_converted_file($file) {
          }
  
          /* Replace to or append webp extension */
