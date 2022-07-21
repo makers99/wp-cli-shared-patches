@@ -28,8 +28,8 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     }
 
     $dependencies = [];
-    foreach (array_keys($composer_json['require']) as $dependecy) {
-      $dependencies[basename($dependecy)] = $dependecy;
+    foreach (array_keys($composer_json['require']) as $dependency) {
+      $dependencies[basename($dependency)] = $dependency;
     }
 
     if (!$dependencies) {
