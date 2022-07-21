@@ -26,11 +26,15 @@ class ExportPatchesCommand extends \WP_CLI_Command {
     if (!$composer_json) {
       return;
     }
-    $dependencies = array_map(
-      fn($dependency) => basename($dependency),
-      array_keys($composer_json['require'])
-    );
-    $dependencies = array_combine($dependencies, $dependencies);
+
+    $dependencies = [];
+    foreach(array_keys($composer_json['require']) as $dependecy) {
+      $dependencies = $dependencies + [basename($dependecy) => $dependecy];
+    }
+
+    if (!$dependencies) {
+      \WP_CLI::error('No dependencies found in composer.json.');
+    }
 
     $patches = [];
     foreach (glob(dirname(__DIR__) . "/patches/*.patch") as $patch) {
@@ -40,7 +44,7 @@ class ExportPatchesCommand extends \WP_CLI_Command {
       if (!isset($dependencies[$plugin_name])) {
         continue;
       }
-      $patches[$plugin_name][$keywords] = './.wp-cli/packages/shared-patches/patches/' . basename($patch);
+      $patches[$dependencies[$plugin_name]][$keywords] = './.wp-cli/packages/shared-patches/patches/' . basename($patch);
     }
     // Map all references to 'patches.json', and then reference this as
     // `patches-file` in the root composer.json.
