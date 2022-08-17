@@ -1,5 +1,5 @@
 From 98a72eee645384cdd0e3d893b8043e8f9f3984e3 Mon Sep 17 00:00:00 2001
-From: bhavsinh-ker <75493036+bhavsinh-ker@users.noreply.github.com>
+From: Daniel Kudwien <daniel@netzstrategen.com>
 Date: Thu, 18 Nov 2021 12:27:30 +0530
 Subject: [PATCH] Fixed PHP notice caused by woocommerce-brands on the product
  page. (#739)
