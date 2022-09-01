@@ -1,0 +1,24 @@
+From 23b9474ab6b3a4be5b73aea479aa20a9eaa6c3f4 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Wed, 31 Aug 2022 22:16:43 +0200
+Subject: [PATCH] Fixed WooCommerce data privacy eraser query deletes all orders
+ with ElasticPress.
+
+Upstream: https://github.com/10up/ElasticPress/pull/2975
+---
+ includes/classes/Indexable.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/classes/Indexable.php b/includes/classes/Indexable.php
+index 5f15a9703..10dbdd949 100644
+--- a/includes/classes/Indexable.php
++++ b/includes/classes/Indexable.php
+@@ -1038,7 +1038,7 @@ public function build_meta_query( $meta_queries ) {
+ 				if ( false !== $terms_obj ) {
+ 					$meta_filter[] = $terms_obj;
+ 				}
+-			} elseif ( is_array( $single_meta_query ) && isset( $single_meta_query[0] ) && is_array( $single_meta_query[0] ) ) {
++			} elseif ( is_array( $single_meta_query ) ) {
+ 				/**
+ 				 * Handle multidimensional array. Something like:
+ 				 *
