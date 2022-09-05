@@ -1,0 +1,31 @@
+From 855a731036443aceb421fe070ad5baa3970659df Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Mon, 5 Sep 2022 09:55:31 +0200
+Subject: [PATCH] Fixed slow settings page on sites with many posts.
+
+---
+ ip2location-redirection.php | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/ip2location-redirection.php b/ip2location-redirection.php
+index 09de21dfa..f1d8c69c5 100644
+--- a/ip2location-redirection.php
++++ b/ip2location-redirection.php
+@@ -739,9 +739,11 @@ class IP2LocationRedirection
+ 			}
+ 		}
+ 
+-		$pages = get_pages(['numberposts' => -1, 'post_status' => 'publish']);
+-		$posts = get_posts(['numberposts' => -1, 'post_status' => 'publish']);
+-		$woocommerce_products = get_posts(['numberposts' => -1, 'post_type' => 'product', 'post_status' => 'publish']);
++		// Backend settings page takes minutes to load.
++		// @see https://wordpress.org/support/topic/add-a-setting-to-toggle-whether-to-load-all-posts-as-options/
++		$pages = [];
++		$posts = [];
++		$woocommerce_products = [];
+ 
+ 		if (count($pages) > 0) {
+ 			foreach ($pages as $page) {
+-- 
+2.30.1
+
