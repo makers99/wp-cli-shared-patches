@@ -8,6 +8,19 @@ Subject: [PATCH] Fixed fatal error on admin-ajax.php when editing pages due to
  inc/functions-load.php | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/wp-content/plugins/sitepress-multilingual-cms/classes/ATE/API/class-wpml-tm-ate-authentication.php b/wp-content/plugins/sitepress-multilingual-cms/classes/ATE/API/class-wpml-tm-ate-authentication.php
+index 28e0adaaa..d1550b3ab 100644
+--- a/classes/ATE/API/class-wpml-tm-ate-authentication.php
++++ b/classes/ATE/API/class-wpml-tm-ate-authentication.php
+@@ -106,7 +106,7 @@ class WPML_TM_ATE_Authentication {
+                }
+ 
+                $query['wpml_core_version'] = ICL_SITEPRESS_VERSION;
+-               $query['wpml_tm_version']   = WPML_TM_VERSION;
++               $query['wpml_tm_version']   = defined('WPML_TM_VERSION') ? WPML_TM_VERSION : '0.0';
+                $query['shared_key']        = $this->get_shared();
+                $query['token']             = uuid_v5( wp_generate_uuid4(), $url );
+                $query['website_uuid']      = $this->get_site_id();
 diff --git a/inc/functions-load.php b/inc/functions-load.php
 index 7851afe60..dd9b51967 100644
 --- a/inc/functions-load.php
