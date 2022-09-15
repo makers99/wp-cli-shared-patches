@@ -1,0 +1,26 @@
+From fb513faee7cbc96dbdd0cf2986f6b146e7921e62 Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Thu, 8 Sep 2022 16:00:51 +0300
+Subject: [PATCH] Fixed elasticpress facets feature cannot be disabled.
+
+Upstream: https://github.com/10up/ElasticPress/pull/3002
+---
+ includes/classes/Feature.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/classes/Feature.php b/includes/classes/Feature.php
+index 31c48a8a8..b4e67d211 100644
+--- a/includes/classes/Feature.php
++++ b/includes/classes/Feature.php
+@@ -186,7 +186,7 @@ abstract class Feature {
+ 
+ 		$active = false;
+ 
+-		if ( ! empty( $feature_settings[ $this->slug ] ) && $feature_settings[ $this->slug ]['active'] ) {
++		if ( ! empty( $feature_settings[ $this->slug ] ) && $feature_settings[ $this->slug ]['active'] && empty( $feature_settings[ $this->slug ][ 'force_inactive' ] ) ) {
+ 			$active = true;
+ 		}
+ 
+-- 
+2.32.1 (Apple Git-133)
+
