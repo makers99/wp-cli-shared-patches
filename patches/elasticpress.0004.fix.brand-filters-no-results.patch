@@ -3,6 +3,7 @@ From: Bogdan Arizancu <bogdan@netzstrategen.com>
 Date: Thu, 8 Sep 2022 16:00:51 +0300
 Subject: [PATCH] Fixed elasticpress facets feature cannot be disabled.
 
+Upstream: https://github.com/10up/ElasticPress/pull/3002
 ---
  includes/classes/Feature.php | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
