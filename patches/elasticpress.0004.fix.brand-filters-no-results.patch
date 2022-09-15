@@ -17,7 +17,7 @@ index 31c48a8a8..b4e67d211 100644
  		$active = false;
  
 -		if ( ! empty( $feature_settings[ $this->slug ] ) && $feature_settings[ $this->slug ]['active'] ) {
-+		if ( ! empty( $feature_settings[ $this->slug ] ) && $feature_settings[ $this->slug ]['active'] && empty( $feature_settings[ $this->slug ][ 'force_inactive' ] ) ) {
++		if ( ! empty( $feature_settings[ $this->slug ] ) && $feature_settings[ $this->slug ]['active'] && empty( $feature_settings[ $this->slug ]['force_inactive'] ) ) {
  			$active = true;
  		}
  
