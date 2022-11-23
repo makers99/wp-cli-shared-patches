@@ -1,0 +1,26 @@
+From 15c0d64f0553a22693ddb27dfb15c2e76b7e31ca Mon Sep 17 00:00:00 2001
+From: Nabi <artsanaat@gmail.com>
+Date: Wed, 23 Nov 2022 14:32:44 +0300
+Subject: [PATCH] Removed checkbox subscription in checkout page.
+
+---
+ woochimp.class.php | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/woochimp.class.php b/woochimp.class.php
+index a3acff69..f61f87c9 100644
+--- a/woochimp.class.php
++++ b/woochimp.class.php
+@@ -4781,7 +4781,8 @@ class WooChimp
+         // Prepare checkbox block
+         $checkbox_block = '<p class="woochimp_checkout_checkbox" style="padding:15px 0;">';
+         $checkbox_state = ($already_subscribed || $this->opt['woochimp_default_state'] == '1') ? 'checked="checked"' : '';
+-        $checkbox_block .= '<input id="woochimp_user_preference" name="woochimp_data[woochimp_user_preference]" type="checkbox" ' . $checkbox_state . '> <label for="woochimp_user_preference">' . $this->prepare_label('woochimp_text_checkout', false) . '</label>';
++        $checkbox_block .= !is_checkout() ? '<input id="woochimp_user_preference" name="woochimp_data[woochimp_user_preference]" type="checkbox" ' . $checkbox_state .' >'  : '';
++        $checkbox_block .= '<label for="woochimp_user_preference">' . $this->prepare_label('woochimp_text_checkout', false) . '</label>';
+         $checkbox_block .= '</p>';
+ 
+         // Maybe prepare groups
+-- 
+2.15.0
+
