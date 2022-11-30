@@ -1,15 +1,15 @@
-From 54447cc8207545df3635b86a5c7aeb98db100a0e Mon Sep 17 00:00:00 2001
+From 76065ab2082a2fd46446f1b73db61d36fb90502f Mon Sep 17 00:00:00 2001
 From: Nabi <artsanaat@gmail.com>
 Date: Wed, 30 Nov 2022 11:05:12 +0300
-Subject: [PATCH] Fixed object cache in woocommerce-order-status-manager
- plugin.
+Subject: [PATCH] Fixed object cache is invalidated too often, slowing down
+ site performance.
 
 ---
  src/wc-order-status-manager-functions.php | 15 ++++++++++++++-
  1 file changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/src/wc-order-status-manager-functions.php b/src/wc-order-status-manager-functions.php
-index 56627038..cec2a840 100644
+index 56627038..7c08029e 100644
 --- a/src/wc-order-status-manager-functions.php
 +++ b/src/wc-order-status-manager-functions.php
 @@ -48,8 +48,21 @@ function wc_order_status_manager_get_order_status_posts( $args = array() ) {
@@ -17,25 +17,24 @@ index 56627038..cec2a840 100644
  
  		// expire cache after 1 second to avoid potential issues with persistent caching
 -		wp_cache_set( 'wc_order_status_manager_order_status_posts', $posts, null, 1 );
-+		wp_cache_set( 'wc_order_status_manager_order_status_posts', $posts);
++		wp_cache_set( 'wc_order_status_manager_order_status_posts', $posts );
  	}
  
  	return $posts;
  }
 +
 +/**
-+ * Invalidates the object cache in Woocommerce order status manager.
++ * Invalidates the cached order statuses.
 + *
 + * @implements save_post_wc_order_status
 + */
 +function save_post_wc_order_status() {
-+    wp_cache_get('wc_order_status_manager_order_status_posts', '', FALSE, $found);
-+    if ($found) {
-+        wp_cache_delete('wc_order_status_manager_order_status_posts');
++    wp_cache_get( 'wc_order_status_manager_order_status_posts', '', FALSE, $found );
++    if ( $found ) {
++        wp_cache_delete( 'wc_order_status_manager_order_status_posts' );
 +    }
 +}
-+add_action('save_post_wc_order_status', 'save_post_wc_order_status');
-\ No newline at end of file
++add_action( 'save_post_wc_order_status', 'save_post_wc_order_status' );
 -- 
 2.15.0
 
