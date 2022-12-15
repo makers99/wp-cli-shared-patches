@@ -1,0 +1,51 @@
+From 7038b5b60965f1fe4cdce35eba571b543872ac94 Mon Sep 17 00:00:00 2001
+From: Ada <109589740+adabaca@users.noreply.github.com>
+Date: Wed, 14 Dec 2022 19:34:50 +0200
+Subject: [PATCH] Fixed woocommerce-quotation plugin enqueues wrong stylesheet
+ file. (#49)
+
+---
+ assets/css/style.css                     | 7 ++++++-
+ functions/adq-frontend-quote-request.php | 2 +-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/assets/css/style.css b/assets/css/style.css
+index c57df5810..0bb340a6b 100644
+--- a/assets/css/style.css
++++ b/assets/css/style.css
+@@ -9,7 +9,7 @@
+   font-style: normal;
+ }
+ 
+-.woocommerce .adq-added-items-link:before {
++.woocommerce .adq-added-items-link:before, .adq-added-items:before {
+   display: inline-block;
+   font-family: 'WooCommerce';
+   content: '\e01d';
+@@ -67,4 +67,9 @@ form.checkout.adq-billing {
+       margin: 0 5px 20px;
+     }
+   }
++}
++
++a#remove_all_items {
++  text-align: center;
++  margin-bottom: 2px;
+ }
+\ No newline at end of file
+diff --git a/functions/adq-frontend-quote-request.php b/functions/adq-frontend-quote-request.php
+index 3f6b7973a..fa38f15da 100644
+--- a/functions/adq-frontend-quote-request.php
++++ b/functions/adq-frontend-quote-request.php
+@@ -143,7 +143,7 @@ if( !function_exists( 'adq_add_quote_button' ) ) {
+  */
+ if( !function_exists( 'adq_header_static_variables' ) ) {
+     function adq_header_static_variables() {
+-            wp_enqueue_style( 'quote-request-style', ADQ_QUOTE_URL . 'assets/css/style.scss' );
++            wp_enqueue_style( 'quote-request-style', ADQ_QUOTE_URL . 'assets/css/style.css' );
+ 
+             wp_register_script( 'jquote-request-js', ADQ_QUOTE_URL . 'assets/js/functions.js', array( 'jquery', 'jquery-cookie' ), '1.0', true );       
+             wp_enqueue_script( 'jquote-request-js' );
+-- 
+2.34.1
+
