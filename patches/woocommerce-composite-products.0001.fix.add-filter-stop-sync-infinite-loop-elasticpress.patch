@@ -1,0 +1,25 @@
+From d8094c3a3766e4a641adabd2183dd328049e71e9 Mon Sep 17 00:00:00 2001
+From: Andres A <andres@Andress-MBP.home>
+Date: Fri, 13 Jan 2023 16:02:42 +0100
+Subject: [PATCH] Adds filter to stop sync_raw_prices.
+
+---
+ includes/class-wc-product-composite.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/class-wc-product-composite.php b/includes/class-wc-product-composite.php
+index 37c8bd0d..6661a46d 100644
+--- a/includes/class-wc-product-composite.php
++++ b/includes/class-wc-product-composite.php
+@@ -236,7 +236,7 @@ class WC_Product_Composite extends WC_Product {
+ 	private function sync_raw_prices() {
+ 
+ 		// Don't do anything here while syncing.
+-		if ( doing_action( 'wp_ajax_woocommerce_do_ajax_product_import' ) ) {
++		if ( doing_action( 'wp_ajax_woocommerce_do_ajax_product_import' ) || apply_filters( 'woocommerce_composite_stop_sync_raw_prices', false )) {
+ 			return false;
+ 		}
+ 
+-- 
+2.36.3
+
