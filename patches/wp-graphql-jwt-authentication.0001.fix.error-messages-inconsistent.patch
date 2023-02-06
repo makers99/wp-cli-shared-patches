@@ -1,0 +1,72 @@
+From bedd525cb2ad2d8bac16bfc6bc2f8cf05c8600cc Mon Sep 17 00:00:00 2001
+From: Andres A <andres@Andress-MBP.home>
+Date: Fri, 3 Feb 2023 12:48:55 +0100
+Subject: [PATCH] Fixed inconsistent error messages.
+
+---
+ src/Auth.php                      | 3 +--
+ src/ManageTokens.php              | 6 +++---
+ wp-graphql-jwt-authentication.php | 2 +-
+ 3 files changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/src/Auth.php b/src/Auth.php
+index d8afa2bc..0cb4721a 100644
+--- a/src/Auth.php
++++ b/src/Auth.php
+@@ -362,8 +362,7 @@ class Auth {
+ 		 * If the authentication fails return a error
+ 		 */
+ 		if ( is_wp_error( $user ) ) {
+-			$error_code = ! empty( $user->get_error_code() ) ? $user->get_error_code() : 'invalid login';
+-			throw new UserError( esc_html( $error_code ) );
++			throw new UserError( $user->get_error_message() );
+ 		}
+ 
+ 		return ! empty( $user ) ? $user : null;
+diff --git a/src/ManageTokens.php b/src/ManageTokens.php
+index b4d893bb..1f2a3419 100644
+--- a/src/ManageTokens.php
++++ b/src/ManageTokens.php
+@@ -96,7 +96,7 @@ class ManageTokens {
+ 							throw new UserError( __( 'The JWT token could not be returned', 'wp-graphql-jwt-authentication' ) );
+ 						}
+ 
+-						if ( $token instanceof \WP_Error ) {
++						if ( is_wp_error( $token ) ) {
+ 							throw new UserError( $token->get_error_message() );
+ 						}
+ 
+@@ -127,7 +127,7 @@ class ManageTokens {
+ 							throw new UserError( __( 'The JWT token could not be returned', 'wp-graphql-jwt-authentication' ) );
+ 						}
+ 
+-						if ( $token instanceof \WP_Error ) {
++						if ( is_wp_error($token) ) {
+ 							throw new UserError( $token->get_error_message() );
+ 						}
+ 
+@@ -151,7 +151,7 @@ class ManageTokens {
+ 						$secret = Auth::get_user_jwt_secret( $user_id );
+ 
+ 						// If the secret cannot be returned, throw an error.
+-						if ( $secret instanceof \WP_Error ) {
++						if ( is_wp_error($secret) ) {
+ 							throw new UserError( $secret->get_error_message() );
+ 						}
+ 
+diff --git a/wp-graphql-jwt-authentication.php b/wp-graphql-jwt-authentication.php
+index 5c90901d..e1108d19 100644
+--- a/wp-graphql-jwt-authentication.php
++++ b/wp-graphql-jwt-authentication.php
+@@ -197,7 +197,7 @@ if ( ! class_exists( '\WPGraphQL\JWT_Authentication' ) ) :
+ 					$token = Auth::validate_token();
+ 					if ( is_wp_error( $token ) ) {
+ 						add_action( 'graphql_before_resolve_field', function() use ( $token ) {
+-							throw new \Exception( $token->get_error_code() . ' | ' . $token->get_error_message() );
++							throw new \Exception( $token->get_error_message() );
+ 						}, 1 );
+ 					}
+ 				}
+-- 
+2.36.4
+
