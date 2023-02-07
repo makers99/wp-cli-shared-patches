@@ -1,0 +1,26 @@
+From 38ad885c799a46a81259cf94e380c63d0b54c1f0 Mon Sep 17 00:00:00 2001
+From: adabaca <ada@olivestudio.ro>
+Date: Tue, 7 Feb 2023 10:47:22 +0200
+Subject: [PATCH] Fixed search-exclude plugin overwriting the excluded ids.
+
+---
+ search-exclude.php | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/search-exclude.php b/search-exclude.php
+index 6ec87535b..b8f9b5357 100644
+--- a/search-exclude.php
++++ b/search-exclude.php
+@@ -246,7 +246,8 @@ class SearchExclude
+         $exclude = apply_filters('searchexclude_filter_search', $exclude, $query);
+ 
+         if ($exclude) {
+-            $query->set('post__not_in', array_merge(array(), $this->getExcluded()));
++            $excluded_ids = isset($query->query_vars['post__not_in']) ? $query->query_vars['post__not_in'] : [];
++            $query->set('post__not_in', array_unique(array_merge($excluded_ids, $this->getExcluded())));
+         }
+ 
+         return $query;
+-- 
+2.34.1
+
