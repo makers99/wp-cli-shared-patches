@@ -1,0 +1,42 @@
+From 26619d5208b4c842cc62a18f6a613ac5ebb01d50 Mon Sep 17 00:00:00 2001
+From: adabaca <ada@olivestudio.ro>
+Date: Wed, 8 Feb 2023 13:11:55 +0200
+Subject: [PATCH] Fixed foogallery deprecated elementor hook.
+
+---
+ .../compatibility/class-elementor-compatibility.php  | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/includes/compatibility/class-elementor-compatibility.php b/includes/compatibility/class-elementor-compatibility.php
+index 8926bcbef..b7ca40ebb 100644
+--- a/includes/compatibility/class-elementor-compatibility.php
++++ b/includes/compatibility/class-elementor-compatibility.php
+@@ -15,7 +15,11 @@ if ( ! class_exists( 'FooGallery_Elementor_Compatibility' ) ) {
+ 
+         function init() {
+             if ( did_action( 'elementor/loaded' ) ) {
+-                add_action( 'elementor/widgets/widgets_registered', array( $this, 'init_widget' ) );
++                if (version_compare( ELEMENTOR_VERSION, '3.5.0', '>=' )) {
++                    add_action( 'elementor/widgets/register', array( $this, 'init_widget' ) );
++                } else {
++                    add_action( 'elementor/widgets/widgets_registered', array( $this, 'init_widget' ) );
++                }
+             }
+         }
+ 
+@@ -25,7 +29,11 @@ if ( ! class_exists( 'FooGallery_Elementor_Compatibility' ) ) {
+             require_once( FOOGALLERY_PATH . 'includes/compatibility/elementor/class-elementor-foogallery-widget.php' );
+ 
+             // Register widget
+-            \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new Elementor_FooGallery_Widget() );
++            if (version_compare( ELEMENTOR_VERSION, '3.5.0', '>=' )) {
++                \Elementor\Plugin::instance()->widgets_manager->register( new Elementor_FooGallery_Widget() );
++            } else {
++                \Elementor\Plugin::instance()->widgets_manager->register_widget_type( new Elementor_FooGallery_Widget() );
++            }
+ 
+         }
+ 
+-- 
+2.34.1
+
