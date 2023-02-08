@@ -16,7 +16,7 @@ index 6ec87535b..b8f9b5357 100644
  
          if ($exclude) {
 -            $query->set('post__not_in', array_merge(array(), $this->getExcluded()));
-+            $excluded_ids = isset($query->query_vars['post__not_in']) ? $query->query_vars['post__not_in'] : [];
++            $excluded_ids = $query->query_vars['post__not_in'] ?? [];
 +            $query->set('post__not_in', array_unique(array_merge($excluded_ids, $this->getExcluded())));
          }
  
