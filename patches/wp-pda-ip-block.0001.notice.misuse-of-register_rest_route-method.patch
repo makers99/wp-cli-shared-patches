@@ -1,0 +1,115 @@
+From a2cf69763c846c9e41b9ef969e012d8403cbe58b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Joan=20L=C3=B3pez?= <joan@somoscuatro.es>
+Date: Thu, 9 Feb 2023 16:16:00 +0100
+Subject: [PATCH] Fixed PHP warnings caused by misuse of register_rest_route
+ method in plugin wp-pda-ip-block.
+
+---
+ admin/class-wp-pda-ip-block-admin.php | 34 ++++++++++++++++++++-------
+ 1 file changed, 25 insertions(+), 9 deletions(-)
+
+diff --git a/admin/class-wp-pda-ip-block-admin.php b/admin/class-wp-pda-ip-block-admin.php
+index 21eeb57f..be4c4f96 100644
+--- a/admin/class-wp-pda-ip-block-admin.php
++++ b/admin/class-wp-pda-ip-block-admin.php
+@@ -160,40 +160,56 @@ class Wp_Pda_Ip_Block_Admin {
+ 	 */
+ 	public function rest_api_ip_block() {
+ 		register_rest_route(
+-			'/pda-ip-block/',
++			'pda-ip-block',
+ 			'(?P<post_id>[0-9-]+)',
+ 			array(
+ 				'methods'  => 'POST',
+ 				'callback' => array( $this, 'insert_data_to_table' ),
++				'permission_callback' => function() {
++					$user = wp_get_current_user();
++					return !empty( $user ) && in_array( 'administrator', (array) $user->roles, true );
++				},
+ 			)
+ 		);
+ 
+ 		register_rest_route(
+-			'/pda-get-ip-block/',
++			'pda-get-ip-block',
+ 			'(?P<post_id>[0-9-]+)',
+ 			array(
+ 				'methods'  => 'GET',
+ 				'callback' => array( $this, 'get_ip_block' ),
++				'permission_callback' => function() {
++					$user = wp_get_current_user();
++					return !empty( $user ) && in_array( 'administrator', (array) $user->roles, true );
++				},
+ 			)
+ 		);
+ 		register_rest_route(
+-			'/pda-get-user-roles-ip-block/',
++			'pda-get-user-roles-ip-block',
+ 			'(?P<post_id>[0-9-]+)',
+ 			array(
+ 				'methods'  => 'GET',
+ 				'callback' => array( $this, 'get_user_roles_ip_block' ),
++				'permission_callback' => function() {
++					$user = wp_get_current_user();
++					return !empty( $user ) && in_array( 'administrator', (array) $user->roles, true );
++				},
+ 			)
+ 		);
+ 		register_rest_route(
+-			'/pda-insert-user-roles/',
++			'pda-insert-user-roles',
+ 			'(?P<post_id>[0-9-]+)',
+ 			array(
+ 				'methods'  => 'POST',
+ 				'callback' => array( $this, 'insert_user_roles_data_to_table' ),
++				'permission_callback' => function() {
++					$user = wp_get_current_user();
++					return !empty( $user ) && in_array( 'administrator', (array) $user->roles, true );
++				},
+ 			)
+ 		);
+ 		register_rest_route(
+-			'/pda-ar/',
++			'pda-ar',
+ 			'search-user',
+ 			array(
+ 				'methods'             => 'POST',
+@@ -204,7 +220,7 @@ class Wp_Pda_Ip_Block_Admin {
+ 			)
+ 		);
+ 		register_rest_route(
+-			'/pda-get-user-access/',
++			'pda-get-user-access',
+ 			'(?P<post_id>[0-9-]+)',
+ 			array(
+ 				'methods'             => 'GET',
+@@ -270,7 +286,7 @@ class Wp_Pda_Ip_Block_Admin {
+ 		);
+ 
+ 		register_rest_route(
+-			'/pda-ar/',
++			'pda-ar',
+ 			'referral-url/(?P<post_id>[0-9-]+)',
+ 			array(
+ 				'methods'             => 'POST',
+@@ -282,7 +298,7 @@ class Wp_Pda_Ip_Block_Admin {
+ 		);
+ 
+ 		register_rest_route(
+-			'/pda-ar/',
++			'pda-ar',
+ 			'referral-url/(?P<post_id>[0-9-]+)',
+ 			array(
+ 				'methods'             => 'GET',
+@@ -294,7 +310,7 @@ class Wp_Pda_Ip_Block_Admin {
+ 		);
+ 
+ 		register_rest_route(
+-			'/pda-ar/',
++			'pda-ar',
+ 			'whitelist-ip/(?P<post_id>[0-9-]+)',
+ 			array(
+ 				'methods'             => 'POST',
+-- 
+2.24.4
+
