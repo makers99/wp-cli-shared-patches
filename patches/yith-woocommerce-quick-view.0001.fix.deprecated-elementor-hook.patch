@@ -1,0 +1,42 @@
+From 1b7f21457a629d8c6ed827502bc78173b4f0922a Mon Sep 17 00:00:00 2001
+From: adabaca <ada@olivestudio.ro>
+Date: Wed, 8 Feb 2023 13:11:11 +0200
+Subject: [PATCH] Fixed yith-woocommerce-quick-view deprecated elementor hook.
+
+---
+ .../builders/elementor/class-yith-elementor.php      | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/plugin-fw/includes/builders/elementor/class-yith-elementor.php b/plugin-fw/includes/builders/elementor/class-yith-elementor.php
+index a7ec4a9b1..cea3d6aeb 100644
+--- a/plugin-fw/includes/builders/elementor/class-yith-elementor.php
++++ b/plugin-fw/includes/builders/elementor/class-yith-elementor.php
+@@ -45,7 +45,11 @@ if ( ! class_exists( 'YITH_Elementor' ) ) {
+ 		 */
+ 		private function __construct() {
+ 			if ( defined( 'ELEMENTOR_VERSION' ) && version_compare( ELEMENTOR_VERSION, '3.0.0', '>=' ) ) {
+-				add_action( 'elementor/widgets/widgets_registered', array( $this, 'register_widgets' ) );
++				if (version_compare( ELEMENTOR_VERSION, '3.5.0', '>=' )) {
++					add_action( 'elementor/widgets/register', array( $this, 'register_widgets' ) );
++				} else {
++					add_action( 'elementor/widgets/widgets_registered', array( $this, 'register_widgets' ) );
++				}
+ 				add_action( 'elementor/elements/categories_registered', array( $this, 'add_yith_category' ) );
+ 
+ 				add_action( 'elementor/editor/after_enqueue_styles', array( $this, 'enqueue_styles' ) );
+@@ -90,7 +94,11 @@ if ( ! class_exists( 'YITH_Elementor' ) ) {
+ 			}
+ 
+ 			foreach ( $this->widgets as $widget ) {
+-				\Elementor\Plugin::instance()->widgets_manager->register_widget_type( new YITH_Elementor_Widget( array(), array( 'yith_data' => $widget ) ) );
++				if (version_compare( ELEMENTOR_VERSION, '3.5.0', '>=' )) {
++					\Elementor\Plugin::instance()->widgets_manager->register( new YITH_Elementor_Widget( array(), array( 'yith_data' => $widget ) ) );
++				} else {
++					\Elementor\Plugin::instance()->widgets_manager->register_widget_type( new YITH_Elementor_Widget( array(), array( 'yith_data' => $widget ) ) );
++				}
+ 			}
+ 		}
+ 
+-- 
+2.34.1
+
