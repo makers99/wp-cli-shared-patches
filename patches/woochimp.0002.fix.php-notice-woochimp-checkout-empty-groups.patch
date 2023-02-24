@@ -16,7 +16,7 @@ index 0fe680b..85e25e6 100644
          if ($already_subscribed === false || ($already_subscribed && ($this->opt['woochimp_hide_checkbox'] == '2' || ($this->opt['woochimp_hide_checkbox'] == '3' && !empty($groups['data']) && !empty($groups['html']))))) {
              echo $checkbox_block;
 -            echo $groups['html'];
-+            if (!empty($groups['html'])) {
++            if (!empty($groups) && !empty($groups['html'])) {
 +                echo $groups['html'];
 +            }
          }
