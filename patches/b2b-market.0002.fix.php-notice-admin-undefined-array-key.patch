@@ -1,0 +1,25 @@
+From f2a1d8499058f1d19246a635fabf8a35ad1f5046 Mon Sep 17 00:00:00 2001
+From: adabaca <ada@olivestudio.ro>
+Date: Fri, 24 Feb 2023 19:05:33 +0200
+Subject: [PATCH] Fixed B2B plugin admin PHP notice.
+
+---
+ .../conditional-shipping-payment/admin/class-csp-options.php    | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/addons/conditional-shipping-payment/admin/class-csp-options.php b/src/addons/conditional-shipping-payment/admin/class-csp-options.php
+index 93c79f9c..bf3009d2 100644
+--- a/src/addons/conditional-shipping-payment/admin/class-csp-options.php
++++ b/src/addons/conditional-shipping-payment/admin/class-csp-options.php
+@@ -60,7 +60,7 @@ class CSP_Options {
+ 
+ 					$settings = $gateway->settings;
+ 
+-					if ( 'yes' == $settings['enabled'] ) {
++					if ( isset($settings['enabled']) && 'yes' == $settings['enabled'] ) {
+ 						$default = 'on';
+ 
+ 						if ( get_option( 'bm_payment_method_enable_' . $gateway->id . '_' . $key ) === false ) {
+-- 
+2.34.1
+
