@@ -1,0 +1,26 @@
+From f95ec11a1d12b097aa2e34cb5831a6eedfd8ba12 Mon Sep 17 00:00:00 2001
+From: danielistrate27 <daniel.istrate@olivestudio.ro>
+Date: Fri, 10 Mar 2023 13:08:48 +0200
+Subject: [PATCH] Fixed woo-postfinance-checkout wpdb prepare notice in
+ checkout page.
+
+---
+ .../class-wc-postfinancecheckout-entity-attribute-options.php   | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/entity/class-wc-postfinancecheckout-entity-attribute-options.php b/includes/entity/class-wc-postfinancecheckout-entity-attribute-options.php
+index 66ee1e0fd..f22be4755 100644
+--- a/includes/entity/class-wc-postfinancecheckout-entity-attribute-options.php
++++ b/includes/entity/class-wc-postfinancecheckout-entity-attribute-options.php
+@@ -77,7 +77,7 @@ class WC_PostFinanceCheckout_Entity_Attribute_Options extends WC_PostFinanceChec
+ 			// phpcs:ignore
+ 			$wpdb->prepare(
+ 				'SELECT * FROM %1$s WHERE attribute_id = %2$d',
+-				$wpdb->prefix . self::get_table_name() .
++				$wpdb->prefix . self::get_table_name(),
+ 				$attribute_id
+ 			),
+ 			ARRAY_A
+-- 
+2.25.1
+
