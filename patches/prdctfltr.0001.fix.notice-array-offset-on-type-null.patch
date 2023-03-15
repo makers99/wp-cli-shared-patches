@@ -1,0 +1,25 @@
+From 86b3b02585a29f934f8343ffb593d6c22e3b45ce Mon Sep 17 00:00:00 2001
+From: danielistrate27 <daniel.istrate@olivestudio.ro>
+Date: Tue, 14 Mar 2023 15:20:35 +0200
+Subject: [PATCH] Fixed warning from prdctfltr plugin.
+
+---
+ includes/compatibility/pf-compatible-preset.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/compatibility/pf-compatible-preset.php b/includes/compatibility/pf-compatible-preset.php
+index 39e4270f2..6b2f3cdf4 100644
+--- a/includes/compatibility/pf-compatible-preset.php
++++ b/includes/compatibility/pf-compatible-preset.php
+@@ -793,7 +793,7 @@ class XforWC_Product_Filters_Compatible_Preset {
+ 		if ( !empty( $includes ) && is_array( $includes ) ) {
+ 			foreach( $includes as $slug ) {
+ 				$data = term_exists( $slug, $taxonomy );
+-				if ( $data['term_id'] ) {
++				if ( $data !== null && $data['term_id'] ) {
+ 					$ids[] = $data['term_id'];
+ 				}
+ 			}
+-- 
+2.25.1
+
