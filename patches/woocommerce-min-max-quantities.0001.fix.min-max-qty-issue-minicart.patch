@@ -1,0 +1,34 @@
+From 4cbea1493866488ce42f08bf05505b433725b6f4 Mon Sep 17 00:00:00 2001
+From: danielistrate27 <daniel.istrate@olivestudio.ro>
+Date: Wed, 15 Mar 2023 15:22:25 +0200
+Subject: [PATCH] Fixed min/max quantity in minicart.
+
+---
+ woocommerce-min-max-quantities.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/woocommerce-min-max-quantities.php b/woocommerce-min-max-quantities.php
+index f2838973e..b77dd76ab 100644
+--- a/woocommerce-min-max-quantities.php
++++ b/woocommerce-min-max-quantities.php
+@@ -1033,7 +1033,7 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
+ 			// If variable product, only apply in cart.
+ 			$variation_id = $product->get_id();
+ 
+-			if ( is_cart() && $product->is_type( 'variation' ) ) {
++			if ( ( is_cart() || str_contains($data['input_name'],'cart[') ) && $product->is_type( 'variation' ) ) {
+ 				$parent_variable_id = $product->get_parent_id();
+ 
+ 				// Cast both 0 and empty values to zero, as we shouldn't do any adjustments for 0/empty values.
+@@ -1135,7 +1135,7 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
+ 			}
+ 
+ 			// Don't apply for cart or checkout as cart/checkout form has qty already pre-filled.
+-			if ( ! is_cart() && ! is_checkout() ) {
++			if ( ! is_cart() && ! is_checkout() && !str_contains($data['input_name'],'cart[') ) {
+ 				// If we have a group of quantity and no minimum then set the quantity to the group of quantity.
+ 				if ( ! empty( $minimum_quantity ) ) {
+ 					$data['input_value'] = $minimum_quantity;
+-- 
+2.25.1
+
