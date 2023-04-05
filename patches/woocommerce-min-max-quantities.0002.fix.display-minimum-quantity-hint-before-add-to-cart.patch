@@ -1,0 +1,188 @@
+From 40a3be2199c76e06c09ef57ca3e7633bdcd21970 Mon Sep 17 00:00:00 2001
+From: adabaca <ada@olivestudio.ro>
+Date: Wed, 5 Apr 2023 16:52:22 +0300
+Subject: [PATCH] Fixed plugin woocommerce-min-max-quantities to display
+ product minimum allowed and group quantities hint before add to cart button.
+
+---
+ woocommerce-min-max-quantities.php | 150 ++++++++++++++++++++++-------
+ 1 file changed, 117 insertions(+), 33 deletions(-)
+
+diff --git a/woocommerce-min-max-quantities.php b/woocommerce-min-max-quantities.php
+index b77dd76ab..6e39c3287 100644
+--- a/woocommerce-min-max-quantities.php
++++ b/woocommerce-min-max-quantities.php
+@@ -162,6 +162,13 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
+ 
+ 			add_filter( 'woocommerce_add_to_cart_product_id', array( $this, 'modify_add_to_cart_quantity' ) );
+ 
++			// Translates validation error message for product quantity field.
++			add_action( 'woocommerce_before_quantity_input_field', array( $this, 'woocommerce_before_quantity_input_field' ) );
++			add_action( 'woocommerce_after_quantity_input_field', array( $this, 'woocommerce_after_quantity_input_field' ) );
++
++			// Displays "minimum quantity" and "group of quantity" hint on single product page.
++			add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'woocommerce_before_add_to_cart_button' ) );
++
+ 			// Declare HPOS compatibility.
+ 			add_action( 'before_woocommerce_init', array( $this, 'declare_hpos_compatibility' ) );
+ 		}
+@@ -1393,39 +1400,6 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
+ 			return $product_id;
+ 		}
+ 
+-		/**
+-		 * Filter Minimum Quantity based on "Group of" option on runtime.
+-		 *
+-		 * @param  int  $min_quantity
+-		 * @param  int  $group_of_quantity
+-		 *
+-		 * @return int
+-		 */
+-		public static function adjust_min_quantity( $min_quantity, $group_of_quantity ) {
+-
+-			// Zero min quantity is always allowed.
+-			if ( ! $min_quantity || ! $group_of_quantity) {
+-				return $min_quantity;
+-			}
+-
+-			if ( $min_quantity < $group_of_quantity ) {
+-
+-				// If Group of = 2 and Minimum Quantity = 1, set Minimum Quantity to 2.
+-				$min_quantity = $group_of_quantity;
+-
+-			} elseif ( $min_quantity > $group_of_quantity ) {
+-				$remainder = $min_quantity / $group_of_quantity;
+-
+-				// If Group of = 2 and Minimum Quantity = 5, set Minimum Quantity to 2 * ceil( 5/2 ) = 6.
+-				// If Group of = 4 and Minimum Quantity = 5, set Minimum Quantity to 4 * ceil( 5/4 ) = 8.
+-				if ( $remainder ) {
+-					$min_quantity = $group_of_quantity * ceil( $remainder );
+-				}
+-			}
+-
+-			return absint( $min_quantity );
+-		}
+-
+ 		/**
+ 		 * Filter Maximum Quantity based on "Group of" option on runtime.
+ 		 *
+@@ -1467,6 +1441,116 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
+ 
+ 			return absint( $max_quantity );
+ 		}
++
++		/**
++		 * Captures the product quantity field output.
++		 */
++		public static function woocommerce_before_quantity_input_field() {
++			ob_start();
++		}
++
++		/**
++		 * Translates validation error message for product quantity field.
++		 */
++		public static function woocommerce_after_quantity_input_field() {
++			$quantity_field = ob_get_clean();
++
++			// Get minimum quantity value.
++			preg_match( '@min=[\'|"](\d)[\'|"]@', $quantity_field, $matches );
++			$min = $matches ? $matches[1] : 0;
++			// Get maximum quantity value.
++			preg_match( '@max=[\'|"](\d)[\'|"]@', $quantity_field, $matches );
++			$max = $matches ? $matches[1] : 0;
++
++			// If none of min, max quantities are set, output the field unchanged.
++			if ( ! $min && ! $max ) {
++				echo $quantity_field;
++				return;
++			}
++
++			// Prepare the custom validation message considering the min, max values.
++			if ( $min && ! $max ) {
++				$message = sprintf( __( 'Value must be greater or equal than %d.', 'woocommerce-min-max-quantities' ), $min );
++			}
++			if ( ! $min && $max ) {
++				$message = sprintf( __( 'Value must be less or equal than %d.', 'woocommerce-min-max-quantities' ), $max );
++			}
++			if ( $min && $max ) {
++				$message = sprintf(
++					__( 'Value must be greater or equal than %d and less or equal than %d.', 'woocommerce-min-max-quantities' ),
++					$min,
++					$max
++				);
++			}
++
++			// Add the customized validation message to the field.
++			$inline = sprintf(
++				'oninvalid="this.setCustomValidity(\'%s\')" oninput="this.setCustomValidity(\'\')"',
++				esc_attr( $message )
++			);
++			$quantity_field = str_replace( '<input', "<input $inline", $quantity_field );
++
++			echo $quantity_field;
++		}
++
++		/**
++		 * Displays "minimum quantity" and "group of quantity" hint on single product page.
++		 *
++		 * @param string $product_description The product description.
++		 */
++		public function woocommerce_before_add_to_cart_button( $product_description ) {
++			if ( ! is_single() ) {
++				return;
++			}
++			$quantities = '';
++			$queried_object_id = get_queried_object()->ID;
++			$minimum_quantity = absint( get_post_meta( $queried_object_id, 'minimum_allowed_quantity', true ) );
++			if ( $minimum_quantity ) {
++				$quantities .= '<p class="woocommerce-min-max-quantities__minimum">';
++				$quantities .= sprintf( __( 'Minimum quantity: %d', 'woocommerce-min-max-quantities' ), $minimum_quantity );
++				$quantities .= '</p>';
++			}
++			$group_of_quantity = absint( $this->get_group_of_quantity_for_product( wc_get_product( $queried_object_id ) ) );
++			if ( $group_of_quantity ) {
++				$quantities .= '<p class="woocommerce-min-max-quantities__unit">';
++				$quantities .= sprintf( __( 'Packaging Unit: %d', 'woocommerce-min-max-quantities' ), $group_of_quantity );
++				$quantities .= '</p>';
++			}
++			echo $product_description . ( $quantities ? '<div class="woocommerce-min-max-quantities">' . $quantities . '</div>' : '' );
++		}
++
++		/**
++		 * Filter Minimum Quantity based on "Group of" option on runtime.
++		 *
++		 * @param  int  $min_quantity
++		 * @param  int  $group_of_quantity
++		 *
++		 * @return int
++		 */
++		public static function adjust_min_quantity( $min_quantity, $group_of_quantity ) {
++
++			// Zero min quantity is always allowed.
++			if ( ! $min_quantity || ! $group_of_quantity) {
++				return $min_quantity;
++			}
++
++			if ( $min_quantity < $group_of_quantity ) {
++
++				// If Group of = 2 and Minimum Quantity = 1, set Minimum Quantity to 2.
++				$min_quantity = $group_of_quantity;
++
++			} elseif ( $min_quantity > $group_of_quantity ) {
++				$remainder = $min_quantity / $group_of_quantity;
++
++				// If Group of = 2 and Minimum Quantity = 5, set Minimum Quantity to 2 * ceil( 5/2 ) = 6.
++				// If Group of = 4 and Minimum Quantity = 5, set Minimum Quantity to 4 * ceil( 5/4 ) = 8.
++				if ( $remainder ) {
++					$min_quantity = $group_of_quantity * ceil( $remainder );
++				}
++			}
++
++			return absint( $min_quantity );
++		}
+ 	}
+ 
+ 	add_action( 'plugins_loaded', array( 'WC_Min_Max_Quantities', 'get_instance' ) );
+-- 
+2.34.1
+
