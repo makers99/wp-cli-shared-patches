@@ -1,0 +1,25 @@
+From 9ab2a022a64c0c761d17c3007a24e197766d729a Mon Sep 17 00:00:00 2001
+From: Andres A <andres@Andress-MBP.home>
+Date: Wed, 12 Apr 2023 11:12:15 +0200
+Subject: [PATCH] Added WGM run time override filter.
+
+---
+ inc/WGM_Tax.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/inc/WGM_Tax.php b/inc/WGM_Tax.php
+index f96aebb6..d2460de5 100644
+--- a/inc/WGM_Tax.php
++++ b/inc/WGM_Tax.php
+@@ -735,7 +735,7 @@ class WGM_Tax {
+ 	public static function get_tax_line( WC_Product $product, $cart = false ) {
+ 		
+ 		if ( ! $cart ) {
+-			if ( WGM_Helper::method_exists( $product, 'get_id' ) && isset( self::$run_time_cache[ 'get_tax_line_' . $product->get_id() ] ) ) {
++			if ( apply_filters( 'wgm_enable_run_time_cache', true ) && WGM_Helper::method_exists( $product, 'get_id' ) && isset( self::$run_time_cache[ 'get_tax_line_' . $product->get_id() ] ) ) {
+ 				return self::$run_time_cache[ 'get_tax_line_' . $product->get_id() ];
+ 			}
+ 		}
+-- 
+2.36.5
+
