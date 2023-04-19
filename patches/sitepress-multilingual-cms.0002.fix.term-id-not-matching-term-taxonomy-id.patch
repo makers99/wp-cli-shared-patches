@@ -1,0 +1,56 @@
+From 278ec4f6d56586f60772f336d049b527feeddfd1 Mon Sep 17 00:00:00 2001
+From: Marc del Amo <marc.delamo@gmail.com>
+Date: Tue, 18 Apr 2023 19:04:27 +0200
+Subject: [PATCH] Fixed WPML term IDs not equal to term taxonomy IDs.
+
+---
+ .../wpml-term-translation.class.php           | 29 ++++++++++---------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
+
+diff --git a/inc/taxonomy-term-translation/wpml-term-translation.class.php b/inc/taxonomy-term-translation/wpml-term-translation.class.php
+index 78b6179af..c2301fd85 100644
+--- a/inc/taxonomy-term-translation/wpml-term-translation.class.php
++++ b/inc/taxonomy-term-translation/wpml-term-translation.class.php
+@@ -118,24 +118,25 @@ class WPML_Term_Translation extends WPML_Element_Translation {
+ 	private function maybe_warm_term_id_cache() {
+ 
+ 		if ( ! isset( $this->ttids ) || ! isset( $this->term_ids ) ) {
+-
+-			$data           = $this->wpdb->get_results(
+-				'	SELECT wpml_translations.element_id, tax.term_id, tax.taxonomy
+-													 ' . $this->get_element_join() . "
+-													 JOIN {$this->wpdb->terms} terms
+-													  ON terms.term_id = tax.term_id
+-													 WHERE tax.term_id != tax.term_taxonomy_id",
++			$data = $this->wpdb->get_results(
++				"SELECT wpml_translations.element_id, tax.term_id, tax.taxonomy " .
++				$this->get_element_join() . " JOIN {$this->wpdb->terms} terms " .
++				"ON terms.term_id = tax.term_id " .
++				"WHERE tax.term_id != tax.term_taxonomy_id",
+ 				ARRAY_A
+ 			);
++
+ 			$this->term_ids = array();
+-			$this->ttids    = array();
+-			foreach ( $data as $row ) {
+-				$this->ttids[ $row['term_id'] ]                     = isset( $this->ttids[ $row['term_id'] ] )
+-					? $this->ttids[ $row['term_id'] ] : array();
+-				$this->ttids[ $row['term_id'] ][ $row['taxonomy'] ] = $row['element_id'];
+-				$this->term_ids[ $row['element_id'] ]               = $row['term_id'];
++			$this->ttids = array();
++
++			foreach ($data as $row) {
++				$this->ttids[$row['term_id']] = isset($this->ttids[$row['term_id']])
++					? absint($this->ttids[$row['term_id']])
++					: array();
++				$this->ttids[$row['term_id']][$row['taxonomy']] = absint($row['element_id']);
++				$this->term_ids[$row['element_id']] = absint($row['term_id']);
+ 			}
+-		}
++    }
+ 	}
+ 
+ 	/**
+-- 
+2.30.2
+
