@@ -1,31 +1,32 @@
-From e42cb5156c9aba97518dca8abb9d1c33ee17ab2e Mon Sep 17 00:00:00 2001
-From: Daniel Kudwien <daniel@netzstrategen.com>
-Date: Tue, 23 Aug 2022 14:28:38 +0200
+From 413a0d8b1e402e73ec65e278da802a2e5950ed83 Mon Sep 17 00:00:00 2001
+From: adabaca <ada@olivestudio.ro>
+Date: Thu, 27 Apr 2023 10:06:02 +0300
 Subject: [PATCH] Fixed fatal error on admin-ajax.php when editing pages due to
- WPML loading Translation Management despite being disabled.
+ WPML loading Translation Management despite being disabled, after update.
 
 ---
- inc/functions-load.php | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ classes/ATE/API/class-wpml-tm-ate-authentication.php | 2 +-
+ inc/functions-load.php                               | 4 +++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/wp-content/plugins/sitepress-multilingual-cms/classes/ATE/API/class-wpml-tm-ate-authentication.php b/wp-content/plugins/sitepress-multilingual-cms/classes/ATE/API/class-wpml-tm-ate-authentication.php
-index 28e0adaaa..d1550b3ab 100644
+diff --git a/classes/ATE/API/class-wpml-tm-ate-authentication.php b/classes/ATE/API/class-wpml-tm-ate-authentication.php
+index 81e740b22..d542fd57f 100644
 --- a/classes/ATE/API/class-wpml-tm-ate-authentication.php
 +++ b/classes/ATE/API/class-wpml-tm-ate-authentication.php
 @@ -106,7 +106,7 @@ class WPML_TM_ATE_Authentication {
-                }
+ 		}
  
-                $query['wpml_core_version'] = ICL_SITEPRESS_VERSION;
--               $query['wpml_tm_version']   = WPML_TM_VERSION;
-+               $query['wpml_tm_version']   = defined('WPML_TM_VERSION') ? WPML_TM_VERSION : '0.0';
-                $query['shared_key']        = $this->get_shared();
-                $query['token']             = uuid_v5( wp_generate_uuid4(), $url );
-                $query['website_uuid']      = $this->get_site_id();
+ 		$query['wpml_core_version'] = ICL_SITEPRESS_VERSION;
+-		$query['wpml_tm_version']   = WPML_TM_VERSION;
++		$query['wpml_tm_version']   = defined('WPML_TM_VERSION') ? WPML_TM_VERSION : '0.0';
+ 		$query['shared_key']        = $this->get_shared();
+ 		$query['token']             = uuid_v5( wp_generate_uuid4(), $url );
+ 		$query['website_uuid']      = $this->get_site_id();
 diff --git a/inc/functions-load.php b/inc/functions-load.php
-index 7851afe60..dd9b51967 100644
+index e71324361..98faa84ec 100644
 --- a/inc/functions-load.php
 +++ b/inc/functions-load.php
-@@ -433,4 +433,6 @@ if ( is_admin() ) {
+@@ -434,4 +434,6 @@ if ( is_admin() ) {
  
  
  // TM
@@ -34,5 +35,5 @@ index 7851afe60..dd9b51967 100644
 +	require_once 'functions-load-tm.php';
 +}
 -- 
-2.25.1
+2.34.1
 
