@@ -1,26 +1,25 @@
-From 9f080af36df8dd5066417c6a59cae52163a3675b Mon Sep 17 00:00:00 2001
-From: Bogdan Arizancu <bogdan@netzstrategen.com>
-Date: Fri, 25 Mar 2022 10:20:36 +0200
-Subject: [PATCH] Fixed fatal error during feed generation for empty
- hierarchical terms list.
+From edc691ea72a8a05a0566d368e62b24ee7968a841 Mon Sep 17 00:00:00 2001
+From: Nabi <artsanaat@gmail.com>
+Date: Wed, 10 May 2023 10:29:35 +0300
+Subject: [PATCH] Fixed webappick-product-feed-for-woocommerce-pro fatal error.
 
 ---
  libs/webappick-product-feed-for-woocommerce/includes/helper.php | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/libs/webappick-product-feed-for-woocommerce/includes/helper.php b/libs/webappick-product-feed-for-woocommerce/includes/helper.php
-index b9873a3fe..2fc4a00c0 100644
+index 28dfacaf..2a20da56 100755
 --- a/libs/webappick-product-feed-for-woocommerce/includes/helper.php
 +++ b/libs/webappick-product-feed-for-woocommerce/includes/helper.php
-@@ -3464,7 +3464,7 @@ if ( ! function_exists( 'woo_feed_get_terms_list_hierarchical_order' ) ) {
+@@ -3376,7 +3376,7 @@ if ( ! function_exists( 'woo_feed_get_terms_list_hierarchical_order' ) ) {
  
  		$terms = get_the_terms( $id, $taxonomy );
  
--		if ( count( $terms ) ) {
-+		if ( ! empty( $terms ) ) {
+-		if ( ! empty( $terms ) ) {
++		if ( is_array( $terms ) && ! empty( $terms ) ) {
  
  			if ( $full_path ) {
  				return woo_feed_deep_term( $terms[ count( $terms ) - 1 ], $taxonomy );
 -- 
-2.24.4
+2.15.0
 
