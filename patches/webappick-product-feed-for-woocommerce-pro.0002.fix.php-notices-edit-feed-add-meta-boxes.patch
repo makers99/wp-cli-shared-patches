@@ -1,0 +1,26 @@
+From 59e079a7a6a1b7914beee1077662fadce24b08b1 Mon Sep 17 00:00:00 2001
+From: Bogdan Arizancu <bogdan@netzstrategen.com>
+Date: Wed, 20 Jul 2022 12:00:05 +0200
+Subject: [PATCH] Fixed various PHP notices in other plugins on edit feed
+ settings page caused by incompatible invocation of add_meta_boxes hook in
+ webappick-product-feed-for-woocommerce-pro.
+
+---
+ libs/webappick-product-feed-for-woocommerce/includes/helper.php | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/libs/webappick-product-feed-for-woocommerce/includes/helper.php b/libs/webappick-product-feed-for-woocommerce/includes/helper.php
+index f4559f4e7..983968661 100644
+--- a/libs/webappick-product-feed-for-woocommerce/includes/helper.php
++++ b/libs/webappick-product-feed-for-woocommerce/includes/helper.php
+@@ -810,7 +810,6 @@ if ( ! function_exists( 'woo_feed_register_and_do_woo_feed_meta_boxes' ) ) {
+ 		 * This action is documented in wp-admin/includes/meta-boxes.php
+ 		 * using screen id instead of post type
+ 		 */
+-		do_action( 'add_meta_boxes', $screen->id, $feedRules );
+ 		do_action( "add_meta_boxes_{$screen->id}", $feedRules );
+ 		do_action( 'do_meta_boxes', $screen->id, 'normal', $feedRules );
+ 		do_action( 'do_meta_boxes', $screen->id, 'advanced', $feedRules );
+-- 
+2.24.4
+
