@@ -1,0 +1,28 @@
+From b1f3cfba82f359d4ed8486db3afc3bbb114ffc91 Mon Sep 17 00:00:00 2001
+From: Nabi <artsanaat@gmail.com>
+Date: Fri, 26 May 2023 16:51:37 +0300
+Subject: [PATCH] Fixed wpml all import fatal error.
+
+---
+ wpml-all-import.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/wpml-all-import.php b/wpml-all-import.php
+index 97fe2a51e..ee03fc461 100644
+--- a/wpml-all-import.php
++++ b/wpml-all-import.php
+@@ -9,9 +9,9 @@
+ 	Author URI: http://www.onthegosystems.com/
+ */
+ 
+-require_once "includes/rapid-addon.php";
++require_once __DIR__ . "/includes/rapid-addon.php";
+ 
+-require_once "vendor/autoload.php";
++require_once __DIR__ . "/vendor/autoload.php";
+ 
+ if ( ! class_exists('WPAI_WPML') )
+ {
+-- 
+2.15.0
+
