@@ -1,0 +1,34 @@
+From 5853907bfb1f0835b948cf615144a6809b835e92 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 13 Jun 2023 17:09:08 +0200
+Subject: [PATCH] Fixed slow wp_update_term() performance with WPML and WCML.
+
+---
+ inc/class-wcml-terms.php | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/inc/class-wcml-terms.php b/inc/class-wcml-terms.php
+index 11f30045b..98d114259 100644
+--- a/inc/class-wcml-terms.php
++++ b/inc/class-wcml-terms.php
+@@ -313,14 +313,15 @@ class WCML_Terms {
+                     SELECT t1.element_id AS e1, t2.element_id AS e2 FROM {$this->wpdb->term_taxonomy} x
+                     JOIN {$this->wpdb->prefix}icl_translations t1 ON x.term_taxonomy_id = t1.element_id AND t1.element_type = %s AND t1.source_language_code IS NULL
+                     LEFT JOIN {$this->wpdb->prefix}icl_translations t2 ON t2.trid = t1.trid AND t2.language_code = %s
++                    WHERE t2.element_id IS NULL
+                 ",
+ 						'tax_' . $taxonomy,
+ 						$language['code']
+ 					)
+ 				);
+ 				foreach ( $terms as $term ) {
+-					if ( empty( $term->e2 ) && ! in_array( $term->e1, $original_terms ) ) {
+-						$original_terms[] = $term->e1;
++					if ( empty( $term->e2 ) && ! isset( $original_terms[ $term->e1 ] ) ) {
++						$original_terms[$term->e1] = 0;
+ 						$not_translated_count ++;
+ 					}
+ 				}
+-- 
+2.30.1
+

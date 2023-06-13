@@ -1,0 +1,47 @@
+From 5853907bfb1f0835b948cf615144a6809b835e92 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 13 Jun 2023 17:09:08 +0200
+Subject: [PATCH] Fixed slow wp_update_term() performance with WPML and WCML.
+
+---
+ .../wpml-term-filters.class.php                       | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/inc/taxonomy-term-translation/wpml-term-filters.class.php b/inc/taxonomy-term-translation/wpml-term-filters.class.php
+index 9668826e6..48e3c6f45 100644
+--- a/inc/taxonomy-term-translation/wpml-term-filters.class.php
++++ b/inc/taxonomy-term-translation/wpml-term-filters.class.php
+@@ -90,8 +90,7 @@ class WPML_Term_Filters extends WPML_WPDB_And_SP_User {
+ 					 WHERE tt.parent > 0
+ 					  AND tt.taxonomy = %s
+ 					  AND iclt.language_code = %s
+-					  AND iclt.element_type = %s
+-					 ORDER BY term_id",
++					  AND iclt.element_type = %s",
+ 					$taxonomy,
+ 					$lang_code,
+ 					'tax_' . $taxonomy
+@@ -103,16 +102,16 @@ class WPML_Term_Filters extends WPML_WPDB_And_SP_User {
+ 					"SELECT term_id, parent
+ 					 FROM {$this->wpdb->term_taxonomy} tt
+ 					 WHERE tt.parent > 0
+-					  AND tt.taxonomy = %s
+-					 ORDER BY term_id",
++					  AND tt.taxonomy = %s",
+ 					$taxonomy
+ 				)
+ 			);
+ 		}
+ 		foreach ( $terms as $term ) {
+ 			if ( $term->parent > 0 ) {
+-				$hierarchy[ $term->parent ]   = isset( $hierarchy[ $term->parent ] )
+-					? $hierarchy[ $term->parent ] : array();
++				if ( ! isset( $hierarchy[ $term->parent ] ) ) {
++					$hierarchy[ $term->parent ] = array();
++				}
+ 				$hierarchy[ $term->parent ][] = $term->term_id;
+ 			}
+ 		}
+-- 
+2.30.1
+
