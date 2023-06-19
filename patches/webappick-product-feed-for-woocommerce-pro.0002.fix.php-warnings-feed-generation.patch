@@ -48,13 +48,13 @@ index 668d4611..f52ce073 100755
  			}
  		} elseif ( ! empty( $str ) ) {
 -			list( $name, $value ) = explode( '=', $str, 2 );
-+            if ( strpos( $str, '=' ) !== false ) {
-+                list( $name, $value ) = explode( '=', $str, 2 );
-+            } else {
-+                $name = $str;
-+                $value = null;
-+            }
- 			$arr[ $name ]         = $value;
++			if ( strpos( $str, '=' ) !== false ) {
++				list( $name, $value ) = explode( '=', $str, 2 );
++ 			} else {
++				$name = $str;
++				$value = null;
++			}
+ 			$arr[ $name ] = $value;
  		}
  
 -- 
