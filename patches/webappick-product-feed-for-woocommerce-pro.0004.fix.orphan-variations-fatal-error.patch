@@ -17,9 +17,9 @@ index be735c6e..2b477538 100755
  			if ( '' === $value && $product->is_type( 'variation' ) ) {
  				$product = wc_get_product( $product->get_parent_id() );
 -				$value   = $product->get_attribute( $attr );
-+        if ( $product ) {
-+          $value = $product->get_attribute( $attr );
-+        }
++				if ( $product ) {
++					$value = $product->get_attribute( $attr );
++				}
  			}
  
  			$getproductattribute = $value;
