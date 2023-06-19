@@ -16,7 +16,7 @@ index f52ce073..4700620d 100755
  		$terms = get_the_terms( $id, $taxonomy );
  
 -		if ( count( $terms ) ) {
-+  		if ( is_array( $terms ) && ! empty( $terms ) ) {
++		if ( is_array( $terms ) && ! empty( $terms ) ) {
  
  			if ( $full_path ) {
  				return woo_feed_deep_term( $terms[ count( $terms ) - 1 ], $taxonomy );
