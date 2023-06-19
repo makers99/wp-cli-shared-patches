@@ -21,7 +21,7 @@ index 1e29fba3..be735c6e 100755
  			} elseif ( has_post_thumbnail( $product->get_parent_id() ) ) {
  				$getImage = wp_get_attachment_image_src( get_post_thumbnail_id( $product->get_parent_id() ), 'single-post-thumbnail' );
 -				$image    = woo_feed_get_formatted_url( $getImage[0] );
-+        $image    = isset( $getImage[0] ) ? woo_feed_get_formatted_url( $getImage[0] ) : '';
++				$image    = isset( $getImage[0] ) ? woo_feed_get_formatted_url( $getImage[0] ) : '';
  			}
  		} elseif ( has_post_thumbnail( $product->get_id() ) ) { // All product type except variation
  			$getImage = wp_get_attachment_image_src( get_post_thumbnail_id( $product->get_id() ), 'single-post-thumbnail' );
