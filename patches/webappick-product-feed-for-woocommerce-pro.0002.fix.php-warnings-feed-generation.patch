@@ -34,12 +34,12 @@ index 668d4611..f52ce073 100755
  			foreach ( $pairs as $i ) {
  				// split into name and value
 -				list( $name, $value ) = explode( '=', $i, 2 );
-+                if ( strpos( $i, '=' ) !== false ) {
-+                    list( $name, $value ) = explode( '=', $i, 2 );
-+                } else {
-+                    $name = $i;
-+                    $value = null;
-+                }
++				if ( strpos( $i, '=' ) !== false ) {
++					list( $name, $value ) = explode( '=', $i, 2 );
++				} else {
++					$name = $i;
++					$value = null;
++				}
  
  				// if name already exists
  				if ( isset( $arr[ $name ] ) ) {
