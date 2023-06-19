@@ -1,0 +1,25 @@
+From 8a28ee321b6361ac0d156fe28cd19f1ae98bde6f Mon Sep 17 00:00:00 2001
+From: Nabi <artsanaat@gmail.com>
+Date: Mon, 19 Jun 2023 12:20:53 +0330
+Subject: [PATCH] Fixed webappick-product-feed-for-woocommerce-pro fatal error.
+
+---
+ libs/webappick-product-feed-for-woocommerce/includes/helper.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libs/webappick-product-feed-for-woocommerce/includes/helper.php b/libs/webappick-product-feed-for-woocommerce/includes/helper.php
+index f52ce073..4700620d 100755
+--- a/libs/webappick-product-feed-for-woocommerce/includes/helper.php
++++ b/libs/webappick-product-feed-for-woocommerce/includes/helper.php
+@@ -3380,7 +3380,7 @@ if ( ! function_exists( 'woo_feed_get_terms_list_hierarchical_order' ) ) {
+ 
+ 		$terms = get_the_terms( $id, $taxonomy );
+ 
+-		if ( count( $terms ) ) {
++        if ( is_array( $terms ) && ! empty( $terms ) ) {
+ 
+ 			if ( $full_path ) {
+ 				return woo_feed_deep_term( $terms[ count( $terms ) - 1 ], $taxonomy );
+-- 
+2.15.0
+
