@@ -1,6 +1,6 @@
-From edc691ea72a8a05a0566d368e62b24ee7968a841 Mon Sep 17 00:00:00 2001
+From 8a28ee321b6361ac0d156fe28cd19f1ae98bde6f Mon Sep 17 00:00:00 2001
 From: Nabi <artsanaat@gmail.com>
-Date: Wed, 10 May 2023 10:29:35 +0300
+Date: Mon, 19 Jun 2023 12:20:53 +0330
 Subject: [PATCH] Fixed webappick-product-feed-for-woocommerce-pro fatal error.
 
 ---
@@ -8,14 +8,14 @@ Subject: [PATCH] Fixed webappick-product-feed-for-woocommerce-pro fatal error.
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/libs/webappick-product-feed-for-woocommerce/includes/helper.php b/libs/webappick-product-feed-for-woocommerce/includes/helper.php
-index 28dfacaf..2a20da56 100755
+index f52ce073..4700620d 100755
 --- a/libs/webappick-product-feed-for-woocommerce/includes/helper.php
 +++ b/libs/webappick-product-feed-for-woocommerce/includes/helper.php
-@@ -3376,7 +3376,7 @@ if ( ! function_exists( 'woo_feed_get_terms_list_hierarchical_order' ) ) {
+@@ -3380,7 +3380,7 @@ if ( ! function_exists( 'woo_feed_get_terms_list_hierarchical_order' ) ) {
  
  		$terms = get_the_terms( $id, $taxonomy );
  
--		if ( ! empty( $terms ) ) {
+-		if ( count( $terms ) ) {
 +		if ( is_array( $terms ) && ! empty( $terms ) ) {
  
  			if ( $full_path ) {

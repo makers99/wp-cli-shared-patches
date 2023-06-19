@@ -1,18 +1,18 @@
-From 07959b98a4322f4bf6defbb015fb5394710f150a Mon Sep 17 00:00:00 2001
-From: Daniel Kudwien <daniel@netzstrategen.com>
-Date: Mon, 28 Feb 2022 16:51:25 +0100
+From 7ba049d7af197d7f9287cc26fa1064076904c8b8 Mon Sep 17 00:00:00 2001
+From: Nabi <artsanaat@gmail.com>
+Date: Mon, 19 Jun 2023 12:12:02 +0330
 Subject: [PATCH] Fixed PHP warnings reported during product feed generation.
 
 ---
- .../classes/class-woo-feed-products-v3.php         |  4 ++--
- .../includes/helper.php                            | 14 ++++++++++++--
+ .../includes/classes/class-woo-feed-products-v3.php        |  4 ++--
+ .../includes/helper.php                                    | 14 ++++++++++++--
  2 files changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php b/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php
-index a18c870a0..0993c2690 100644
+index 1e29fba3..be735c6e 100755
 --- a/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php
 +++ b/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php
-@@ -2456,10 +2456,10 @@ class Woo_Feed_Products_v3 {
+@@ -2537,10 +2537,10 @@ class Woo_Feed_Products_v3 {
  			// Variation product type
  			if ( has_post_thumbnail( $product->get_id() ) ) {
  				$getImage = wp_get_attachment_image_src( get_post_thumbnail_id( $product->get_id() ), 'single-post-thumbnail' );
@@ -26,10 +26,10 @@ index a18c870a0..0993c2690 100644
  		} elseif ( has_post_thumbnail( $product->get_id() ) ) { // All product type except variation
  			$getImage = wp_get_attachment_image_src( get_post_thumbnail_id( $product->get_id() ), 'single-post-thumbnail' );
 diff --git a/libs/webappick-product-feed-for-woocommerce/includes/helper.php b/libs/webappick-product-feed-for-woocommerce/includes/helper.php
-index 983968661..b9873a3fe 100644
+index 668d4611..f52ce073 100755
 --- a/libs/webappick-product-feed-for-woocommerce/includes/helper.php
 +++ b/libs/webappick-product-feed-for-woocommerce/includes/helper.php
-@@ -2193,7 +2193,12 @@ if ( ! function_exists( 'woo_feed_parse_string' ) ) {
+@@ -2075,7 +2075,12 @@ if ( ! function_exists( 'woo_feed_parse_string' ) ) {
  			// loop through each pair
  			foreach ( $pairs as $i ) {
  				// split into name and value
@@ -43,7 +43,7 @@ index 983968661..b9873a3fe 100644
  
  				// if name already exists
  				if ( isset( $arr[ $name ] ) ) {
-@@ -2209,7 +2214,12 @@ if ( ! function_exists( 'woo_feed_parse_string' ) ) {
+@@ -2091,7 +2096,12 @@ if ( ! function_exists( 'woo_feed_parse_string' ) ) {
  				}
  			}
  		} elseif ( ! empty( $str ) ) {
@@ -58,5 +58,5 @@ index 983968661..b9873a3fe 100644
  		}
  
 -- 
-2.24.4
+2.15.0
 

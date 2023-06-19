@@ -1,18 +1,18 @@
-From 3ca1f8085dd2312b7c83bf83235ae0242107329d Mon Sep 17 00:00:00 2001
-From: Bogdan Arizancu <bogdan@netzstrategen.com>
-Date: Wed, 20 Jul 2022 12:37:07 +0200
-Subject: [PATCH] Fixed fatal error during feed generation for orphan product
+From 6ac0efd46e9778fc69530a4360940cca770cb0bb Mon Sep 17 00:00:00 2001
+From: Nabi <artsanaat@gmail.com>
+Date: Mon, 19 Jun 2023 12:31:26 +0330
+Subject: [PATCH] Fixed fatal error during feed generation for orphan product 
  variations.
 
 ---
- .../includes/classes/class-woo-feed-products-v3.php           | 4 +++-
+ .../includes/classes/class-woo-feed-products-v3.php                   | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php b/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php
-index 0993c2690..2c2542836 100644
+index be735c6e..2b477538 100755
 --- a/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php
 +++ b/libs/webappick-product-feed-for-woocommerce/includes/classes/class-woo-feed-products-v3.php
-@@ -3790,7 +3790,9 @@ class Woo_Feed_Products_v3 {
+@@ -3880,7 +3880,9 @@ class Woo_Feed_Products_v3 {
  			// if empty get attribute of parent post
  			if ( '' === $value && $product->is_type( 'variation' ) ) {
  				$product = wc_get_product( $product->get_parent_id() );
@@ -24,5 +24,5 @@ index 0993c2690..2c2542836 100644
  
  			$getproductattribute = $value;
 -- 
-2.24.4
+2.15.0
 
