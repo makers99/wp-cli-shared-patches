@@ -1,6 +1,6 @@
-From 594df1ea97d914c982fad8373a32e0923d55231e Mon Sep 17 00:00:00 2001
+From d2f69be5d4cb4b5aa62eaca04cef9291d555e91a Mon Sep 17 00:00:00 2001
 From: Fabian Marz <fabian@netzstrategen.com>
-Date: Tue, 20 Jun 2023 12:02:08 +0200
+Date: Wed, 21 Jun 2023 15:13:16 +0200
 Subject: [PATCH] Fixed real-media-library CPU performance when loading
  folders.
 
@@ -9,7 +9,7 @@ Subject: [PATCH] Fixed real-media-library CPU performance when loading
  1 file changed, 5 insertions(+), 10 deletions(-)
 
 diff --git a/inc/attachment/Structure.php b/inc/attachment/Structure.php
-index f73252e20..c48ca5472 100644
+index f73252e20..2fd701017 100644
 --- a/inc/attachment/Structure.php
 +++ b/inc/attachment/Structure.php
 @@ -208,7 +208,7 @@ class Structure implements \MatthiasWeb\RealMediaLibrary\api\IStructure {
@@ -51,7 +51,7 @@ index f73252e20..c48ca5472 100644
 -                return $folder;
 -            }
 +        if ($found = $this->getParsed()[$id] ?? NULL) {
-+          return $found;
++            return $found;
          }
          /**
           * When a folder is not found by an absolute path this filter is
