@@ -1,0 +1,25 @@
+From e3e84334d0048b811457e5fc91d31e068d3eaa4b Mon Sep 17 00:00:00 2001
+From: Nabi <artsanaat@gmail.com>
+Date: Thu, 22 Jun 2023 08:40:14 +0330
+Subject: [PATCH] Fixed wisdm-reports-for-learndash acf php warning.
+
+---
+ includes/admin/dashboard/class-dashboard.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/admin/dashboard/class-dashboard.php b/includes/admin/dashboard/class-dashboard.php
+index 768c43dc..a015afbe 100644
+--- a/includes/admin/dashboard/class-dashboard.php
++++ b/includes/admin/dashboard/class-dashboard.php
+@@ -317,7 +317,7 @@ if ( ! class_exists( 'Dashboard' ) ) {
+ 				$body     = wp_remote_retrieve_body( $response );
+ 				$actual_data  = json_decode($body);
+ 				
+-				$data_array = $actual_data->acf->whats_new_features_data;
++				$data_array = $actual_data?->acf?->whats_new_features_data;
+ 				
+ 				if(! empty($data_array)){
+ 					$latest = $data_array[0]->version_number;
+-- 
+2.15.0
+
