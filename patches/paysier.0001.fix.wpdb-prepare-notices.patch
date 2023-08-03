@@ -1,0 +1,42 @@
+From a7ac471248ef69a5391d637e339452bd4c8236d4 Mon Sep 17 00:00:00 2001
+From: adabaca <ada@olivestudio.ro>
+Date: Thu, 3 Aug 2023 17:09:07 +0300
+Subject: [PATCH] Fixed paysier plugin wpdb prepare notices.
+
+---
+ Payment/Paysier.php | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/Payment/Paysier.php b/Payment/Paysier.php
+index c1b1cd397..af100fffb 100644
+--- a/Payment/Paysier.php
++++ b/Payment/Paysier.php
+@@ -922,10 +922,9 @@ function add_paysier_payment_method() {
+         public function removeCustomerGracePeriod() : mixed
+         {
+             // Check if customer is blocked
+-            $sql = $this->wpdb->prepare('
++            $sql = '
+                 DELETE FROM '.PAYSIER_WHITELIST_TABLE.' 
+-                WHERE till < now()
+-            ');
++                WHERE till < now()';
+ 
+             return $this->wpdb->query($sql);
+         }
+@@ -997,10 +996,9 @@ function add_paysier_payment_method() {
+         public function removeCustomerBlocked() : mixed
+         {
+             // Check if customer is blocked
+-            $sql = $this->wpdb->prepare('
++            $sql = '
+                 DELETE FROM '.PAYSIER_BLOCKED_TABLE.'
+-                WHERE till < now()
+-            ');
++                WHERE till < now()';
+ 
+             return $this->wpdb->query($sql);
+         }
+-- 
+2.34.1
+
