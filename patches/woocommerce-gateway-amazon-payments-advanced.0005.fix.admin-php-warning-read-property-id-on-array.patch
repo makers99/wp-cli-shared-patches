@@ -1,0 +1,27 @@
+From ac52f1e8c85f4b44b6c05b0f815600d341faec95 Mon Sep 17 00:00:00 2001
+From: adabaca <ada@olivestudio.ro>
+Date: Thu, 3 Aug 2023 13:55:11 +0300
+Subject: [PATCH] Fixed woocommerce-gateway-amazon-payments-advanced admin PHP
+ warning.
+
+---
+ .../admin/class-wc-amazon-payments-advanced-order-admin.php    | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/includes/admin/class-wc-amazon-payments-advanced-order-admin.php b/includes/admin/class-wc-amazon-payments-advanced-order-admin.php
+index 76ef11e5f..0a0719dce 100644
+--- a/includes/admin/class-wc-amazon-payments-advanced-order-admin.php
++++ b/includes/admin/class-wc-amazon-payments-advanced-order-admin.php
+@@ -126,6 +126,9 @@ class WC_Amazon_Payments_Advanced_Order_Admin {
+ 	 * @return void
+ 	 */
+ 	public function meta_box( $screen, $order ) {
++		if (is_array($order)) {
++			return;
++		}
+ 
+ 		$order = $order instanceof \WC_Order ? $order : wc_get_order( $order->ID );
+ 		if ( ! ( $order instanceof \WC_Order ) ) {
+-- 
+2.34.1
+
