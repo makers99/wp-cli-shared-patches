@@ -3,6 +3,7 @@ From: Fabian Marz <fabian@netzstrategen.com>
 Date: Tue, 5 Sep 2023 16:17:38 +0200
 Subject: [PATCH] Fixed media attachments are duplicated.
 
+Upstream: https://wpml.org/forums/topic/media-files-are-duplicated/
 ---
  .../class-wpml-media-attachments-duplication.php          | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
