@@ -1,28 +1,37 @@
-From a3ba30f7bd60e2183af3ae7cac3a0c12eaccdae5 Mon Sep 17 00:00:00 2001
+From 97535574c7cc966a2a1bae42c9bd2d241158bc4c Mon Sep 17 00:00:00 2001
 From: Fabian Marz <fabian@netzstrategen.com>
-Date: Tue, 9 May 2023 15:59:22 +0200
-Subject: [PATCH] Fixed wrong primitives cause comparisons to fail.
+Date: Tue, 5 Sep 2023 16:17:38 +0200
+Subject: [PATCH] Fixed media attachments are duplicated.
 
 ---
- .../class-wpml-media-attachments-duplication.php            | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ .../class-wpml-media-attachments-duplication.php          | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/classes/media/duplication/class-wpml-media-attachments-duplication.php b/classes/media/duplication/class-wpml-media-attachments-duplication.php
-index 6ad18d0b7..f5d9b15c5 100644
+index fbf5582c9..8d231ef03 100644
 --- a/classes/media/duplication/class-wpml-media-attachments-duplication.php
 +++ b/classes/media/duplication/class-wpml-media-attachments-duplication.php
-@@ -685,7 +685,7 @@ class WPML_Media_Attachments_Duplication {
- 				 || $this->is_feature_image_marked_to_duplication( $pidd )
- 			) {
+@@ -437,7 +437,7 @@ class WPML_Media_Attachments_Duplication {
+ 
+ 	public function record_original_thumbnail_ids_and_sync( $meta_id, $object_id, $meta_key, $meta_value ) {
+ 		if ( '_thumbnail_id' === $meta_key ) {
+-			$original_thumbnail_id = get_post_meta( $object_id, $meta_key, true );
++			$original_thumbnail_id = (int) get_post_meta( $object_id, $meta_key, true );
+ 			if ( $original_thumbnail_id !== $meta_value ) {
+ 				$this->original_thumbnail_ids[ $object_id ] = $original_thumbnail_id;
+ 				$this->sync_post_thumbnail( $object_id, $meta_value ? $meta_value : false );
+@@ -679,7 +679,7 @@ class WPML_Media_Attachments_Duplication {
+ 
+ 			if ( Option::shouldDuplicateMedia( $pidd ) || Option::shouldDuplicateFeatured( $pidd ) ) {
  				$translations_prepared = $this->wpdb->prepare( "SELECT element_id FROM {$this->wpdb->prefix}icl_translations WHERE trid = %d", array( $icl_trid ) );
 -				$translations          = $this->wpdb->get_col( $translations_prepared );
 +				$translations          = array_map( 'intval', $this->wpdb->get_col( $translations_prepared ) );
  
  				foreach ( $translations as $element_id ) {
  					if ( $element_id && $element_id != $pidd ) {
-@@ -695,9 +695,9 @@ class WPML_Media_Attachments_Duplication {
+@@ -689,9 +689,9 @@ class WPML_Media_Attachments_Duplication {
  
- 						if ( $this->is_media_marked_to_duplication( $element_id ) ) {
+ 						if ( Option::shouldDuplicateFeatured( $element_id ) ) {
  							$source_attachments_prepared = $this->wpdb->prepare( "SELECT ID FROM {$this->wpdb->posts} WHERE post_parent = %d AND post_type = %s", array( $pidd, 'attachment' ) );
 -							$source_attachments          = $this->wpdb->get_col( $source_attachments_prepared );
 +							$source_attachments          = array_map( 'intval', $this->wpdb->get_col( $source_attachments_prepared ) );
