@@ -1,0 +1,47 @@
+From 97535574c7cc966a2a1bae42c9bd2d241158bc4c Mon Sep 17 00:00:00 2001
+From: Fabian Marz <fabian@netzstrategen.com>
+Date: Tue, 5 Sep 2023 16:17:38 +0200
+Subject: [PATCH] Fixed media attachments are duplicated.
+
+Upstream: https://wpml.org/forums/topic/media-files-are-duplicated/
+---
+ .../class-wpml-media-attachments-duplication.php          | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/classes/media/duplication/class-wpml-media-attachments-duplication.php b/classes/media/duplication/class-wpml-media-attachments-duplication.php
+index fbf5582c9..8d231ef03 100644
+--- a/classes/media/duplication/class-wpml-media-attachments-duplication.php
++++ b/classes/media/duplication/class-wpml-media-attachments-duplication.php
+@@ -437,7 +437,7 @@ class WPML_Media_Attachments_Duplication {
+ 
+ 	public function record_original_thumbnail_ids_and_sync( $meta_id, $object_id, $meta_key, $meta_value ) {
+ 		if ( '_thumbnail_id' === $meta_key ) {
+-			$original_thumbnail_id = get_post_meta( $object_id, $meta_key, true );
++			$original_thumbnail_id = (int) get_post_meta( $object_id, $meta_key, true );
+ 			if ( $original_thumbnail_id !== $meta_value ) {
+ 				$this->original_thumbnail_ids[ $object_id ] = $original_thumbnail_id;
+ 				$this->sync_post_thumbnail( $object_id, $meta_value ? $meta_value : false );
+@@ -679,7 +679,7 @@ class WPML_Media_Attachments_Duplication {
+ 
+ 			if ( Option::shouldDuplicateMedia( $pidd ) || Option::shouldDuplicateFeatured( $pidd ) ) {
+ 				$translations_prepared = $this->wpdb->prepare( "SELECT element_id FROM {$this->wpdb->prefix}icl_translations WHERE trid = %d", array( $icl_trid ) );
+-				$translations          = $this->wpdb->get_col( $translations_prepared );
++				$translations          = array_map( 'intval', $this->wpdb->get_col( $translations_prepared ) );
+ 
+ 				foreach ( $translations as $element_id ) {
+ 					if ( $element_id && $element_id != $pidd ) {
+@@ -689,9 +689,9 @@ class WPML_Media_Attachments_Duplication {
+ 
+ 						if ( Option::shouldDuplicateFeatured( $element_id ) ) {
+ 							$source_attachments_prepared = $this->wpdb->prepare( "SELECT ID FROM {$this->wpdb->posts} WHERE post_parent = %d AND post_type = %s", array( $pidd, 'attachment' ) );
+-							$source_attachments          = $this->wpdb->get_col( $source_attachments_prepared );
++							$source_attachments          = array_map( 'intval', $this->wpdb->get_col( $source_attachments_prepared ) );
+ 							$attachments_prepared        = $this->wpdb->prepare( "SELECT ID FROM {$this->wpdb->posts} WHERE post_parent = %d AND post_type = %s", array( $element_id, 'attachment' ) );
+-							$attachments                 = $this->wpdb->get_col( $attachments_prepared );
++							$attachments                 = array_map( 'intval', $this->wpdb->get_col( $attachments_prepared ) );
+ 
+ 							foreach ( $source_attachments as $source_attachment_id ) {
+ 								foreach ( $attachments as $attachment_id ) {
+-- 
+2.30.2
+
