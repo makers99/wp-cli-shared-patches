@@ -1,4 +1,4 @@
-From d2f69be5d4cb4b5aa62eaca04cef9291d555e91a Mon Sep 17 00:00:00 2001
+From 16be4aa08895f0fbe1d3469add0b097d8e0d97d9 Mon Sep 17 00:00:00 2001
 From: Fabian Marz <fabian@netzstrategen.com>
 Date: Wed, 21 Jun 2023 15:13:16 +0200
 Subject: [PATCH] Fixed real-media-library CPU performance when loading
@@ -9,27 +9,27 @@ Subject: [PATCH] Fixed real-media-library CPU performance when loading
  1 file changed, 5 insertions(+), 10 deletions(-)
 
 diff --git a/inc/attachment/Structure.php b/inc/attachment/Structure.php
-index f73252e20..2fd701017 100644
+index 0c6102410..acec4520d 100644
 --- a/inc/attachment/Structure.php
 +++ b/inc/attachment/Structure.php
-@@ -208,7 +208,7 @@ class Structure implements \MatthiasWeb\RealMediaLibrary\api\IStructure {
+@@ -186,7 +186,7 @@ class Structure implements IStructure
                  if (isset($creatable)) {
                      $result = \call_user_func_array([$creatable, 'instance'], [$value]);
-                     if (is_rml_folder($result)) {
+                     if (\is_rml_folder($result)) {
 -                        $this->parsed[] = $result;
 +                        $this->parsed[\intval($value->id)] = $result;
                      }
                  }
              }
-@@ -228,6 +228,7 @@ class Structure implements \MatthiasWeb\RealMediaLibrary\api\IStructure {
-         $this->parsed = apply_filters('RML/Tree/Parsed', $this->parsed);
+@@ -206,6 +206,7 @@ class Structure implements IStructure
+         $this->parsed = \apply_filters('RML/Tree/Parsed', $this->parsed);
          // Create the tree
          $folder = null;
 +        $cats_tree = [];
          foreach ($this->parsed as $key => $category) {
              $parent = $category->getParent();
              if ($parent > -1) {
-@@ -235,11 +236,7 @@ class Structure implements \MatthiasWeb\RealMediaLibrary\api\IStructure {
+@@ -213,11 +214,7 @@ class Structure implements IStructure
                  if ($folder !== null) {
                      $folder->addChildren($category);
                  }
@@ -42,9 +42,9 @@ index f73252e20..2fd701017 100644
                  $cats_tree[] = $category;
              }
          }
-@@ -251,10 +248,8 @@ class Structure implements \MatthiasWeb\RealMediaLibrary\api\IStructure {
+@@ -230,10 +227,8 @@ class Structure implements IStructure
          if (!$nullForRoot && $id === -1) {
-             return \MatthiasWeb\RealMediaLibrary\folder\Root::getInstance();
+             return Root::getInstance();
          }
 -        foreach ($this->getParsed() as $folder) {
 -            if ($folder->getId() === $id) {
@@ -56,5 +56,5 @@ index f73252e20..2fd701017 100644
          /**
           * When a folder is not found by an absolute path this filter is
 -- 
-2.30.2
+2.25.1
 
