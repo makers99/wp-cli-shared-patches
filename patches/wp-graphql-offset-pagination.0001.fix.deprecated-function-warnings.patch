@@ -1,0 +1,41 @@
+From daabc068d178a8518832b82ec76b482738bcfed9 Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Tue, 14 Nov 2023 09:35:04 +0100
+Subject: [PATCH] Fixed deprecated function warnings.
+
+---
+ src/Loader.php | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/Loader.php b/src/Loader.php
+index 39a9f84e1..9a8938b19 100644
+--- a/src/Loader.php
++++ b/src/Loader.php
+@@ -72,13 +72,13 @@ class Loader
+      */
+     static function get_page_size(AbstractConnectionResolver $resolver)
+     {
+-        $args = $resolver->getArgs();
++        $args = $resolver->get_args();
+         return intval($args['where']['offsetPagination']['size'] ?? 0);
+     }
+ 
+     static function is_offset_resolver(AbstractConnectionResolver $resolver)
+     {
+-        $args = $resolver->getArgs();
++        $args = $resolver->get_args();
+         return isset($args['where']['offsetPagination']);
+     }
+ 
+@@ -126,7 +126,7 @@ class Loader
+     ) {
+         $size = self::get_page_size($resolver);
+         $query = $resolver->get_query();
+-        $args = $resolver->getArgs();
++        $args = $resolver->get_args();
+         $offset = $args['where']['offsetPagination']['offset'] ?? 0;
+ 
+         $total = null;
+-- 
+2.24.4
+
