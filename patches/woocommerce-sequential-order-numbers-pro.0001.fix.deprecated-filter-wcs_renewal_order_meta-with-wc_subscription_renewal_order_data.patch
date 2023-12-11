@@ -1,0 +1,41 @@
+From dbc5a6a8bfc2833bc434333e80b5d7ac5af87b14 Mon Sep 17 00:00:00 2001
+From: Nabi <artsanaat@gmail.com>
+Date: Mon, 11 Dec 2023 13:33:19 +0330
+Subject: [PATCH] Fixed deprecated filter wcs_renewal_order_meta with
+ wc_subscription_renewal_order_data in
+ woocommerce-sequential-order-numbers-pro plugin.
+
+---
+ changelog.txt                                | 3 +++
+ woocommerce-sequential-order-numbers-pro.php | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/changelog.txt b/changelog.txt
+index b51476eb1..a7368b1bb 100644
+--- a/changelog.txt
++++ b/changelog.txt
+@@ -1,5 +1,8 @@
+ *** WooCommerce Sequential Order Numbers Pro Changelog ***
+ 
++2023.12.11 - version 1.20.4
++ * Fix - Updated deprecated `wcs_renewal_order_meta` filter with `wc_subscription_renewal_order_data` filter
++
+ 2023.08.01 - version 1.20.3
+  * Tweak - Also set sequential order numbers for orders sent via the WooCommerce Checkout Block
+  * Fix - Ensure that searching orders in the admin screen by order number can return consistent results when using HPOS
+diff --git a/woocommerce-sequential-order-numbers-pro.php b/woocommerce-sequential-order-numbers-pro.php
+index 854e8c5c9..84c452985 100644
+--- a/woocommerce-sequential-order-numbers-pro.php
++++ b/woocommerce-sequential-order-numbers-pro.php
+@@ -6,7 +6,7 @@
+  * Description: Provides custom incrementing order numbers for WooCommerce orders.
+  * Author: SkyVerge
+  * Author URI: http://www.woocommerce.com
+- * Version: 1.20.3
++ * Version: 1.20.4
+  * Text Domain: woocommerce-sequential-order-numbers-pro
+  * Domain Path: /i18n/languages/
+  *
+-- 
+2.15.0
+
