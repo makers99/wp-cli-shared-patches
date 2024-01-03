@@ -1,0 +1,27 @@
+From fc8786ec4cd0b7dbfdeb5536892bcce5e42cf0e8 Mon Sep 17 00:00:00 2001
+From: Nabi <artsanaat@gmail.com>
+Date: Wed, 3 Jan 2024 16:19:55 +0330
+Subject: [PATCH] Changed deprecated filter wcs_renewal_order_meta with
+ wc_subscription_renewal_order_data in
+ woocommerce-sequential-order-numbers-pro plugin.
+
+---
+ class-wc-seq-order-number-pro.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/class-wc-seq-order-number-pro.php b/class-wc-seq-order-number-pro.php
+index f1105c23c..7eede97be 100644
+--- a/class-wc-seq-order-number-pro.php
++++ b/class-wc-seq-order-number-pro.php
+@@ -103,7 +103,7 @@ class WC_Seq_Order_Number_Pro extends Framework\SV_WC_Plugin {
+ 			add_filter( 'wcs_upgrade_subscription_meta_to_copy', array( $this, 'subscriptions_remove_subscription_order_meta_during_upgrade' ) );
+ 
+ 			// don't copy over SONP meta from the subscription to the renewal order
+-			add_filter( 'wcs_renewal_order_meta', array( $this, 'subscriptions_remove_renewal_order_meta' ) );
++			add_filter( 'wc_subscription_renewal_order_data', array( $this, 'subscriptions_remove_renewal_order_meta' ) );
+ 
+ 			// set order number on renewals
+ 			add_filter( 'wcs_renewal_order_created', array( $this, 'subscriptions_set_sequential_order_number' ), 9 );
+-- 
+2.15.0
+
