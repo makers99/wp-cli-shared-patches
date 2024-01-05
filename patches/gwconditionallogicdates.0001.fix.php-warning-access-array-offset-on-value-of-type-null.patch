@@ -1,5 +1,5 @@
 From 85659172dab9a80985ebabedf31d6a7fe350ebb7 Mon Sep 17 00:00:00 2001
-From: Nabi <artsanaat@gmail.com>
+From: Nabi <nabi@netzstrategen.com>
 Date: Wed, 3 Jan 2024 17:09:08 +0330
 Subject: [PATCH] Fixed Trying to access array offset on value of type null in
  gwconditionallogicdates.
