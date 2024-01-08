@@ -1,0 +1,27 @@
+From 85659172dab9a80985ebabedf31d6a7fe350ebb7 Mon Sep 17 00:00:00 2001
+From: Nabi <nabi@netzstrategen.com>
+Date: Wed, 3 Jan 2024 17:09:08 +0330
+Subject: [PATCH] Fixed Trying to access array offset on value of type null in
+ gwconditionallogicdates.
+
+---
+ includes/class-gw-conditional-logic-date-fields.php | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/includes/class-gw-conditional-logic-date-fields.php b/includes/class-gw-conditional-logic-date-fields.php
+index da871fa6e..abb30c906 100644
+--- a/includes/class-gw-conditional-logic-date-fields.php
++++ b/includes/class-gw-conditional-logic-date-fields.php
+@@ -586,7 +586,8 @@ if ( ! class_exists( 'GWConditionalLogicDateFields' ) ) {
+ 			 * @see https://secure.helpscout.net/conversation/964227500/13854?folderId=14965
+ 			 */
+ 			if ( ! self::is_valid_timestamp( $target_value ) ) {
+-				$temp_rules   = self::convert_conditional_logic_rules( array( $rule ), $source_field->formId );
++				// If there is no $source_field object, pass the form ID from set_current_form().
++				$temp_rules   = self::convert_conditional_logic_rules( array( $rule ), ! empty( $source_field ) ? $source_field->formId : $this->current_form['id'] );
+ 				$target_value = $temp_rules[0]['value'];
+ 
+ 				if ( ! self::is_valid_timestamp( $value ) && ! empty( $timestamp ) ) {
+-- 
+2.15.0
+
