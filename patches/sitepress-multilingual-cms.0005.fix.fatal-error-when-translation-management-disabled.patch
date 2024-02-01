@@ -1,0 +1,29 @@
+From 07510997d9358bb6a915f091d88060b8214de511 Mon Sep 17 00:00:00 2001
+From: adabaca <ada@olivestudio.ro>
+Date: Thu, 1 Feb 2024 17:47:57 +0200
+Subject: [PATCH] Fixed wpml_tm_load_element_translations() function not
+ defined error when WPML TM is disabled.
+
+---
+ menu/post-menus/wpml-posts-listing-page.class.php | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/menu/post-menus/wpml-posts-listing-page.class.php b/menu/post-menus/wpml-posts-listing-page.class.php
+index 2ce2fdc12..7848c4919 100644
+--- a/menu/post-menus/wpml-posts-listing-page.class.php
++++ b/menu/post-menus/wpml-posts-listing-page.class.php
+@@ -35,7 +35,9 @@ class WPML_Posts_Listing_Page {
+ 		$wpml_post_translations->prefetch_ids( $post_ids );
+ 
+ 		// Get and cache all translations for the listed posts.
+-		$wpml_tm_element_translations = wpml_tm_load_element_translations();
+-		$wpml_tm_element_translations->init_jobs( $wpml_post_translations->get_trids() );
++		if ( ! defined( 'WPML_DO_NOT_LOAD_EMBEDDED_TM' ) || ! WPML_DO_NOT_LOAD_EMBEDDED_TM ) {
++			$wpml_tm_element_translations = wpml_tm_load_element_translations();
++			$wpml_tm_element_translations->init_jobs( $wpml_post_translations->get_trids() );
++		}
+ 	}
+ }
+-- 
+2.34.1
+
