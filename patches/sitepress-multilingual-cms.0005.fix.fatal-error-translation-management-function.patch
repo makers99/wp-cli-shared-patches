@@ -1,0 +1,25 @@
+From 3e787e160692ff9a86ba4a5dc22644bee7f91789 Mon Sep 17 00:00:00 2001
+From: adabaca <ada@olivestudio.ro>
+Date: Wed, 31 Jan 2024 14:10:31 +0200
+Subject: [PATCH] Fixed sitepress-multilingual-cms function not defined error.
+
+---
+ menu/wpml-post-status-display.class.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/menu/wpml-post-status-display.class.php b/menu/wpml-post-status-display.class.php
+index f31fef54a..05bf6e18f 100644
+--- a/menu/wpml-post-status-display.class.php
++++ b/menu/wpml-post-status-display.class.php
+@@ -59,7 +59,7 @@ class WPML_Post_Status_Display {
+ 	public function get_status_html( $post_id, $lang ) {
+ 		list( $text, $link, $trid, $css_class, $status ) = $this->get_status_data( $post_id, $lang );
+ 
+-		if ( Option::isTMAllowed() ) {
++		if ( Option::isTMAllowed() && (! defined( 'WPML_DO_NOT_LOAD_EMBEDDED_TM' ) || ! WPML_DO_NOT_LOAD_EMBEDDED_TM) ) {
+ 			$wpml_tm_element_translations = wpml_tm_load_element_translations();
+ 			$review_status = $wpml_tm_element_translations->get_translation_review_status( $trid, $lang );
+ 		} else {
+-- 
+2.34.1
+
