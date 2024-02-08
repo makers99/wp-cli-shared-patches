@@ -1,0 +1,26 @@
+From 87bdc2ae9e1e25350cc0cadd7996c8fa3e91b5bd Mon Sep 17 00:00:00 2001
+From: adabaca <ada@olivestudio.ro>
+Date: Mon, 5 Feb 2024 14:49:57 +0200
+Subject: [PATCH] Fixed WPML translation priority warnings.
+
+---
+ vendor/wpml/core-api/core/setup/Option.php | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/vendor/wpml/core-api/core/setup/Option.php b/vendor/wpml/core-api/core/setup/Option.php
+index eca51a37b..659b371bd 100644
+--- a/vendor/wpml/core-api/core/setup/Option.php
++++ b/vendor/wpml/core-api/core/setup/Option.php
+@@ -145,6 +145,9 @@ class Option {
+ 	}
+ 
+ 	public static function isTMAllowed() {
++		if (defined( 'WPML_DO_NOT_LOAD_EMBEDDED_TM' ) && WPML_DO_NOT_LOAD_EMBEDDED_TM) {
++			return FALSE;
++		}
+ 		return self::get( self::TM_ALLOWED );
+ 	}
+ 
+-- 
+2.34.1
+
