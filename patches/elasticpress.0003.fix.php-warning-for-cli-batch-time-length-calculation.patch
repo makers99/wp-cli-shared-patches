@@ -1,22 +1,23 @@
-From 53b381e5fa3598e24771078796931503a6106ce5 Mon Sep 17 00:00:00 2001
+From efe35a4b7b545788876f3ec3d8281d5f7c47826e Mon Sep 17 00:00:00 2001
 From: Nabi <artsanaat@gmail.com>
-Date: Thu, 22 Jun 2023 10:44:40 +0330
-Subject: [PATCH] Fixed warning from Elasticpress for PHP >= 8.0.
+Date: Thu, 29 Feb 2024 14:21:18 +0330
+Subject: [PATCH] Fixed PHP warning for batch time length calculation in
+ ElasticPress CLI.
 
 ---
  includes/classes/Command.php | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/includes/classes/Command.php b/includes/classes/Command.php
-index 784e8083d..34f05abd3 100644
+index 81fa2f2c5..a1c6c2e93 100644
 --- a/includes/classes/Command.php
 +++ b/includes/classes/Command.php
-@@ -1326,7 +1326,7 @@ class Command extends WP_CLI_Command {
+@@ -1335,7 +1335,7 @@ class Command extends WP_CLI_Command {
  		if ( 'index_next_batch' === $context ) {
  			$counter++;
  			if ( ( $counter % 10 ) === 0 ) {
--				$time_elapsed_diff = $time_elapsed > 0 ? ' (+' . (string) ( Utility::timer_stop() - $time_elapsed ) . ')' : '';
-+				$time_elapsed_diff = $time_elapsed > 0 ? ' (+' . (string) ( Utility::timer_stop() - (int) $time_elapsed ) . ')' : '';
+-				$time_elapsed_diff = $time_elapsed > 0 ? ' (+' . (string) ( Utility::timer_stop() - (int) $time_elapsed ) . ')' : '';
++        $time_elapsed_diff = $time_elapsed > 0 ? ' (+' . (string) ( Utility::timer_stop() - (int) $time_elapsed ) . ')' : '';
  				$time_elapsed      = Utility::timer_stop( 2 );
  				WP_CLI::log( WP_CLI::colorize( '%Y' . esc_html__( 'Time elapsed: ', 'elasticpress' ) . '%N' . Utility::timer_format( $time_elapsed ) . $time_elapsed_diff ) );
  
