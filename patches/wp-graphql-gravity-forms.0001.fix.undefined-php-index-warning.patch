@@ -1,0 +1,25 @@
+From 980bb3779c3e1197d3383336aaa872c38131461a Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Mon, 11 Mar 2024 10:39:11 +0100
+Subject: [PATCH] fix: undefined array index php warning
+
+---
+ src/Type/Enum/CurrencyEnum.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Type/Enum/CurrencyEnum.php b/src/Type/Enum/CurrencyEnum.php
+index 5efd64aef..36c9d4aef 100644
+--- a/src/Type/Enum/CurrencyEnum.php
++++ b/src/Type/Enum/CurrencyEnum.php
+@@ -39,7 +39,7 @@ class CurrencyEnum extends AbstractEnum {
+ 
+ 		foreach ( $currencies as $code => $currency ) {
+ 			$values[ WPEnumType::get_safe_name( $code ) ] = [
+-				'value'       => $currency['code'],
++				'value'       => !empty($currency['code']) ? $currency['code'] : null,
+ 				// translators: Currency Name.
+ 				'description' => sprintf( __( '%s .', 'wp-graphql-gravity-forms' ), $currency['name'] ),
+ 			];
+-- 
+2.24.4
+
