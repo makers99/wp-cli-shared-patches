@@ -1,0 +1,35 @@
+From a06d21c539f5d7131b3d35409be41a219b462226 Mon Sep 17 00:00:00 2001
+From: Marc <marc.delamo@gmail.com>
+Date: Thu, 14 Mar 2024 13:20:21 +0100
+Subject: [PATCH] Fixed PHP 8.1 warning in timber-library about deprecated
+ return type.
+
+---
+ vendor/twig/twig/src/Node/Node.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/vendor/twig/twig/src/Node/Node.php b/vendor/twig/twig/src/Node/Node.php
+index 68e0fd3e..77667821 100644
+--- a/vendor/twig/twig/src/Node/Node.php
++++ b/vendor/twig/twig/src/Node/Node.php
+@@ -210,7 +210,7 @@ class Node implements \Twig_NodeInterface
+     /**
+      * @return int
+      */
+-    public function count()
++    public function count(): int
+     {
+         return \count($this->nodes);
+     }
+@@ -218,7 +218,7 @@ class Node implements \Twig_NodeInterface
+     /**
+      * @return \Traversable
+      */
+-    public function getIterator()
++    public function getIterator(): \Traversable
+     {
+         return new \ArrayIterator($this->nodes);
+     }
+-- 
+2.24.4
+
