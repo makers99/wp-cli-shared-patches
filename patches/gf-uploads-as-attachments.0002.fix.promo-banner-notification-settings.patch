@@ -1,0 +1,31 @@
+From d9ebc3f80a7f1856a77b763761ada0e6f055586d Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 26 Mar 2024 10:42:16 +0100
+Subject: [PATCH] Fixed promotion banner is permanently output in form
+ notification settings.
+
+---
+ includes/class-settings.php | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/includes/class-settings.php b/includes/class-settings.php
+index 83d3e9e8..35def67f 100644
+--- a/includes/class-settings.php
++++ b/includes/class-settings.php
+@@ -94,11 +94,13 @@ class Settings {
+ 				<br>
+ 			</td>
+ 		</tr>
++		<?php if ( ! get_transient( 'gfuaa_dismiss_upgrade_notice' ) ): ?>
+ 		<tr valign="top">
+ 			<th scope="row" colspan="2">
+ 				<?php gf_uploads_as_attachments_upgrades(); ?>
+ 			</th>
+ 		</tr>
++		<?php endif ?>
+ 
+ 		<?php
+ 
+-- 
+2.25.1
+
