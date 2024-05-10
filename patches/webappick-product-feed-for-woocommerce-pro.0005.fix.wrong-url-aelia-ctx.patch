@@ -1,0 +1,25 @@
+From 81b36795a2a43ce93e792aa441f3d454d25f59d3 Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Fri, 10 May 2024 11:44:11 +0200
+Subject: [PATCH] fix: wrong urls in ctx aelia url feeds
+
+---
+ .../V5/Compatibility/WC_Aelia_CurrencySwitcherCompatibility.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libs/webappick-product-feed-for-woocommerce/V5/Compatibility/WC_Aelia_CurrencySwitcherCompatibility.php b/libs/webappick-product-feed-for-woocommerce/V5/Compatibility/WC_Aelia_CurrencySwitcherCompatibility.php
+index a4fd1a6420..c7aaf98f1a 100644
+--- a/libs/webappick-product-feed-for-woocommerce/V5/Compatibility/WC_Aelia_CurrencySwitcherCompatibility.php
++++ b/libs/webappick-product-feed-for-woocommerce/V5/Compatibility/WC_Aelia_CurrencySwitcherCompatibility.php
+@@ -21,7 +21,7 @@ class WC_Aelia_CurrencySwitcherCompatibility {
+ 		add_action( 'before_woo_feed_generate_batch_data', array( $this, 'switch_currency' ), 10, 1 );
+ 
+ 		// Add currency suffix to product link.
+-		add_filter( 'woo_feed_filter_product_link', array( $this, 'get_product_link_with_suffix' ), 10, 3 );
++		//add_filter( 'woo_feed_filter_product_link', array( $this, 'get_product_link_with_suffix' ), 10, 3 );
+ 	}
+ 
+ 	/**
+-- 
+2.24.4
+

@@ -1,0 +1,25 @@
+From 9ec4f26301570e4d30cceed90239af87324352bd Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Fri, 10 May 2024 13:13:26 +0200
+Subject: [PATCH] fix: deprecate function call in wp-graphql-offset-pagination
+
+---
+ src/Loader.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Loader.php b/src/Loader.php
+index 9a8938b197..de08b71ba3 100644
+--- a/src/Loader.php
++++ b/src/Loader.php
+@@ -90,7 +90,7 @@ class Loader
+         array $query_args,
+         AbstractConnectionResolver $resolver
+     ) {
+-        $info = $resolver->getInfo();
++        $info = $resolver->get_info();
+         $selection_set = $info->getFieldSelection(2);
+ 
+         if (!isset($selection_set['pageInfo']['offsetPagination']['total'])) {
+-- 
+2.24.4
+
