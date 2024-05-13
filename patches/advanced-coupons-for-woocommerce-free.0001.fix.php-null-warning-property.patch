@@ -1,0 +1,26 @@
+From 4049029ae4fd0a48c75927ac7bc9645040f2c40f Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Fri, 10 May 2024 17:15:14 +0200
+Subject: [PATCH] fix: php warning read property on null
+ advanced-coupons-for-woocommerce
+
+---
+ Models/Scheduler.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Models/Scheduler.php b/Models/Scheduler.php
+index 8b6021aedb..524db6a8cb 100644
+--- a/Models/Scheduler.php
++++ b/Models/Scheduler.php
+@@ -215,7 +215,7 @@ class Scheduler extends Base_Model implements Model_Interface {
+      */
+     public function disable_wc_default_coupon_expiry_check() {
+         // don't proceed when in admin and viewing coupons list.
+-        if ( is_admin() && get_current_screen()->id === 'edit-shop_coupon' ) {
++        if ( is_admin() && get_current_screen()?->id === 'edit-shop_coupon' ) {
+             return;
+         }
+ 
+-- 
+2.24.4
+
