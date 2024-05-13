@@ -1,0 +1,25 @@
+From 761f94b13e311d884ad01c6a22608db43f30fdeb Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Fri, 10 May 2024 17:08:28 +0200
+Subject: [PATCH] fix: deprecated function _admin_bar_bump_cb
+
+---
+ inc/namespace.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/inc/namespace.php b/inc/namespace.php
+index 452ec6d068..72a3309fc5 100644
+--- a/inc/namespace.php
++++ b/inc/namespace.php
+@@ -175,7 +175,7 @@ function get_styles() {
+ 	global $wp_styles;
+ 
+ 	ob_start();
+-	_admin_bar_bump_cb();
++	wp_enqueue_admin_bar_bump_styles();
+ 	$wp_styles->do_items();
+ 	return ob_get_clean();
+ }
+-- 
+2.24.4
+
