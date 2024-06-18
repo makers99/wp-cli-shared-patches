@@ -1,0 +1,25 @@
+From bac4c245724417f900b9a925e5ed43f6a351addb Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Tue, 18 Jun 2024 13:15:25 +0200
+Subject: [PATCH] fix: critical error on paysier plugin
+
+---
+ Payment/Paysier.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Payment/Paysier.php b/Payment/Paysier.php
+index 46a0e70b31..bda66f4b14 100644
+--- a/Payment/Paysier.php
++++ b/Payment/Paysier.php
+@@ -431,7 +431,7 @@ function add_paysier_payment_method() {
+          */
+         public function checkout_get_value($value, $index)
+         {
+-            $data = WC()->session->get('pscc_post_data');
++            $data = WC()?->session?->get('pscc_post_data');
+             return isset($data[$index]) ? $data[$index] : $value;
+         }
+ 
+-- 
+2.24.4
+
