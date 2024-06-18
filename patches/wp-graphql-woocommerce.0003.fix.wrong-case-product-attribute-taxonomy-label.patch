@@ -1,0 +1,25 @@
+From d4deef3b1d53acd80d5e5c587412aba1fe4e9edc Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Tue, 18 Jun 2024 14:55:44 +0200
+Subject: [PATCH] fix: wrong taxonomy label case in product attributes
+
+---
+ includes/type/object/class-product-attribute-types.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/type/object/class-product-attribute-types.php b/includes/type/object/class-product-attribute-types.php
+index ac792001ec..0bc146cf4a 100644
+--- a/includes/type/object/class-product-attribute-types.php
++++ b/includes/type/object/class-product-attribute-types.php
+@@ -71,7 +71,7 @@ class Product_Attribute_Types {
+ 						'description' => __( 'Attribute label', 'wp-graphql-woocommerce' ),
+ 						'resolve'     => static function ( $attribute ) {
+ 							$taxonomy = get_taxonomy( $attribute->get_name() );
+-							return $taxonomy ? ucwords( $taxonomy->labels->singular_name ) : null;
++							return $taxonomy ? $taxonomy->labels->singular_name : null;
+ 						},
+ 					],
+ 					'name'  => [
+-- 
+2.24.4
+
