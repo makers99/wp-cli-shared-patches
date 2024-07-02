@@ -1,0 +1,27 @@
+From b6996798e37cc170c9b104f4f7220583e5e671cf Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Tue, 2 Jul 2024 15:57:25 +0200
+Subject: [PATCH] fix: php warning undefined array key
+
+---
+ includes/class-wc-regenerate-images.php | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/includes/class-wc-regenerate-images.php b/includes/class-wc-regenerate-images.php
+index 1ffedca626..c72a2456a3 100644
+--- a/includes/class-wc-regenerate-images.php
++++ b/includes/class-wc-regenerate-images.php
+@@ -272,6 +272,10 @@ class WC_Regenerate_Images {
+ 			$imagedata['width']  = $imagedata['sizes']['full']['width'];
+ 		}
+ 
++		if ( ! isset( $imagedata['height'], $imagedata['width'] ) ) {
++			return array();
++		}
++
+ 		return array(
+ 			'width'  => $imagedata['width'],
+ 			'height' => $imagedata['height'],
+-- 
+2.24.4
+
