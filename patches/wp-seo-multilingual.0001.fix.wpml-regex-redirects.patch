@@ -1,0 +1,37 @@
+From f5661aa133190dc1b877740c02572ed5f75fd23b Mon Sep 17 00:00:00 2001
+From: Marc del Amo <marc.delamo@gmail.com>
+Date: Thu, 11 Jul 2024 16:02:02 +0200
+Subject: [PATCH] fix: yoast regex redirects not working with wpml
+
+---
+ classes/class-wpml-wpseo-redirection.php | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/classes/class-wpml-wpseo-redirection.php b/classes/class-wpml-wpseo-redirection.php
+index 2c7940358..47801af12 100644
+--- a/classes/class-wpml-wpseo-redirection.php
++++ b/classes/class-wpml-wpseo-redirection.php
+@@ -32,8 +32,18 @@ class WPML_WPSEO_Redirection {
+ 			}
+ 
+ 			foreach ( $redirections as $redirection ) {
+-				if ( $redirection['origin'] === $url || '/' . $redirection['origin'] === $url ) {
+-					return true;
++				if($redirection['format'] == 'regex'){
++						// Ensure $url starts with /, if regex would need to check if string starts with this is needed.
++						if(strpos($url, '/', 0) !== 0){
++								$url = '/' . $url;
++						}
++						// Lets use ~ as a regex delimiter instead of /, as we are matching a URL.
++						preg_match('~' . $redirection['origin'] . '~', $url, $matches);
++						if(count($matches) > 0){
++								return true;
++						}
++				} else if($redirection['origin'] === $url || '/' . $redirection['origin'] === $url){
++						return true;
+ 				}
+ 			}
+ 		}
+-- 
+2.24.4
+
