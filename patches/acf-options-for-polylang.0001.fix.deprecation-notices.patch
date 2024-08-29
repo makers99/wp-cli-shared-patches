@@ -1,0 +1,39 @@
+From 206b1bce899935e7fb5f04d5186e7a8d0dbe4066 Mon Sep 17 00:00:00 2001
+From: Fabian Marz <fabian@netzstrategen.com>
+Date: Thu, 29 Aug 2024 15:14:41 +0200
+Subject: [PATCH] fix: PHP deprecation notices
+
+---
+ classes/helpers.php | 2 +-
+ classes/main.php    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/classes/helpers.php b/classes/helpers.php
+index 5f7bcdfe3..89ac85399 100644
+--- a/classes/helpers.php
++++ b/classes/helpers.php
+@@ -35,7 +35,7 @@ class Helpers {
+ 			$post_id = 'options';
+ 		}
+ 
+-		return str_replace( sprintf( '_%s', pll_current_language( 'locale' ) ), '', $post_id );
++		return $post_id ? str_replace( sprintf( '_%s', pll_current_language( 'locale' ) ), '', $post_id ) : 0;
+ 	}
+ 
+ 
+diff --git a/classes/main.php b/classes/main.php
+index b2638fbcc..549e36606 100644
+--- a/classes/main.php
++++ b/classes/main.php
+@@ -47,7 +47,7 @@ class Main {
+ 	 *
+ 	 */
+ 	public function get_default_reference( $reference, $field_name, $post_id ) {
+-		if ( ! empty( $reference ) ) {
++		if ( ! empty( $reference ) || !$post_id) {
+ 			return $reference;
+ 		}
+ 
+-- 
+2.39.2
+
