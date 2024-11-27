@@ -1,0 +1,25 @@
+From 7640509030436058bdaf2b78c3822aafd406d49f Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Wed, 27 Nov 2024 15:55:04 +0100
+Subject: [PATCH] fix: fatal error in sale-flash woocommerce template
+
+---
+ templates/loop/sale-flash.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/templates/loop/sale-flash.php b/templates/loop/sale-flash.php
+index b1186adc49..a01375977b 100644
+--- a/templates/loop/sale-flash.php
++++ b/templates/loop/sale-flash.php
+@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
+ global $post, $product;
+ 
+ ?>
+-<?php if ( $product->is_on_sale() ) : ?>
++<?php if ( $product?->is_on_sale() ) : ?>
+ 
+ 	<?php echo apply_filters( 'woocommerce_sale_flash', '<span class="onsale">' . esc_html__( 'Sale!', 'woocommerce' ) . '</span>', $post, $product ); ?>
+ 
+-- 
+2.24.4
+
