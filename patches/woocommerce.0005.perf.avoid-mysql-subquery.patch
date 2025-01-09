@@ -1,0 +1,44 @@
+From bc734ccaee9b623e41d01bac2c68ed7db3deebb7 Mon Sep 17 00:00:00 2001
+From: Fabian Marz <fabian@netzstrategen.com>
+Date: Wed, 8 Jan 2025 17:06:57 +0100
+Subject: [PATCH] perf: avoid subuery for product attribute counts to make use
+ of db indices
+
+---
+ .../src/StoreApi/Utilities/ProductQueryFilters.php           | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/packages/woocommerce-blocks/src/StoreApi/Utilities/ProductQueryFilters.php b/packages/woocommerce-blocks/src/StoreApi/Utilities/ProductQueryFilters.php
+index 22dfd9817..22c361eb7 100644
+--- a/packages/woocommerce-blocks/src/StoreApi/Utilities/ProductQueryFilters.php
++++ b/packages/woocommerce-blocks/src/StoreApi/Utilities/ProductQueryFilters.php
+@@ -130,17 +130,14 @@ class ProductQueryFilters {
+ 		$product_query = new ProductQuery();
+ 
+ 		add_filter( 'posts_clauses', array( $product_query, 'add_query_clauses' ), 10, 2 );
+-		add_filter( 'posts_pre_query', '__return_empty_array' );
+ 
+ 		$query_args                   = $product_query->prepare_objects_query( $request );
+ 		$query_args['no_found_rows']  = true;
+ 		$query_args['posts_per_page'] = -1;
+ 		$query                        = new \WP_Query();
+ 		$result                       = $query->query( $query_args );
+-		$product_query_sql            = $query->request;
+ 
+ 		remove_filter( 'posts_clauses', array( $product_query, 'add_query_clauses' ), 10 );
+-		remove_filter( 'posts_pre_query', '__return_empty_array' );
+ 
+ 		if ( count( $attributes ) === count( array_filter( $attributes, 'is_numeric' ) ) ) {
+ 			$attributes = array_map( 'wc_attribute_taxonomy_name_by_id', wp_parse_id_list( $attributes ) );
+@@ -160,7 +157,7 @@ class ProductQueryFilters {
+ 			INNER JOIN {$wpdb->term_relationships} AS term_relationships ON posts.ID = term_relationships.object_id
+ 			INNER JOIN {$wpdb->term_taxonomy} AS term_taxonomy USING( term_taxonomy_id )
+ 			INNER JOIN {$wpdb->terms} AS terms USING( term_id )
+-			WHERE posts.ID IN ( {$product_query_sql} )
++			WHERE posts.ID IN (" . implode( ',', $result ) . ")
+ 			{$attributes_to_count_sql}
+ 			GROUP BY terms.term_id
+ 		";
+-- 
+2.39.2
+
