@@ -1,0 +1,27 @@
+From 90ff6c2778657b4ac3e16432aee68c8d71a7106e Mon Sep 17 00:00:00 2001
+From: Fabian Marz <fabian@netzstrategen.com>
+Date: Thu, 16 Jan 2025 23:19:46 +0100
+Subject: [PATCH] perf(product-finder): integrate search index with results
+
+---
+ includes/classes/Indexable/Term/Term.php | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/includes/classes/Indexable/Term/Term.php b/includes/classes/Indexable/Term/Term.php
+index 4147f57b7..3a31fa595 100644
+--- a/includes/classes/Indexable/Term/Term.php
++++ b/includes/classes/Indexable/Term/Term.php
+@@ -938,6 +938,10 @@ class Term extends Indexable {
+ 			$from_to['name'] = version_compare( (string) $es_version, '7.0', '<' ) ? 'name.raw' : 'name.sortable';
+ 		}
+ 
++		if ( 'none' === $orderby ) {
++			$orderby = 'id';
++		}
++
+ 		$orderby = $from_to[ $orderby ] ?? $orderby;
+ 
+ 		$sort[] = array(
+-- 
+2.39.5
+
