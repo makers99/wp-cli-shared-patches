@@ -1,7 +1,7 @@
 From 90ff6c2778657b4ac3e16432aee68c8d71a7106e Mon Sep 17 00:00:00 2001
 From: Fabian Marz <fabian@netzstrategen.com>
 Date: Thu, 16 Jan 2025 23:19:46 +0100
-Subject: [PATCH] perf(product-finder): integrate search index with results
+Subject: [PATCH] fix: add fallback if term orderby is set to none
 
 ---
  includes/classes/Indexable/Term/Term.php | 4 ++++
