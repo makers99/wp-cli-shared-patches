@@ -1,0 +1,41 @@
+From 90ff6c2778657b4ac3e16432aee68c8d71a7106e Mon Sep 17 00:00:00 2001
+From: Fabian Marz <fabian@netzstrategen.com>
+Date: Thu, 16 Jan 2025 23:19:46 +0100
+Subject: [PATCH] perf: add caching to attribute count queries
+
+---
+ .../StoreApi/Utilities/ProductQueryFilters.php | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/packages/woocommerce-blocks/src/StoreApi/Utilities/ProductQueryFilters.php b/packages/woocommerce-blocks/src/StoreApi/Utilities/ProductQueryFilters.php
+index 22c361eb7..00bc89c46 100644
+--- a/packages/woocommerce-blocks/src/StoreApi/Utilities/ProductQueryFilters.php
++++ b/packages/woocommerce-blocks/src/StoreApi/Utilities/ProductQueryFilters.php
+@@ -134,8 +134,22 @@ class ProductQueryFilters {
+ 		$query_args                   = $product_query->prepare_objects_query( $request );
+ 		$query_args['no_found_rows']  = true;
+ 		$query_args['posts_per_page'] = -1;
+-		$query                        = new \WP_Query();
+-		$result                       = $query->query( $query_args );
++		$cache_key                    = md5( serialize( $query_args ) );
++		$result                       = wp_cache_get( $cache_key, 'counts' );
++
++		if ( !$result ) {
++			$query   = new \WP_Query();
++			$result  = $query->query( $query_args );
++			wp_cache_add( $cache_key, $result, 'counts' );
++		}
++
++		if ( !$result || is_wp_error( $result ) ) {
++			return [];
++		}
++
++		if ( is_a( $result[0], '\WP_Post' ) ) {
++			$result = wp_list_pluck( $result, 'ID' );
++		}
+ 
+ 		remove_filter( 'posts_clauses', array( $product_query, 'add_query_clauses' ), 10 );
+ 
+-- 
+2.39.5
+
