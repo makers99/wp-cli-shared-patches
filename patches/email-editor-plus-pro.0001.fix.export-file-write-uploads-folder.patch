@@ -1,0 +1,39 @@
+From b4d09215748b8d83dc1585f0a9cde95ad5b2ef74 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Mon, 7 Jul 2025 11:13:49 +0200
+Subject: [PATCH] Fixed email-editor-plus attempts to write files outside of
+ writable uploads folder.
+
+---
+ Core/Controllers/Admin/EmailTemplates.php | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/Core/Controllers/Admin/EmailTemplates.php b/Core/Controllers/Admin/EmailTemplates.php
+index 807c54d5..7f9b854e 100644
+--- a/Core/Controllers/Admin/EmailTemplates.php
++++ b/Core/Controllers/Admin/EmailTemplates.php
+@@ -147,7 +147,11 @@ class EmailTemplates {
+ 		if ( $id <= 0 ) {
+ 			wp_send_json_error( [ 'message' => __( 'Invalid Template ID', 'email-editor-plus' ) ] );
+ 		}
+-		$export_path = EDPW_PLUGIN_PATH . 'File/';
++		$uploads = wp_upload_dir();
++		$export_path = $uploads['basedir'] . '/email-editor-plus/';
++		if ( ! is_dir( $export_path ) ) {
++			wp_mkdir_p( $export_path );
++		}
+ 		if ( ! is_writable( $export_path ) && function_exists( 'chmod' ) ) {
+ 			if ( ! @chmod( $export_path, 0777 ) ) {
+ 				wp_send_json_error( [ 'message' => __( 'Permission denied to write a file', 'email-editor-plus' ) ] );
+@@ -174,7 +178,7 @@ class EmailTemplates {
+ 			wp_send_json_success( [
+ 				'download'      => true,
+ 				'download_name' => $file_name,
+-				'download_url'  => EDPW_PLUGIN_URL . 'File/' . $file_name,
++				'download_url'  => $uploads['baseurl'] . '/email-editor-plus/' . $file_name,
+ 				'message'       => __( 'Your template start downloading', 'email-editor-plus' )
+ 			] );
+ 		} catch ( Exception $e ) {
+-- 
+2.41.0
+
