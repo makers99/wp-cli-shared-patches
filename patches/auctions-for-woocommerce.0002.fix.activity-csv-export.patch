@@ -1,0 +1,35 @@
+From a76d76e935d4992b06d12bca6e8265bb541c5bbf Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 6 May 2025 10:53:11 +0200
+Subject: [PATCH] Fixed auction activity CSV export outputs auction winners
+ instead of bidders.
+
+---
+ admin/class-auctions-for-woocommerce-admin.php | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/admin/class-auctions-for-woocommerce-admin.php b/admin/class-auctions-for-woocommerce-admin.php
+index 62ee28dc..f2882caa 100644
+--- a/admin/class-auctions-for-woocommerce-admin.php
++++ b/admin/class-auctions-for-woocommerce-admin.php
+@@ -1896,14 +1896,14 @@ class Auctions_For_Woocommerce_Admin {
+ 
+ 			if ( isset( $product ) && is_object( $product ) ){
+ 			
+-				$userdata = get_userdata( $product->get_auction_current_bider() );
++				$userdata = get_userdata( $item['userid'] );
+ 
+ 				$row = array(
+ 					$item['auction_id'],
+ 					$product->get_sku(),
+ 					'"' . $item['post_title'] . '"',
+-					esc_attr( $userdata->user_nicename ),
+-					esc_attr( $userdata->user_firstname ) . ' ' . esc_attr( $userdata->user_lastname ),
++					esc_attr( $userdata->user_nicename ?? '' ),
++					esc_attr( $userdata->user_firstname ?? '' ) . ' ' . esc_attr( $userdata->user_lastname ?? '' ),
+ 					$item[ 'bid' ],
+ 					$item['date'],
+ 					( 1 === $item[ 'proxy' ] ) ? 'Yes' : '',
+-- 
+2.41.0
+
