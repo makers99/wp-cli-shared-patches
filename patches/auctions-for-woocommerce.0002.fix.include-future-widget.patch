@@ -1,0 +1,25 @@
+From 255b612d1b19a56ff333134ea7f33b4b666fd1e1 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Fri, 11 Jul 2025 15:22:12 +0200
+Subject: [PATCH] Fixed bad legacy file include.
+
+---
+ public/class-auctions-for-woocommerce-public.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/public/class-auctions-for-woocommerce-public.php b/public/class-auctions-for-woocommerce-public.php
+index 274741ef..c6f5cad0 100644
+--- a/public/class-auctions-for-woocommerce-public.php
++++ b/public/class-auctions-for-woocommerce-public.php
+@@ -204,7 +204,7 @@ class Auctions_For_Woocommerce_Public {
+ 		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/widgets/class-auctions-for-woocommerce-widget-ending-soon-auction.php';
+ 		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/widgets/class-auctions-for-woocommerce-widget-my-auctions.php';
+ 		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/widgets/class-wc-widget-auction-search.php';
+-		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/widgets/class-auctions-for-woocommerce-widget-future- auctions.php';
++		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/widgets/class-auctions-for-woocommerce-widget-future-auctions.php';
+ 		include_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/widgets/class-auctions-for-woocommerce-widget-watchlist.php';
+ 		// Register widgets
+ 		register_widget( 'Auctions_For_Woocommerce_Widget_Recent_Auction' );
+-- 
+2.41.0
+
