@@ -1,0 +1,30 @@
+From 0cfd102718751df6adac2f400806f87956fadef6 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Fri, 11 Jul 2025 15:05:35 +0200
+Subject: [PATCH] Fixed auction closing soon reminder emails are sent only
+ after the specified time period has passed.
+
+Example: Cron runs every 5 minutes, the closing soon reminder is
+configured to be sent 1h before an auction closes, and the auction ends
+at 7:00pm. With the previous code, the email was sent at 6:05pm instead
+of 6:00pm.
+---
+ includes/class-auctions-for-woocommerce-cronjobs.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/class-auctions-for-woocommerce-cronjobs.php b/includes/class-auctions-for-woocommerce-cronjobs.php
+index fbfba011..8ce06287 100644
+--- a/includes/class-auctions-for-woocommerce-cronjobs.php
++++ b/includes/class-auctions-for-woocommerce-cronjobs.php
+@@ -325,7 +325,7 @@ class Auctions_For_Woocommerce_Cronjobs {
+ 				),
+ 				array(
+ 					'key'     => '_auction_dates_to',
+-					'compare' => '<',
++					'compare' => '<=',
+ 					'value'   => $maxtime,
+ 					'type '   => 'DATETIME',
+ 				),
+-- 
+2.41.0
+
