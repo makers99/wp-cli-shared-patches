@@ -1,0 +1,55 @@
+From 18e9b1c13a274ad16c85e0584fc85f8b6a474cc8 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Mon, 28 Apr 2025 14:54:03 +0200
+Subject: [PATCH] Fixed auctions-for-woocommerce cron event callbacks cannot be
+ invoked from WordPress cron.
+
+---
+ includes/class-auctions-for-woocommerce-cronjobs.php | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/includes/class-auctions-for-woocommerce-cronjobs.php b/includes/class-auctions-for-woocommerce-cronjobs.php
+index 2f8c4ef7..fbfba011 100644
+--- a/includes/class-auctions-for-woocommerce-cronjobs.php
++++ b/includes/class-auctions-for-woocommerce-cronjobs.php
+@@ -92,7 +92,6 @@ class Auctions_For_Woocommerce_Cronjobs {
+ 
+ 		);
+ 		for ( $i = 0; $i < 3; $i++ ) {
+-			$time      = microtime( 1 );
+ 			$the_query = new WP_Query( $args );
+ 			$posts_ids = $the_query->posts;
+ 
+@@ -106,10 +105,7 @@ class Auctions_For_Woocommerce_Cronjobs {
+ 				}
+ 			}
+ 
+-			$time = microtime( 1 ) - $time;
+-			if ( $i < 3 ) {
+-				sleep( 20 - $time );
+-			}
++			usleep( 150 * 1000 );
+ 		}
+ 	}
+ 
+@@ -121,7 +117,7 @@ class Auctions_For_Woocommerce_Cronjobs {
+ 
+ 		$remind_to_pay_settings = get_option( 'woocommerce_remind_to_pay_settings' );
+ 		if ( 'yes' !== $remind_to_pay_settings['enabled'] ) {
+-			exit();
++			return;
+ 		}
+ 
+ 		$interval    = ( ! empty( $remind_to_pay_settings['interval'] ) ) ? (int) $remind_to_pay_settings['interval'] : 7;
+@@ -361,7 +357,7 @@ class Auctions_For_Woocommerce_Cronjobs {
+ 		$remind_to_pay_settings = get_option( 'woocommerce_remind_to_pay_settings' );
+ 
+ 		if ( 'yes' !== $remind_to_pay_settings['enabled'] ) {
+-			exit();
++			return;
+ 		}
+ 
+ 		$interval    = ( isset( $remind_to_pay_settings['interval'] ) && ! empty( $remind_to_pay_settings['interval'] ) ) ? (int) $remind_to_pay_settings['interval'] : 7;
+-- 
+2.41.0
+
