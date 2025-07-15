@@ -1,0 +1,35 @@
+From 39d84770aed16f6a27eb642ee7709a4f27b6423c Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Mon, 5 May 2025 10:56:45 +0200
+Subject: [PATCH] Fixed shop administrators are unable to test checkout for
+ finished auction.
+
+---
+ public/class-auctions-for-woocommerce-public.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/public/class-auctions-for-woocommerce-public.php b/public/class-auctions-for-woocommerce-public.php
+index a9266b4b..274741ef 100644
+--- a/public/class-auctions-for-woocommerce-public.php
++++ b/public/class-auctions-for-woocommerce-public.php
+@@ -313,7 +313,7 @@ class Auctions_For_Woocommerce_Public {
+ 			}
+ 
+ 			$current_user = wp_get_current_user();
+-			if ( intval( $product->get_auction_current_bider() ) !== $current_user->ID ) {
++			if ( intval( $product->get_auction_current_bider() ) !== $current_user->ID && ! current_user_can('edit_others_shop_orders') ) {
+ 				return false;
+ 			}
+ 
+@@ -496,7 +496,7 @@ class Auctions_For_Woocommerce_Public {
+ 					header( 'Location: ' . wp_login_url( wc_get_checkout_url() . '?pay-auction=' . $product_id ) );
+ 					exit;
+ 				}
+-				if ( $current_user->ID !== $product_data->get_auction_current_bider() ) {
++				if ( $current_user->ID !== $product_data->get_auction_current_bider() && ! current_user_can('edit_others_shop_orders') ) {
+ 					wc_add_notice( sprintf( esc_html__( 'You can not buy this item because you did not win the auction! ', 'auctions-for-woocommerce' ), $product_data->get_title() ), 'error' );
+ 					return false;
+ 				}
+-- 
+2.41.0
+
