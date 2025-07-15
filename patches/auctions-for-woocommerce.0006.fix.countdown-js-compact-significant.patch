@@ -1,0 +1,43 @@
+From 54f13ad7b1b8e2630b26d2e2261cbdba2a0b0d3f Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 25 Mar 2025 19:02:57 +0100
+Subject: [PATCH] Fixed auction countdown ignores compact and significant
+ attributes.
+
+---
+ public/js/auctions-for-woocommerce-public.js | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/public/js/auctions-for-woocommerce-public.js b/public/js/auctions-for-woocommerce-public.js
+index 780c06e4..da941c32 100644
+--- a/public/js/auctions-for-woocommerce-public.js
++++ b/public/js/auctions-for-woocommerce-public.js
+@@ -28,15 +28,12 @@ jQuery(document).ready(function($) {
+ 	$(".auction-time-countdown").each(function(index) {
+ 		var time   = $(this).data('time');
+ 		var format = $(this).data('format');
++		var significant = $(this).data('significant');
++		var compact = ($(this).data('compact') ?? afw_data.compact_counter) == 'yes';
+ 
+ 		if (format === '') {
+ 			format = 'yowdHMS';
+ 		}
+-		if (afw_data.compact_counter == 'yes') {
+-			compact = true;
+-		} else {
+-			compact = false;
+-		}
+ 		var etext = '';
+ 		if ($(this).hasClass('future')) {
+ 			etext = '<div class="started">' + afw_data.started + '</div>';
+@@ -50,6 +47,7 @@ jQuery(document).ready(function($) {
+ 		$(this).wc_auctions_countdown({
+ 			until: time,
+ 			format: format,
++			significant: significant,
+ 			compact: compact,
+ 
+ 			onExpiry: closeAuction,
+-- 
+2.41.0
+
