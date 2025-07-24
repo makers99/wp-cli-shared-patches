@@ -1,0 +1,76 @@
+From 4b4ab9d7558d67cf51405fe748858814c2449266 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Thu, 24 Jul 2025 13:31:33 +0200
+Subject: [PATCH] Fixed string translation is invoked before gettext domain is
+ registered.
+
+Upstream: https://github.com/usefulteam/jwt-auth/pull/139
+---
+ class-auth.php  | 16 ++--------------
+ class-setup.php |  2 +-
+ 2 files changed, 3 insertions(+), 15 deletions(-)
+
+diff --git a/class-auth.php b/class-auth.php
+index 204f3e1ed..6996ccf88 100644
+--- a/class-auth.php
++++ b/class-auth.php
+@@ -35,13 +35,6 @@ class Auth {
+ 	 */
+ 	private $jwt_error = null;
+ 
+-	/**
+-	 * Collection of translate-able messages.
+-	 *
+-	 * @var array
+-	 */
+-	private $messages = array();
+-
+ 	/**
+ 	 * The REST API slug.
+ 	 *
+@@ -54,11 +47,6 @@ class Auth {
+ 	 */
+ 	public function __construct() {
+ 		$this->namespace = 'jwt-auth/v1';
+-
+-		$this->messages = array(
+-			'jwt_auth_no_auth_header'  => __( 'Authorization header not found.', 'jwt-auth' ),
+-			'jwt_auth_bad_auth_header' => __( 'Authorization header malformed.', 'jwt-auth' ),
+-		);
+ 	}
+ 
+ 	/**
+@@ -379,7 +367,7 @@ public function validate_token( $return_response = true ) {
+ 					'success'    => false,
+ 					'statusCode' => 401,
+ 					'code'       => 'jwt_auth_no_auth_header',
+-					'message'    => $this->messages['jwt_auth_no_auth_header'],
++					'message'    => __( 'Authorization header not found.', 'jwt-auth' ),
+ 					'data'       => array(),
+ 				),
+ 				401
+@@ -398,7 +386,7 @@ public function validate_token( $return_response = true ) {
+ 					'success'    => false,
+ 					'statusCode' => 401,
+ 					'code'       => 'jwt_auth_bad_auth_header',
+-					'message'    => $this->messages['jwt_auth_bad_auth_header'],
++					'message'    => __( 'Authorization header malformed.', 'jwt-auth' ),
+ 					'data'       => array(),
+ 				),
+ 				401
+diff --git a/class-setup.php b/class-setup.php
+index b783e58df..17bfdb18b 100644
+--- a/class-setup.php
++++ b/class-setup.php
+@@ -58,7 +58,7 @@ public function __construct() {
+ 	 * Setup textdomain.
+ 	 */
+ 	public function setup_text_domain() {
+-		load_plugin_textdomain( 'jwt-auth', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
++		load_plugin_textdomain( 'jwt-auth', false, plugin_basename( __DIR__ ) . '/languages' );
+ 	}
+ 
+ 	/**
+-- 
+2.41.0
+
