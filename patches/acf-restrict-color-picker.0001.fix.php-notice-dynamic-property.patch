@@ -1,0 +1,28 @@
+From feb640a762a46b86d0f285baaf1f4fcee38a5d08 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 3 Jun 2025 00:39:48 +0200
+Subject: [PATCH] Fixed PHP Notice: Creation of dynamic property
+ ACF_Restrict_Color_Picker_Options::$settings is deprecated.
+
+Upstream: https://github.com/VitalDevTeam/acf-restrict-color-picker/pull/4
+
+---
+ acf-restrict-color-picker.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/acf-restrict-color-picker.php b/acf-restrict-color-picker.php
+index 93550955e..c37be0046 100644
+--- a/acf-restrict-color-picker.php
++++ b/acf-restrict-color-picker.php
+@@ -34,7 +34,7 @@ class ACF_Restrict_Color_Picker_Options {
+ 
+ 	private $plugin_path;
+ 	private $plugin_url;
+-	private $color_settings;
++	private $settings;
+ 	private $theme_color_palette;
+ 
+ 	/**
+-- 
+2.41.0
+
