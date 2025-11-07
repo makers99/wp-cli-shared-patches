@@ -1,7 +1,7 @@
 From 9883b267e02fead0c213081d6d159edd3c1e5c7a Mon Sep 17 00:00:00 2001
 From: creative-andrew <andres@netzstrategen.com>
 Date: Fri, 7 Nov 2025 09:53:12 +0100
-Subject: [PATCH] fix(plugins): deprecation notice in wp-auth-server
+Subject: [PATCH] fix(sso): PHP 8.3 deprecation warnings in wp-oauth-server.
 
 ---
  includes/functions.php | 2 +-
