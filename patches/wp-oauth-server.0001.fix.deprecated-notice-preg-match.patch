@@ -1,0 +1,25 @@
+From 9883b267e02fead0c213081d6d159edd3c1e5c7a Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Fri, 7 Nov 2025 09:53:12 +0100
+Subject: [PATCH] fix(plugins): deprecation notice in wp-auth-server
+
+---
+ includes/functions.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/functions.php b/includes/functions.php
+index f31cd2e42..e60cea3b1 100644
+--- a/includes/functions.php
++++ b/includes/functions.php
+@@ -723,7 +723,7 @@ function wp_oauth_get_authentication_token( $server ) {
+ 		}
+ 	}
+ 
+-	if ( preg_match( '/Bearer\s(\S+)/i', $authorizationHeader, $matches ) ) {
++	if ( is_string( $authorizationHeader ) && preg_match( '/Bearer\s(\S+)/i', $authorizationHeader, $matches ) ) {
+ 		return $matches[1];
+ 	}
+ 
+-- 
+2.39.5 (Apple Git-154)
+
