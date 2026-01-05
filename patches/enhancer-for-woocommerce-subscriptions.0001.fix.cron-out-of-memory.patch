@@ -1,0 +1,383 @@
+From 43772d63a5a1e439329d7b78cb075ab7b6c69661 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 23 Dec 2025 17:47:34 +0100
+Subject: [PATCH] fix(shop): Out of memory errors due to cron job of
+ enhancer-for-woocommerce-subscriptions.
+
+---
+ includes/class-enr-action-scheduler.php       | 49 +++++++++++++
+ includes/class-enr-shipping-cycle.php         | 71 +++++++++++++++++++
+ includes/class-enr-subscriptions-manager.php  | 63 ++++++++++++++++
+ .../class-enr-subscriptions-price-update.php  | 67 +++++++++++++++++
+ includes/class-wc-subscriptions-enhancer.php  | 47 ++++++++----
+ 5 files changed, 283 insertions(+), 14 deletions(-)
+
+diff --git a/includes/class-enr-action-scheduler.php b/includes/class-enr-action-scheduler.php
+index 7c011395d..a40bb39af 100644
+--- a/includes/class-enr-action-scheduler.php
++++ b/includes/class-enr-action-scheduler.php
+@@ -94,9 +94,15 @@ class ENR_Action_Scheduler {
+ 				self::maybe_schedule_when_date_updated( $subscription, 'trial_end' );
+ 				self::maybe_schedule_when_date_updated( $subscription, 'next_payment' );
+ 				self::maybe_schedule_when_date_updated( $subscription, 'end' );
++				// Mark as processed so we don't query this subscription again in find_old_subscriptions()
++				$subscription->update_meta_data( '_enr_reminders_scheduled', 'yes' );
++				$subscription->save_meta_data();
+ 				break;
+ 			case 'pending-cancel':
+ 				self::maybe_schedule_when_date_updated( $subscription, 'end' );
++				// Mark as processed so we don't query this subscription again in find_old_subscriptions()
++				$subscription->update_meta_data( '_enr_reminders_scheduled', 'yes' );
++				$subscription->save_meta_data();
+ 				break;
+ 			case 'on-hold':
+ 				self::unschedule_all_actions( $subscription, 'enr_woocommerce_scheduled_subscription_shipping_fulfilment_order' );
+@@ -110,6 +116,49 @@ class ENR_Action_Scheduler {
+ 		}
+ 	}
+ 
++	/**
++	 * Find old subscriptions that match the criteria for maybe_schedule_when_status_updated.
++	 *
++	 * Queries Active or Pending-Cancel subscriptions that have NOT yet been scheduled/processed
++	 * (identified by the absence of '_enr_reminders_scheduled' meta).
++	 *
++	 * @return array List of subscription IDs.
++	 */
++	public static function find_old_subscriptions() {
++		global $wpdb;
++
++		// 1. Determine Tables for Orders and Meta (HPOS vs Posts)
++		$orders_table   = $wpdb->posts;
++		$meta_table     = $wpdb->postmeta;
++		$id_column      = 'ID';
++		$type_column    = 'post_type';
++		$status_column  = 'post_status';
++		$meta_id_column = 'post_id';
++
++		// Check if High Performance Order Storage (HPOS) is enabled
++		if ( class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' ) && \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled() ) {
++			$orders_table   = \Automattic\WooCommerce\Utilities\OrderUtil::get_table_for_orders();
++			$meta_table     = \Automattic\WooCommerce\Utilities\OrderUtil::get_table_for_orders_meta();
++			$id_column      = 'id';
++			$type_column    = 'type';
++			$status_column  = 'status';
++			$meta_id_column = 'order_id';
++		}
++
++		// 2. Find Subscriptions with status 'active' or 'pending-cancel'
++		// AND exclude if '_enr_reminders_scheduled' meta exists
++		$query = "
++			SELECT DISTINCT o.$id_column
++			FROM $orders_table o
++			LEFT JOIN $meta_table om ON (o.$id_column = om.$meta_id_column AND om.meta_key = '_enr_reminders_scheduled')
++			WHERE o.$type_column = 'shop_subscription'
++			AND o.$status_column IN ('wc-active', 'wc-pending-cancel')
++			AND om.meta_id IS NULL
++		";
++
++		return $wpdb->get_col( $query );
++	}
++
+ 	/**
+ 	 * When a subscription's date is updated, maybe schedule some events.
+ 	 *
+diff --git a/includes/class-enr-shipping-cycle.php b/includes/class-enr-shipping-cycle.php
+index 004f5e434..dd9f3a108 100644
+--- a/includes/class-enr-shipping-cycle.php
++++ b/includes/class-enr-shipping-cycle.php
+@@ -570,6 +570,77 @@ class ENR_Shipping_Cycle {
+ 		}
+ 	}
+ 
++	/**
++	 * Find old subscriptions that match the criteria for maybe_enable_for_old_subscription.
++	 *
++	 * Queries subscriptions containing products with 'separate shipping cycle' enabled
++	 * AND excludes subscriptions that already have 'separate shipping cycle' enabled.
++	 *
++	 * @return array List of subscription IDs.
++	 */
++	public static function find_old_subscriptions() {
++		global $wpdb;
++
++		// 1. Find Product IDs: Must have BOTH meta keys set to 'yes'
++		// _enr_enable_seperate_shipping_cycle = 'yes'
++		// _enr_enable_seperate_shipping_cycle_for_old_subscriptions = 'yes'
++		// Status check: Include everything except Trash/Auto-draft (to support Private/Draft products)
++		$product_ids_query = "
++			SELECT p.ID
++			FROM {$wpdb->posts} p
++			INNER JOIN {$wpdb->postmeta} pm1 ON (p.ID = pm1.post_id)
++			INNER JOIN {$wpdb->postmeta} pm2 ON (p.ID = pm2.post_id)
++			WHERE p.post_type IN ('product', 'product_variation')
++			AND p.post_status NOT IN ('trash', 'auto-draft')
++			AND pm1.meta_key = '_enr_enable_seperate_shipping_cycle' AND pm1.meta_value = 'yes'
++			AND pm2.meta_key = '_enr_enable_seperate_shipping_cycle_for_old_subscriptions' AND pm2.meta_value = 'yes'
++		";
++
++		$product_ids = $wpdb->get_col( $product_ids_query );
++
++		if ( empty( $product_ids ) ) {
++			return array();
++		}
++
++		$product_ids_sql = implode( ',', array_map( 'absint', $product_ids ) );
++
++		// 2. Determine Tables for Orders and Meta (HPOS vs Posts)
++		$orders_table   = $wpdb->posts;
++		$meta_table     = $wpdb->postmeta;
++		$id_column      = 'ID';
++		$type_column    = 'post_type';
++		$status_column  = 'post_status';
++		$meta_id_column = 'post_id';
++
++		// Check if High Performance Order Storage (HPOS) is enabled
++		if ( class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' ) && \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled() ) {
++			$orders_table   = \Automattic\WooCommerce\Utilities\OrderUtil::get_table_for_orders();
++			$meta_table     = \Automattic\WooCommerce\Utilities\OrderUtil::get_table_for_orders_meta();
++			$id_column      = 'id';
++			$type_column    = 'type';
++			$status_column  = 'status';
++			$meta_id_column = 'order_id';
++		}
++
++		// 3. Find Subscriptions containing these products AND excluding those already enabled
++		// Exclude if _enr_enable_seperate_shipping_cycle is 'yes'
++		$query = "
++			SELECT DISTINCT o.$id_column
++			FROM $orders_table o
++			INNER JOIN {$wpdb->prefix}woocommerce_order_items oi ON (o.$id_column = oi.order_id)
++			INNER JOIN {$wpdb->prefix}woocommerce_order_itemmeta oim ON (oi.order_item_id = oim.order_item_id)
++			LEFT JOIN $meta_table om ON (o.$id_column = om.$meta_id_column AND om.meta_key = '_enr_enable_seperate_shipping_cycle' AND om.meta_value = 'yes')
++			WHERE o.$type_column = 'shop_subscription'
++			AND o.$status_column NOT IN ('trash', 'auto-draft')
++			AND oi.order_item_type = 'line_item'
++			AND oim.meta_key IN ('_product_id', '_variation_id')
++			AND oim.meta_value IN ($product_ids_sql)
++			AND om.meta_value IS NULL
++		";
++
++		return $wpdb->get_col( $query );
++	}
++
+ 	/**
+ 	 * Save the shipping in renewal order.
+ 	 * 
+diff --git a/includes/class-enr-subscriptions-manager.php b/includes/class-enr-subscriptions-manager.php
+index 7ac5a8e88..8941360c0 100644
+--- a/includes/class-enr-subscriptions-manager.php
++++ b/includes/class-enr-subscriptions-manager.php
+@@ -145,6 +145,69 @@ class ENR_Subscriptions_Manager {
+ 		}
+ 	}
+ 
++	/**
++	 * Find old subscriptions that match the criteria for maybe_enable_for_old_subscription.
++	 *
++	 * Queries subscriptions that contain a product that has '_enr_allow_subscribe_now' enabled
++	 * and excludes subscriptions that have already been processed (marked by '_enr_exclude_reminder_emails').
++	 *
++	 * @return array List of subscription IDs.
++	 */
++	public static function find_old_subscriptions() {
++		global $wpdb;
++
++		// 1. Find Product IDs: Only with meta '_enr_allow_subscribe_now' = 'yes'
++		$product_ids_query = "
++			SELECT post_id
++			FROM {$wpdb->postmeta}
++			WHERE meta_key = '_enr_allow_subscribe_now'
++			AND meta_value = 'yes'
++		";
++
++		$product_ids = $wpdb->get_col( $product_ids_query );
++
++		if ( empty( $product_ids ) ) {
++			return array();
++		}
++
++		$product_ids_sql = implode( ',', array_map( 'absint', $product_ids ) );
++
++		// 2. Determine Tables for Orders and Meta (HPOS vs Posts)
++		$orders_table  = $wpdb->posts;
++		$meta_table    = $wpdb->postmeta;
++		$id_column     = 'ID';
++		$type_column   = 'post_type';
++		$status_column = 'post_status';
++		$meta_id_column = 'post_id';
++
++		// Check if High Performance Order Storage (HPOS) is enabled
++		if ( class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' ) && \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled() ) {
++			$orders_table   = \Automattic\WooCommerce\Utilities\OrderUtil::get_table_for_orders();
++			$meta_table     = \Automattic\WooCommerce\Utilities\OrderUtil::get_table_for_orders_meta();
++			$id_column      = 'id';
++			$type_column    = 'type';
++			$status_column  = 'status';
++			$meta_id_column = 'order_id';
++		}
++
++		// 3. Find Subscriptions containing these products AND excluding already processed ones
++		$query = "
++			SELECT DISTINCT o.$id_column
++			FROM $orders_table o
++			INNER JOIN {$wpdb->prefix}woocommerce_order_items oi ON (o.$id_column = oi.order_id)
++			INNER JOIN {$wpdb->prefix}woocommerce_order_itemmeta oim ON (oi.order_item_id = oim.order_item_id)
++			LEFT JOIN $meta_table om ON (o.$id_column = om.$meta_id_column AND om.meta_key = '_enr_exclude_reminder_emails')
++			WHERE o.$type_column = 'shop_subscription'
++			AND o.$status_column NOT IN ('trash', 'auto-draft')
++			AND oi.order_item_type = 'line_item'
++			AND oim.meta_key IN ('_product_id', '_variation_id')
++			AND oim.meta_value IN ($product_ids_sql)
++			AND om.meta_key IS NULL
++		";
++
++		return $wpdb->get_col( $query );
++	}
++
+ 	/*
+ 	  |--------------------------------------------------------------------------
+ 	  | Action Scheduler Callback Methods
+diff --git a/includes/class-enr-subscriptions-price-update.php b/includes/class-enr-subscriptions-price-update.php
+index 5787e2b29..5b2a81dbd 100644
+--- a/includes/class-enr-subscriptions-price-update.php
++++ b/includes/class-enr-subscriptions-price-update.php
+@@ -347,6 +347,73 @@ class ENR_Subscriptions_Price_Update {
+ 		}
+ 	}
+ 
++	/**
++	 * Find old subscriptions that match the criteria for maybe_enable_for_old_subscription.
++	 *
++	 * Queries subscriptions containing products with 'price update for old subscriptions' set to 'override-storewide'
++	 * AND excludes subscriptions that already have this meta set.
++	 *
++	 * @return array List of subscription IDs.
++	 */
++	public static function find_old_subscriptions() {
++		global $wpdb;
++
++		// 1. Find Product IDs: Meta '_enr_allow_price_update_for_old_subscriptions' = 'override-storewide'
++		$product_ids_query = "
++			SELECT p.ID
++			FROM {$wpdb->posts} p
++			INNER JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id)
++			WHERE p.post_type IN ('product', 'product_variation')
++			AND p.post_status NOT IN ('trash', 'auto-draft')
++			AND pm.meta_key = '_enr_allow_price_update_for_old_subscriptions'
++			AND pm.meta_value = 'override-storewide'
++		";
++
++		$product_ids = $wpdb->get_col( $product_ids_query );
++
++		if ( empty( $product_ids ) ) {
++			return array();
++		}
++
++		$product_ids_sql = implode( ',', array_map( 'absint', $product_ids ) );
++
++		// 2. Determine Tables for Orders and Meta (HPOS vs Posts)
++		$orders_table   = $wpdb->posts;
++		$meta_table     = $wpdb->postmeta;
++		$id_column      = 'ID';
++		$type_column    = 'post_type';
++		$status_column  = 'post_status';
++		$meta_id_column = 'post_id';
++
++		// Check if High Performance Order Storage (HPOS) is enabled
++		if ( class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' ) && \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled() ) {
++			$orders_table   = \Automattic\WooCommerce\Utilities\OrderUtil::get_table_for_orders();
++			$meta_table     = \Automattic\WooCommerce\Utilities\OrderUtil::get_table_for_orders_meta();
++			$id_column      = 'id';
++			$type_column    = 'type';
++			$status_column  = 'status';
++			$meta_id_column = 'order_id';
++		}
++
++		// 3. Find Subscriptions containing these products AND excluding those already updated
++		// Exclude if '_enr_allow_price_update_for_old_subscriptions' meta exists on the subscription
++		$query = "
++			SELECT DISTINCT o.$id_column
++			FROM $orders_table o
++			INNER JOIN {$wpdb->prefix}woocommerce_order_items oi ON (o.$id_column = oi.order_id)
++			INNER JOIN {$wpdb->prefix}woocommerce_order_itemmeta oim ON (oi.order_item_id = oim.order_item_id)
++			LEFT JOIN $meta_table om ON (o.$id_column = om.$meta_id_column AND om.meta_key = '_enr_allow_price_update_for_old_subscriptions')
++			WHERE o.$type_column = 'shop_subscription'
++			AND o.$status_column NOT IN ('trash', 'auto-draft')
++			AND oi.order_item_type = 'line_item'
++			AND oim.meta_key IN ('_product_id', '_variation_id')
++			AND oim.meta_value IN ($product_ids_sql)
++			AND om.meta_id IS NULL
++		";
++
++		return $wpdb->get_col( $query );
++	}
++
+ 	/**
+ 	 * May be update to new subscription price if the price is changed in the subscription product.
+ 	 * 
+diff --git a/includes/class-wc-subscriptions-enhancer.php b/includes/class-wc-subscriptions-enhancer.php
+index 7c8d3c204..6cead9636 100644
+--- a/includes/class-wc-subscriptions-enhancer.php
++++ b/includes/class-wc-subscriptions-enhancer.php
+@@ -316,24 +316,43 @@ final class WC_Subscriptions_Enhancer {
+ 	 * Run the background process of old subscriptions update.
+ 	 */
+ 	public function update_old_subscriptions() {
+-		$subscriptions = wcs_get_subscriptions( array(
+-			'subscriptions_per_page' => -1,
+-			'subscription_status'    => 'active',
+-			'return'                 => 'ids',
+-				) );
++		// 1. ENR_Subscriptions_Manager: Allow Subscribe Now
++		// Queries products with 'allow_subscribe_now' and finds their subscriptions.
++		$manager_ids = ENR_Subscriptions_Manager::find_old_subscriptions();
++		if ( ! empty( $manager_ids ) ) {
++			foreach ( $manager_ids as $id ) {
++				ENR_Subscriptions_Manager::maybe_enable_for_old_subscription( $id );
++			}
++		}
+ 
+-		if ( empty( $subscriptions ) ) {
+-			return;
++		// 2. ENR_Shipping_Cycle: Separate Shipping Cycle
++		// Queries products with shipping cycle enabled and finds their subscriptions.
++		$shipping_ids = ENR_Shipping_Cycle::find_old_subscriptions();
++		if ( ! empty( $shipping_ids ) ) {
++			foreach ( $shipping_ids as $id ) {
++				ENR_Shipping_Cycle::maybe_enable_for_old_subscription( $id );
++			}
+ 		}
+ 
+-		foreach ( $subscriptions as $id => $subscription ) {
+-			$subscription = wcs_get_subscription( $subscription );
++		// 3. ENR_Subscriptions_Price_Update: Price Update
++		// Queries products with 'override-storewide' price update settings.
++		$price_ids = ENR_Subscriptions_Price_Update::find_old_subscriptions();
++		if ( ! empty( $price_ids ) ) {
++			foreach ( $price_ids as $id ) {
++				ENR_Subscriptions_Price_Update::maybe_enable_for_old_subscription( $id );
++			}
++		}
+ 
+-			if ( $subscription ) {
+-				ENR_Subscriptions_Manager::maybe_enable_for_old_subscription( $subscription );
+-				ENR_Shipping_Cycle::maybe_enable_for_old_subscription( $subscription );
+-				ENR_Subscriptions_Price_Update::maybe_enable_for_old_subscription( $subscription );
+-				ENR_Action_Scheduler::maybe_schedule_when_status_updated( $subscription, $subscription->get_status() );
++		// 4. ENR_Action_Scheduler: Reminders
++		// Queries active subscriptions that haven't had reminders scheduled yet.
++		$scheduler_ids = ENR_Action_Scheduler::find_old_subscriptions();
++		if ( ! empty( $scheduler_ids ) ) {
++			foreach ( $scheduler_ids as $id ) {
++				$subscription = wcs_get_subscription( $id );
++				if ( $subscription ) {
++					// Re-triggering status update logic will schedule reminders and set the '_enr_reminders_scheduled' flag
++					ENR_Action_Scheduler::maybe_schedule_when_status_updated( $subscription, $subscription->get_status() );
++				}
+ 			}
+ 		}
+ 	}
+-- 
+2.41.0
+
