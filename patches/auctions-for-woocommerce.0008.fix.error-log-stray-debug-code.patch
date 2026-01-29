@@ -1,0 +1,25 @@
+From c4b48b197ee30907e755a56adedfc4120369f5c5 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Thu, 18 Sep 2025 14:08:58 +0200
+Subject: [PATCH] Fixed error log polluted by stray debug code.
+
+---
+ includes/elementor/widgets/auction_bid_form.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/includes/elementor/widgets/auction_bid_form.php b/includes/elementor/widgets/auction_bid_form.php
+index b713d3c1..7a3b6bf7 100644
+--- a/includes/elementor/widgets/auction_bid_form.php
++++ b/includes/elementor/widgets/auction_bid_form.php
+@@ -8,7 +8,7 @@ use Elementor\Group_Control_Typography;
+ if ( ! defined( 'ABSPATH' ) ) {
+ 	exit; // Exit if accessed directly
+ }
+-error_log( '111');
++
+ class Auction_Bid_Form extends Base_Widget {
+ 
+ 	public function get_name() {
+-- 
+2.43.0
+
