@@ -37,6 +37,13 @@ chapter.
 
 ## Installation
 
+### Requirements
+
+* Git command line
+* All code of plugins is under Git version control.
+* PHP 7.4 or later
+
+
 ### Install as WP-CLI package (user-specific)
 
 1. Ensure you have [WP-CLI](http://wp-cli.org/) installed and set up in your `$PATH`.
@@ -86,11 +93,6 @@ chapter.
     ```
 
 
-### Requirements
-
-* PHP 7.4 or later.
-
-
 ## Creating patches
 
 All patches are created from an existing commit, so that the author, committer,
@@ -101,17 +103,20 @@ your changes into a single commit if you have multiple commits.
 
 Each patch filename must be in the following structure, delimited by dots:
 
+```
+example-plugin.0001.fix.relevant-context-keywords.patch
+```
 1. Name of the plugin (folder).
-2. Patch number, starting from `0000`. Automatically generated.
+2. Patch number, starting from `0000` (automatically generated).
 3. Type of change, either `"fix"` or `"feature"`.
 4. Keywords to provide approximate context, delimited by hyphens.
+
+The following command will create a new patch file in the [`/patches`](patches) folder, which you
+can then add to the repository:
 
 ```console
 $ wp patch create example-plugin c03314 fix keywords-context-info
 ```
-
-This will create a new patch file in the [`/patches`](patches) folder, which you
-can then add to the repository.
 
 Here is how the comand works under the hood:
 
