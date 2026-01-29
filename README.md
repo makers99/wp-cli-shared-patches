@@ -40,7 +40,7 @@ chapter.
 ### Requirements
 
 * Git command line
-* All code of plugins is under Git version control.
+* All code of plugins is under Git version control
 * PHP 7.4 or later
 
 
@@ -111,8 +111,8 @@ example-plugin.0001.fix.relevant-context-keywords.patch
 3. Type of change, either `"fix"` or `"feature"`.
 4. Keywords to provide approximate context, delimited by hyphens.
 
-The following command will create a new patch file in the [`/patches`](patches) folder, which you
-can then add to the repository:
+The following command will create a new patch file in the [`/patches`](patches)
+folder, which you can then add to the repository:
 
 ```console
 $ wp patch create example-plugin c03314 fix keywords-context-info
