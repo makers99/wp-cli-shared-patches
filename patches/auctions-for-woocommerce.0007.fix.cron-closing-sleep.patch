@@ -1,8 +1,7 @@
 From 18e9b1c13a274ad16c85e0584fc85f8b6a474cc8 Mon Sep 17 00:00:00 2001
 From: Daniel Kudwien <daniel@netzstrategen.com>
 Date: Mon, 28 Apr 2025 14:54:03 +0200
-Subject: [PATCH] Fixed auctions-for-woocommerce cron event callbacks cannot be
- invoked from WordPress cron.
+Subject: [PATCH] fix(auctions-for-woocommerce): Cron for closing auctions sleeps too long.
 
 ---
  includes/class-auctions-for-woocommerce-cronjobs.php | 10 +++-------
@@ -32,24 +31,6 @@ index 2f8c4ef7..fbfba011 100644
  		}
  	}
  
-@@ -121,7 +117,7 @@ class Auctions_For_Woocommerce_Cronjobs {
- 
- 		$remind_to_pay_settings = get_option( 'woocommerce_remind_to_pay_settings' );
- 		if ( 'yes' !== $remind_to_pay_settings['enabled'] ) {
--			exit();
-+			return;
- 		}
- 
- 		$interval    = ( ! empty( $remind_to_pay_settings['interval'] ) ) ? (int) $remind_to_pay_settings['interval'] : 7;
-@@ -361,7 +357,7 @@ class Auctions_For_Woocommerce_Cronjobs {
- 		$remind_to_pay_settings = get_option( 'woocommerce_remind_to_pay_settings' );
- 
- 		if ( 'yes' !== $remind_to_pay_settings['enabled'] ) {
--			exit();
-+			return;
- 		}
- 
- 		$interval    = ( isset( $remind_to_pay_settings['interval'] ) && ! empty( $remind_to_pay_settings['interval'] ) ) ? (int) $remind_to_pay_settings['interval'] : 7;
 -- 
 2.41.0
 
