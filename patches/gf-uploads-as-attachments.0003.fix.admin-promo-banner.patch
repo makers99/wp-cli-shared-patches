@@ -1,0 +1,25 @@
+From 3f62c34fd926b54d1d6b33db9eee0194069cf945 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Wed, 4 Feb 2026 14:44:47 +0100
+Subject: [PATCH] fix(admin): Remove gf-uploads-as-attachments promotion
+ banner.
+
+---
+ includes/class-settings.php | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/includes/class-settings.php b/includes/class-settings.php
+index 35def67fe..0d2cd2f70 100644
+--- a/includes/class-settings.php
++++ b/includes/class-settings.php
+@@ -6,7 +6,6 @@ class Settings {
+ 
+ 	public function __construct() {
+ 		add_action( 'admin_notices', array( $this, 'admin_notice' ) );
+-		add_action( 'admin_notices', array( $this, 'upgrade_notice' ) );
+ 		add_action( 'wp_ajax_gfuaa_dismiss_upgrade_notice', array( $this, 'dismiss_upgrade_notice' ) );
+ 		add_filter( 'gform_notification_ui_settings', array( $this, 'add_notification_settings' ), 10, 3 );
+ 		add_filter( 'gform_pre_notification_save', array( $this, 'save_notification_settings' ), 10, 2 );
+-- 
+2.41.0
+
