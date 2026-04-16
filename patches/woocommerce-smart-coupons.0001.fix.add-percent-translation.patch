@@ -1,0 +1,36 @@
+From cefb3850c6a0037f8143401c5b35c5e5dbfd3eab Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Thu, 16 Apr 2026 14:07:39 +0200
+Subject: [PATCH] feat: translate discount type
+
+---
+ includes/class-wc-sc-coupon-actions.php | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/includes/class-wc-sc-coupon-actions.php b/includes/class-wc-sc-coupon-actions.php
+index 36789c035..9e11f34fe 100644
+--- a/includes/class-wc-sc-coupon-actions.php
++++ b/includes/class-wc-sc-coupon-actions.php
+@@ -1173,6 +1173,10 @@ if ( ! class_exists( 'WC_SC_Coupon_Actions' ) ) {
+ 						}
+ 						$discount_type = ( ! empty( $coupon_action['discount_type'] ) ) ? $coupon_action['discount_type'] : 'percent';
+ 
++						// Translate discount type for display.
++						$discount_type_display = ( 'percent' === $discount_type ) ? __( 'percent', 'woocommerce-smart-coupons' ) : $discount_type;
++						$discount_type_display = ( 'flat' === $discount_type ) ? __( 'flat', 'woocommerce-smart-coupons' ) : $discount_type_display;
++
+ 						// Generate popup HTML if eligible products exist.
+ 						if ( ! empty( $popup_products_html ) ) {
+ 							$popup_htmls .= sprintf(
+@@ -1188,7 +1192,7 @@ if ( ! class_exists( 'WC_SC_Coupon_Actions' ) ) {
+ 								$this->sanitize_html_id_or_class( $coupon_code ),
+ 								_x( 'Choose an option.', 'Popup title', 'woocommerce-smart-coupons' ),
+ 								// translators: %1$s: coupon code as unique id, %2$d: number of options, %3$s: discount amount, %4$s: currency symbol, %5$s: discount type, %6$s: coupon code.
+-								sprintf( _x( 'Redeem Your "%1$s" and choose 1 product from %2$d options with %3$s %4$s %5$s off ', 'Popup description', 'woocommerce-smart-coupons' ), $coupon_code, count( $coupon_actions ), (float) $coupon_action['discount_amount'], 'flat' === $discount_type ? get_woocommerce_currency_symbol() : '', $discount_type ),
++								sprintf( _x( 'Redeem Your "%1$s" and choose 1 product from %2$d options with %3$s %4$s %5$s off ', 'Popup description', 'woocommerce-smart-coupons' ), $coupon_code, count( $coupon_actions ), (float) $coupon_action['discount_amount'], 'flat' === $discount_type ? get_woocommerce_currency_symbol() : '', $discount_type_display ),
+ 								$popup_products_html,
+ 								_x( 'Add to Cart', 'Add to Cart button text', 'woocommerce-smart-coupons' ),
+ 								esc_attr( $coupon_code ) // raw coupon code in data attribute.
+-- 
+2.24.4
+
