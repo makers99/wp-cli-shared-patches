@@ -1,0 +1,26 @@
+From e339bd5115a545c70772be0812de245fc7a11c74 Mon Sep 17 00:00:00 2001
+From: navidabdi <artsanaat@gmail.com>
+Date: Tue, 14 Apr 2026 11:31:08 +0200
+Subject: [PATCH] fix: avoid basename null deprecation in is_preview in
+ gravityforms plugin
+
+---
+ common.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common.php b/common.php
+index 1bb513170..a7bc4d0cc 100644
+--- a/common.php
++++ b/common.php
+@@ -4048,7 +4048,7 @@ Content-Type: text/html;
+ 
+ 	public static function is_preview() {
+ 		$url_info  = parse_url( RGFormsModel::get_current_page_url() );
+-		$file_name = basename( rgar( $url_info, 'path' ) );
++		$file_name = basename( rgar( $url_info, 'path' ) ?: '' );
+ 
+ 		return $file_name == 'preview.php' || rgget( 'gf_page', $_GET ) == 'preview' || rgget( 'gf_ajax_page', $_GET ) == 'preview'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+ 	}
+-- 
+2.50.1 (Apple Git-155)
+
