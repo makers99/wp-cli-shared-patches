@@ -1,4 +1,4 @@
-From b4d09215748b8d83dc1585f0a9cde95ad5b2ef74 Mon Sep 17 00:00:00 2001
+From 0854b7349649adf47a1d775ad8ac28d89e429ce4 Mon Sep 17 00:00:00 2001
 From: Daniel Kudwien <daniel@netzstrategen.com>
 Date: Mon, 7 Jul 2025 11:13:49 +0200
 Subject: [PATCH] Fixed email-editor-plus attempts to write files outside of
@@ -9,12 +9,12 @@ Subject: [PATCH] Fixed email-editor-plus attempts to write files outside of
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/Core/Controllers/Admin/EmailTemplates.php b/Core/Controllers/Admin/EmailTemplates.php
-index 807c54d5..7f9b854e 100644
+index 1cb38d67e..4d2f57a27 100755
 --- a/Core/Controllers/Admin/EmailTemplates.php
 +++ b/Core/Controllers/Admin/EmailTemplates.php
-@@ -147,7 +147,11 @@ class EmailTemplates {
- 		if ( $id <= 0 ) {
- 			wp_send_json_error( [ 'message' => __( 'Invalid Template ID', 'email-editor-plus' ) ] );
+@@ -189,7 +189,11 @@ class EmailTemplates {
+ 			require_once ABSPATH . '/wp-admin/includes/file.php';
+ 			WP_Filesystem();
  		}
 -		$export_path = EDPW_PLUGIN_PATH . 'File/';
 +		$uploads = wp_upload_dir();
@@ -22,10 +22,10 @@ index 807c54d5..7f9b854e 100644
 +		if ( ! is_dir( $export_path ) ) {
 +			wp_mkdir_p( $export_path );
 +		}
- 		if ( ! is_writable( $export_path ) && function_exists( 'chmod' ) ) {
- 			if ( ! @chmod( $export_path, 0777 ) ) {
- 				wp_send_json_error( [ 'message' => __( 'Permission denied to write a file', 'email-editor-plus' ) ] );
-@@ -174,7 +178,7 @@ class EmailTemplates {
+ 		if ( ! $wp_filesystem->is_writable( $export_path ) ) {
+ 			if ( ! $wp_filesystem->chmod( $export_path, FS_CHMOD_DIR ) ) {
+ 				wp_send_json_error( [
+@@ -219,7 +223,7 @@ class EmailTemplates {
  			wp_send_json_success( [
  				'download'      => true,
  				'download_name' => $file_name,
@@ -35,5 +35,5 @@ index 807c54d5..7f9b854e 100644
  			] );
  		} catch ( Exception $e ) {
 -- 
-2.41.0
+2.43.0
 
