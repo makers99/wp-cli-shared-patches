@@ -1,0 +1,58 @@
+From 131b3b10ca4b6ecf5caf6b356ba267558630c5db Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 9 Jun 2026 10:48:51 +0200
+Subject: [PATCH] fix(plugins): Deprecated gform_input_mask_script warning on
+ every page with a Gravity Forms form.
+
+Replace the removed-in-3.0 gform_input_mask_script filter with gform_pre_render, which swaps the stored 'iban' token for the actual jQuery Masked Input pattern before GF generates the mask init script. Validation is unaffected because gform_validation reads inputMaskValue from the database, not the rendered form object.
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+---
+ gform-iban.php | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
+
+diff --git a/gform-iban.php b/gform-iban.php
+index ae31860dd..07f59bae9 100644
+--- a/gform-iban.php
++++ b/gform-iban.php
+@@ -25,24 +25,23 @@ if ( class_exists( 'GFForms' ) ) {
+ 	add_filter( 'gform_input_masks', 'gform_iban_add_mask' );
+ 
+ 	/**
+-	 * Sets the IBAN mask script for a field.
++	 * Replaces the 'iban' mask token with the actual jQuery Masked Input pattern at render time.
++	 * The stored inputMaskValue stays 'iban' in the database so validation can still identify IBAN fields.
+ 	 *
+-	 * @since 	1.0
+-	 * @param 	string 	$script		The script (including <script> tag) to be filtered.
+-	 * @param 	int 	$form_id	ID of current form.
+-	 * @param 	int		$field_id	ID of current field.
+-	 * @param 	string	$mask		Currently configured mask.
+-	 * @return 	string              The updated script.
++	 * @since 1.0
++	 * @param array $form The current form object.
++	 * @return array The form object with the IBAN mask value replaced.
+ 	 */
+-	function gform_iban_set_mask_script($script, $form_id, $field_id, $mask){
+-
+-		// Mask: 2 letters / 2 numbers / max 32 numbers or letters
+-		if ( 'iban' == $mask ) {
+-			$script = "jQuery('#input_{$form_id}_{$field_id}').mask('aa99 ?**** **** **** **** **** **** **** ****');";
++	function gform_iban_set_mask_value( $form ) {
++		foreach ( $form['fields'] as &$field ) {
++			if ( $field->inputMask && 'iban' === $field->inputMaskValue ) {
++				// Mask: 2 letters / 2 numbers / max 32 alphanumeric characters.
++				$field->inputMaskValue = 'aa99 ?**** **** **** **** **** **** **** ****';
++			}
+ 		}
+-		return $script;
++		return $form;
+ 	}
+-	add_filter( 'gform_input_mask_script', 'gform_iban_set_mask_script', 10, 4 );
++	add_filter( 'gform_pre_render', 'gform_iban_set_mask_value' );
+ 
+ 	/**
+ 	 * Validates Gravity Forms fields with an IBAN mask.
+-- 
+2.25.1
+
