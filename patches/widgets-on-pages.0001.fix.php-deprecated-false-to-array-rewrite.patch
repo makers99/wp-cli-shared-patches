@@ -1,0 +1,30 @@
+From bbafcc4a5e09e4079796d30d2beec86cfa829d70 Mon Sep 17 00:00:00 2001
+From: Marc del Amo <marc@netzstrategen.com>
+Date: Wed, 17 Jun 2026 17:32:40 +0200
+Subject: [PATCH] Fixed PHP Deprecated: Automatic conversion of false to array
+ in wop_cpt_turbo_sidebars().
+
+$opts['rewrite'] is set to false and immediately overwritten with array
+key assignments, triggering a PHP 8.1+ deprecation notice on every admin page
+load. Initialize as an empty array instead.
+
+---
+ admin/class-widgets-on-pages-admin.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/admin/class-widgets-on-pages-admin.php b/admin/class-widgets-on-pages-admin.php
+index 3e0ab1d38..90e849b35 100644
+--- a/admin/class-widgets-on-pages-admin.php
++++ b/admin/class-widgets-on-pages-admin.php
+@@ -417,7 +417,7 @@ class Widgets_On_Pages_Admin
+         $opts['publicly_querable'] = false;
+         $opts['query_var'] = true;
+         $opts['register_meta_box_cb'] = '';
+-        $opts['rewrite'] = false;
++        $opts['rewrite'] = array();
+         $opts['show_in_admin_bar'] = false;
+         $opts['show_in_menu'] = 'admin.php?page=widgets-on-pages';
+         // $opts['show_in_menu']							= true;
+-- 
+2.50.1 (Apple Git-155)
+
