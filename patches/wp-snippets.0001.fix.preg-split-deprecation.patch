@@ -33,5 +33,5 @@ index 1ef6450c6..22c58fb3e 100644
 \ No newline at end of file
 +register_deactivation_hook(__FILE__, 'wp_snippets::deactivate');
 -- 
-2.39.5 (Apple Git-154)
+2.47.3
 
