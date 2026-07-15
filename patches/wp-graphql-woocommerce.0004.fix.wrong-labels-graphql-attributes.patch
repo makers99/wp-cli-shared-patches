@@ -1,15 +1,27 @@
-From 9d82f1bb4ebe10821af0e736add36101e78e0f47 Mon Sep 17 00:00:00 2001
+From 73305203c2c61f8116fc8b58ef2b6c8596326fee Mon Sep 17 00:00:00 2001
 From: creative-andrew <andres@netzstrategen.com>
-Date: Tue, 7 May 2024 15:38:16 +0200
+Date: Wed, 15 Jul 2026 17:41:30 +0200
 Subject: [PATCH] fix: wrong label names in woo-graphql
 
+Rebase the original May 2024 fix (PR #76) onto the current upstream
+context. Upstream refactored the VariationAttribute label resolver in
+d65c6a7 (Aug 2024), collapsing the old 3-line taxonomy-slug/regex/
+ucwords fallback into a single-line wc_attribute_taxonomy_slug() call.
+That changed the diff context our original patch targeted, so its
+type-resolver hunk silently stopped applying (composer-patches has no
+exit-on-patch-failure configured), leaving VariationAttribute.label
+return the raw taxonomy slug again -- while the connection-resolver
+hunk kept applying fine, since that file's context hadn't changed.
+
+Same fix as before, just re-targeted: read the pre-resolved 'label'
+from $source instead of recomputing it from the taxonomy slug.
 ---
- .../class-variation-attribute-connection-resolver.php     | 2 ++
- includes/type/object/class-variation-attribute-type.php   | 8 +-------
- 2 files changed, 3 insertions(+), 7 deletions(-)
+ .../class-variation-attribute-connection-resolver.php       | 2 ++
+ includes/type/object/class-variation-attribute-type.php     | 6 +-----
+ 2 files changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/includes/data/connection/class-variation-attribute-connection-resolver.php b/includes/data/connection/class-variation-attribute-connection-resolver.php
-index 1a975c89d6..e6b68b4217 100644
+index 1a975c8..e6b68b4 100644
 --- a/includes/data/connection/class-variation-attribute-connection-resolver.php
 +++ b/includes/data/connection/class-variation-attribute-connection-resolver.php
 @@ -94,6 +94,7 @@ class Variation_Attribute_Connection_Resolver {
@@ -29,10 +41,10 @@ index 1a975c89d6..e6b68b4217 100644
  				];
  			}
 diff --git a/includes/type/object/class-variation-attribute-type.php b/includes/type/object/class-variation-attribute-type.php
-index 0942bb5d74..82119a0702 100644
+index 7b1fcbc..82119a0 100644
 --- a/includes/type/object/class-variation-attribute-type.php
 +++ b/includes/type/object/class-variation-attribute-type.php
-@@ -44,13 +44,7 @@ class Variation_Attribute_Type {
+@@ -44,11 +44,7 @@ class Variation_Attribute_Type {
  						'type'        => 'String',
  						'description' => __( 'Label of attribute', 'wp-graphql-woocommerce' ),
  						'resolve'     => static function ( $source ) {
@@ -40,13 +52,11 @@ index 0942bb5d74..82119a0702 100644
 -								return null;
 -							}
 -
--							$slug  = \wc_attribute_taxonomy_slug( $source['name'] );
--							$label = preg_replace( '/(-|_)/', ' ', $slug );
--							return ! empty( $label ) ? ucwords( $label ) : null;
+-							return \wc_attribute_taxonomy_slug( $source['name'] );
 +							return isset( $source['label'] ) ? $source['label'] : null;
  						},
  					],
  					'name'        => [
 -- 
-2.24.4
+2.39.5 (Apple Git-154)
 
