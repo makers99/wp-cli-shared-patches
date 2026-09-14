@@ -1,0 +1,50 @@
+From e11850f13282a712d25c5e470beb8301197524e0 Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Mon, 14 Sep 2026 12:58:05 +0200
+Subject: [PATCH] fix: guard the composited item quantity step against a zero
+ parent quantity
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Loading any page that renders an add-to-cart block while a composite sits in
+the cart throws `DivisionByZeroError: Division by zero` and takes the whole page
+down with WordPress's critical error screen (ID-998). The trace runs
+ProductButton -> BlocksSharedState::load_cart_state() -> Hydration -> this
+filter, so it is not confined to the cart page.
+
+`$step` is the composited item's own `multiple_of`, which
+filter_container_cart_item_quantity_limits() derives from the parent composite's
+cart quantity. A zero parent quantity leaves it at zero, and on PHP 8 dividing
+by it is fatal rather than the warning it was on PHP 7.
+
+The vendor already fixed exactly this in 11.0.6 — "Prevented division-by-zero
+warnings when normalizing composited cart item quantities against a zero parent
+quantity" — but only in the classic cart path, class-wc-cp-cart.php:1861. The
+Store API path it missed is the one the Cart and Checkout blocks use, so the
+bug only surfaced once the shop moved to block checkout. This applies the same
+guard there.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+---
+ includes/api/class-wc-cp-store-api.php | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/includes/api/class-wc-cp-store-api.php b/includes/api/class-wc-cp-store-api.php
+index bd8056e6a..9c2f60c0a 100644
+--- a/includes/api/class-wc-cp-store-api.php
++++ b/includes/api/class-wc-cp-store-api.php
+@@ -464,7 +464,9 @@ class WC_CP_Store_API {
+ 		if ( $max ) {
+ 			// Limit child item max quantity.
+ 			$item_data['quantity_limits']->maximum = min( $item_data['quantity_limits']->maximum, $max );
+-			$item_data['quantity_limits']->maximum = floor( $item_data['quantity_limits']->maximum / $step ) * $step;
++			if ( $step > 0 ) {
++				$item_data['quantity_limits']->maximum = floor( $item_data['quantity_limits']->maximum / $step ) * $step;
++			}
+ 		}
+ 	}
+ 
+-- 
+2.39.5 (Apple Git-154)
+
