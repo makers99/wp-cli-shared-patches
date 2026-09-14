@@ -1,0 +1,37 @@
+From eb07f796f93de707eaa1fc5d7baf0dfc53596c49 Mon Sep 17 00:00:00 2001
+From: focus1 <focus1@gmail.com>
+Date: Wed, 27 May 2026 17:00:57 +0200
+Subject: [PATCH] fix(wp-snippets): avoid deprecated preg_split limit
+
+---
+ wp-snippets.php | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/wp-snippets.php b/wp-snippets.php
+index 1ef6450c6..22c58fb3e 100644
+--- a/wp-snippets.php
++++ b/wp-snippets.php
+@@ -86,11 +86,11 @@ class wp_snippets // Like PHP includes; for WordPress.
+ 			define('WP_SNIPPET_ROLES_EDIT_CAPS', 'administrator,editor,author');
+ 
+ 		if(WP_SNIPPET_ROLES_ALL_CAPS) // Certain roles should receive all snippet-related caps?
+-			self::$roles_all_caps = preg_split('/[\s;,]+/', WP_SNIPPET_ROLES_ALL_CAPS, NULL, PREG_SPLIT_NO_EMPTY);
++			self::$roles_all_caps = preg_split('/[\s;,]+/', WP_SNIPPET_ROLES_ALL_CAPS, -1, PREG_SPLIT_NO_EMPTY);
+ 		self::$roles_all_caps = apply_filters('wp_snippet_roles_all_caps', self::$roles_all_caps);
+ 
+ 		if(WP_SNIPPET_ROLES_EDIT_CAPS) // Certain roles should receive edit-related caps for snippets?
+-			self::$roles_edit_caps = preg_split('/[\s;,]+/', WP_SNIPPET_ROLES_EDIT_CAPS, NULL, PREG_SPLIT_NO_EMPTY);
++			self::$roles_edit_caps = preg_split('/[\s;,]+/', WP_SNIPPET_ROLES_EDIT_CAPS, -1, PREG_SPLIT_NO_EMPTY);
+ 		self::$roles_edit_caps = apply_filters('wp_snippet_roles_edit_caps', self::$roles_edit_caps);
+ 
+ 		self::register(); // Register snippet post type.
+@@ -319,4 +319,4 @@ class wp_snippets // Like PHP includes; for WordPress.
+  */
+ add_action('init', 'wp_snippets::initialize');
+ register_activation_hook(__FILE__, 'wp_snippets::activate');
+-register_deactivation_hook(__FILE__, 'wp_snippets::deactivate');
+\ No newline at end of file
++register_deactivation_hook(__FILE__, 'wp_snippets::deactivate');
+-- 
+2.47.3
+
