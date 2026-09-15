@@ -1,0 +1,38 @@
+From b1bce3de54e6c07add30b2767876dd5a046434a6 Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Tue, 15 Sep 2026 11:49:43 +0200
+Subject: [PATCH] fix: guard has_session() against the Store API session
+ handler
+
+A Store API request carrying a Cart-Token swaps WooCommerce's session
+handler for StoreApi\SessionHandler, which extends WC_Session rather than
+WC_Session_Handler and so has no has_session(). Calling it fatals the
+request, which is how a guest cart without a cookie session takes down
+add-item, apply-coupon and remove-coupon.
+
+Treat a handler that cannot answer as one that has a session: a cart token
+is a session, and the customer address it carries should not be overwritten.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+---
+ src/plugin-main.php | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/plugin-main.php b/src/plugin-main.php
+index a98508751..ef086d77d 100644
+--- a/src/plugin-main.php
++++ b/src/plugin-main.php
+@@ -179,7 +179,9 @@ class WC_Aelia_Tax_Display_By_Country extends Aelia_Plugin {
+ 			}
+ 
+ 			$shipping_country = trim($woocommerce->customer->get_shipping_country());
+-			if($set_shipping_country || empty($shipping_country) || !$woocommerce->session->has_session()) {
++			$session = $woocommerce->session;
++			$has_session = !is_object($session) || !method_exists($session, 'has_session') || $session->has_session();
++			if($set_shipping_country || empty($shipping_country) || !$has_session) {
+ 				// Set the shipping location
+ 				//
+ 				// IMPORTANT
+-- 
+2.47.3
+
