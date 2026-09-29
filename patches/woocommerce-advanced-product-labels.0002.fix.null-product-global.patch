@@ -1,0 +1,38 @@
+From ba4059452efa6739c4af7665be29941b9dd2cb14 Mon Sep 17 00:00:00 2001
+From: focus1 <focus1@gmail.com>
+Date: Tue, 29 Sep 2026 11:44:31 +0200
+Subject: [PATCH] fix: guard the null product global in advanced product labels
+
+WAPL_Global_Labels::global_label_hook() runs on
+woocommerce_before_shop_loop_item_title, which our Twig templates fire
+outside the product loop via Timber, leaving the $product global unset.
+It then calls $product->get_id() unguarded and fatals:
+
+    Call to a member function get_id() on null
+    #0 class-wp-hook.php(341): WAPL_Global_Labels->global_label_hook()
+    #4 timber/lib/Twig.php(39): call_user_func_array()
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+---
+ class-wapl-global-labels.php | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/class-wapl-global-labels.php b/class-wapl-global-labels.php
+index 46c715536..70671c00f 100644
+--- a/class-wapl-global-labels.php
++++ b/class-wapl-global-labels.php
+@@ -55,6 +55,11 @@ class WAPL_Global_Labels {
+ 			return;
+ 		}
+ 
++		// Templates may fire the hook outside the product loop, leaving $product unset.
++		if ( ! $product instanceof \WC_Product ) {
++			return;
++		}
++
+ 		// Check if product is excluded from Global Labels
+ 		if ( 'yes' == get_post_meta( $product->get_id(), '_wapl_label_exclude', true ) ) {
+ 			return;
+-- 
+2.47.3
+
