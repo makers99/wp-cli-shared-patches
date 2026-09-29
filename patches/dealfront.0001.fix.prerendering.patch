@@ -1,0 +1,77 @@
+From da611aceaadb799847372b54f1848fe2e307e1f8 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 29 Sep 2026 11:23:19 +0200
+Subject: [PATCH] fix(dealfront): Tracker counted prerendered pages nobody was
+ ever shown.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Patched in the plugin itself this time, so the change can be sent to
+Dealfront and fixed upstream rather than lived with.
+
+lftracker_v1_*.js contains no mention of prerendering,
+document.prerendering or prerenderingchange, and the loader runs the
+moment the snippet is parsed — including inside a prerendered document,
+which is a complete page that runs every script while hidden and may
+never be shown. On this site roughly a third of all recorded page loads
+were such documents, some reporting more than an hour after the visitor
+had left.
+
+The snippet is unchanged; it moves into a boot() that an ordinary load
+calls immediately and a prerendered one calls on prerenderingchange,
+with visibilitychange as the fallback for browsers that prerender
+without implementing it.
+
+LeadTracker stands down while this patch is present rather than nesting
+a second gate inside it, and takes over again if a plugin update
+overwrites the file.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+---
+ admin/includes/script-generator.php | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/admin/includes/script-generator.php b/admin/includes/script-generator.php
+index 4523d56d..5c2b3b5a 100644
+--- a/admin/includes/script-generator.php
++++ b/admin/includes/script-generator.php
+@@ -4,9 +4,35 @@ if (!defined('ABSPATH')) {
+ }
+ ?>
+ <?php
++// The tracker is held back until the page is actually shown.
++//
++// Chrome, Edge and Samsung Internet prerender links ahead of the click
++// (Speculation Rules, and Chrome's own address-bar prediction). A
++// prerendered document is a complete page that runs every script while
++// hidden, and the visitor may never open it — so a tracker that reports on
++// load counts visits that did not happen. On this site roughly a third of
++// all recorded page loads were prerendered documents that were never
++// activated, some of them firing more than an hour after the visitor had
++// left, which showed up in Leadfeeder as phantom page views and misleading
++// visit paths.
++//
++// document.prerendering is true only in such a document, and
++// prerenderingchange fires when it is activated. visibilitychange is the
++// fallback for browsers that prerender without implementing the former.
++// Everything else — an ordinary load — boots immediately, as before.
++//
++// See https://developer.chrome.com/docs/web-platform/prerender-pages
+ echo "<script>" .
++  "(function(d){ function boot(){" .
+   "(function(ss,ex){ window.ldfdr=window.ldfdr||function(){(ldfdr._q=ldfdr._q||[]).push([].slice.call(arguments));};" .
+   "(function(d,s){ fs=d.getElementsByTagName(s)[0]; function ce(src){ var cs=d.createElement(s); cs.src=src; cs.async=1; fs.parentNode.insertBefore(cs,fs); };" .
+   "ce('https://sc.lfeeder.com/lftracker_v1_'+ss+(ex?'_'+ex:'')+'.js'); })(document,'script'); })('$leadfeeder_tracker_id');" . // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
++  "}" .
++  "if (!d.prerendering) { boot(); return; }" .
++  "var started = false;" .
++  "var start = function(){ if (started || d.prerendering) return; started = true;" .
++  "d.removeEventListener('prerenderingchange', start); d.removeEventListener('visibilitychange', start); boot(); };" .
++  "d.addEventListener('prerenderingchange', start); d.addEventListener('visibilitychange', start);" .
++  "})(document);" .
+   "</script>"
+   ?>
+-- 
+2.41.0
+
