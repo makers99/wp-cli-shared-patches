@@ -1,16 +1,18 @@
-From ba4059452efa6739c4af7665be29941b9dd2cb14 Mon Sep 17 00:00:00 2001
+From 519ad9dfda67f853c5f3839f1d83e53b009e70c2 Mon Sep 17 00:00:00 2001
 From: focus1 <focus1@gmail.com>
-Date: Tue, 29 Sep 2026 11:44:31 +0200
+Date: Tue, 29 Sep 2026 12:22:54 +0200
 Subject: [PATCH] fix: guard the null product global in advanced product labels
 
-WAPL_Global_Labels::global_label_hook() runs on
-woocommerce_before_shop_loop_item_title, which our Twig templates fire
-outside the product loop via Timber, leaving the $product global unset.
-It then calls $product->get_id() unguarded and fatals:
+Restores the guard reverted in #1516, moved to sit immediately after
+`global $product;` instead of further down.
 
-    Call to a member function get_id() on null
-    #0 class-wp-hook.php(341): WAPL_Global_Labels->global_label_hook()
-    #4 timber/lib/Twig.php(39): call_user_func_array()
+Position matters: composer-patches applies patches through the
+web/app/plugins symlink into local-plugins, so the committed source
+carries the change and the patch is expected to fail as already-applied
+on every install. With the guard lower in the method its leading context
+(`return;` / `}` / blank) also matched the end of the inserted block, so
+patch found a second valid anchor and duplicated it (#1516). Anchored to
+`global $product;` the context is unique and occurs once.
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
 ---
@@ -18,20 +20,20 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/class-wapl-global-labels.php b/class-wapl-global-labels.php
-index 46c715536..70671c00f 100644
+index 46c715536..76d6707d3 100644
 --- a/class-wapl-global-labels.php
 +++ b/class-wapl-global-labels.php
-@@ -55,6 +55,11 @@ class WAPL_Global_Labels {
- 			return;
- 		}
+@@ -45,6 +45,11 @@ class WAPL_Global_Labels {
+ 		/** @var $product WC_Product */
+ 		global $product;
  
 +		// Templates may fire the hook outside the product loop, leaving $product unset.
 +		if ( ! $product instanceof \WC_Product ) {
 +			return;
 +		}
 +
- 		// Check if product is excluded from Global Labels
- 		if ( 'yes' == get_post_meta( $product->get_id(), '_wapl_label_exclude', true ) ) {
+ 		// Stop if global labels are disabled
+ 		if ( 'no' == get_option( 'enable_wapl', 'yes' ) ) {
  			return;
 -- 
 2.47.3
