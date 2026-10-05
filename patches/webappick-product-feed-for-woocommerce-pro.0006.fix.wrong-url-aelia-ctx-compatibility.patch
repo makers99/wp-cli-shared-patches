@@ -1,0 +1,45 @@
+From 75f22a9c7b1a35f9f0502b6e7bd9826e18ecb917 Mon Sep 17 00:00:00 2001
+From: creative-andrew <andres@netzstrategen.com>
+Date: Mon, 5 Oct 2026 15:47:42 +0200
+Subject: [PATCH] fix: wrong urls in ctx aelia ctx-compatibility feeds
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+CH feed URLs carry aelia_cs_currency=EUR, which contradicts the
+aelia_customer_country=ch the feed template appends (ID-1027).
+
+The parameter comes from WC_Aelia_CurrencySwitcherCompatibility::
+get_product_link_with_suffix(), which appends $config->get_feed_currency().
+Shared-patches serial 0005 disables that filter, but only in the
+V5/Compatibility/ copy — CompatibilityFactory::init() loads the class from
+ctx-compatibility/, so the live copy was never covered.
+
+Both copies were disabled until 2026-06-10, when a13826ce4 re-enabled them
+and 154ee35e8 (wp plugin patch) re-disabled only the V5 one, leaving
+ctx-compatibility/ active ever since.
+
+Same fix gaco applied in be3fa9d47; this commit is the source for a new
+shared-patches serial so wopa and lampify get it too.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+---
+ .../WC_Aelia_CurrencySwitcherCompatibility.php                  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libs/webappick-product-feed-for-woocommerce/ctx-compatibility/WC_Aelia_CurrencySwitcherCompatibility.php b/libs/webappick-product-feed-for-woocommerce/ctx-compatibility/WC_Aelia_CurrencySwitcherCompatibility.php
+index f1ba8bcc0..67e93dd33 100644
+--- a/libs/webappick-product-feed-for-woocommerce/ctx-compatibility/WC_Aelia_CurrencySwitcherCompatibility.php
++++ b/libs/webappick-product-feed-for-woocommerce/ctx-compatibility/WC_Aelia_CurrencySwitcherCompatibility.php
+@@ -21,7 +21,7 @@ class WC_Aelia_CurrencySwitcherCompatibility {
+ 		add_action( 'before_woo_feed_generate_batch_data', array( $this, 'switch_currency' ), 10, 1 );
+ 
+ 		// Add currency suffix to product link.
+-		add_filter( 'woo_feed_filter_product_link', array( $this, 'get_product_link_with_suffix' ), 10, 3 );
++		//add_filter( 'woo_feed_filter_product_link', array( $this, 'get_product_link_with_suffix' ), 10, 3 );
+ 	}
+ 
+ 	/**
+-- 
+2.54.0 (Apple Git-157)
+
