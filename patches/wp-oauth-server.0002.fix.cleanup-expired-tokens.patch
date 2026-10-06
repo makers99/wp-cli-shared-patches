@@ -1,0 +1,64 @@
+From 40a34bb66f84775778f5393c47418689f65489bf Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Tue, 6 Oct 2026 16:26:09 +0200
+Subject: [PATCH] fix(wp-oauth-server): Expired OAuth tokens and authorization
+ codes were never deleted.
+
+The hourly cleanup compared the TIMESTAMP expires columns with a Unix
+timestamp string, which matches no row at all, and deleting expired refresh
+tokens was commented out upstream. The tables keep growing with every token
+ever issued; on a site with OAuth clients in daily use, they hold tens of
+thousands of expired rows.
+
+The columns hold site-local wall clock time, so they are now compared against
+current_time('mysql'). Refresh tokens are included, except those that never
+expire (refresh_token_lifetime 0), which are stored with a zero date. The
+first run after deployment removes the backlog.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ includes/cron.php | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/includes/cron.php b/includes/cron.php
+index 626266e8a2..4f69742d18 100644
+--- a/includes/cron.php
++++ b/includes/cron.php
+@@ -24,19 +24,23 @@ add_action( 'wpo_global_cleanup', 'wpo_global_cleanup_functionality' );
+ function wpo_global_cleanup_functionality() {
+ 	
+ 	global $wpdb;
+-	$current_time = time();
+-	
++	// The expires columns are TIMESTAMPs holding site-local wall clock time
++	// (@see \WPOAuth2\Storage\Wordpressdb::setAccessToken()), so they have to be
++	// compared against the same. A Unix timestamp string matched no row at all,
++	// so nothing was ever deleted.
++	$current_time = current_time( 'mysql' );
++
+ 	// Delete All Auth Codes that are expired up until now.
+-	$expired_auth_codes = $wpdb->query( "DELETE FROM {$wpdb->prefix}oauth_authorization_codes WHERE expires <= '$current_time' " );
++	$expired_auth_codes = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}oauth_authorization_codes WHERE expires <= %s", $current_time ) );
+ 	do_action( 'wpo_global_cleanup_after_auth_code_cleanup', $expired_auth_codes );
+-	
++
+ 	// Handle expired access that are expired up until now.
+-	$expired_access_tokens = $wpdb->query( "DELETE FROM {$wpdb->prefix}oauth_access_tokens WHERE expires <= '$current_time' " );
++	$expired_access_tokens = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}oauth_access_tokens WHERE expires <= %s", $current_time ) );
+ 	do_action( 'wpo_global_cleanup_after_access_token_cleanup', $expired_access_tokens );
+-	
+-	// Handle expired refresh tokesn that are expired up until now. We need to leave the never expire tokens alone if there is any.
+-	// $expired_refresh_tokens = $wpdb->query( "DELETE FROM {$wpdb->prefix}oauth_refresh_tokens WHERE expires <= '$current_time' NOT IN '0000-00-00 00:00:00' " );
+-	// do_action( 'wpo_global_cleanup_after_refresh_token_cleanup', $expired_refresh_tokens );
+-	
+-	// exit;
++
++	// Handle expired refresh tokens that are expired up until now. A refresh
++	// token that never expires (refresh_token_lifetime 0) is stored with the
++	// Unix epoch or a zero date, which the lower bound leaves alone.
++	$expired_refresh_tokens = $wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->prefix}oauth_refresh_tokens WHERE expires <= %s AND expires > '1970-01-02 00:00:00'", $current_time ) );
++	do_action( 'wpo_global_cleanup_after_refresh_token_cleanup', $expired_refresh_tokens );
+ }
+-- 
+2.41.0
+
