@@ -1,0 +1,96 @@
+From 74f2bf5181d5a911f1e5e3b3721122ea130925d9 Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Thu, 24 Sep 2026 15:32:21 +0200
+Subject: [PATCH] fix(auctions-for-woocommerce): Expired countdown hides the
+ bid area and reloads the page endlessly.
+
+The countdown expiry handler hides the bid area before it asks the server what
+happened, sets no request timeout, and reloads the page on every answer it does
+not recognise as well as on every transport error.
+
+A backend that does not answer therefore takes the bid area away for the rest
+of the visit and replaces the page with an error page. A response coming from a
+shared cache that still shows the auction as not started makes the reloaded
+page expire its countdown again at once, which reloads again.
+
+The handler now restores what it hid when the request fails, times out after
+15 seconds instead of holding the connection open, and reloads at most once per
+auction and browsing session.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+---
+ public/js/auctions-for-woocommerce-public.js | 38 ++++++++++++++++++--
+ 1 file changed, 35 insertions(+), 3 deletions(-)
+
+diff --git a/public/js/auctions-for-woocommerce-public.js b/public/js/auctions-for-woocommerce-public.js
+index ca0ff49c6..0d230f784 100644
+--- a/public/js/auctions-for-woocommerce-public.js
++++ b/public/js/auctions-for-woocommerce-public.js
+@@ -145,6 +145,28 @@ function number_format(number , decimals = autoNumericdata.decimalPlacesOverride
+ 	}
+ 	return s.join(dec);
+ }
++
++// Reloads the page at most once per auction and browsing session.
++//
++// A reload only helps when the response reflects the new auction state. If it
++// is answered from a shared cache that was filled before the state changed,
++// the page comes back unchanged, its countdown expires again at once and asks
++// for another reload - an endless loop on a stale object.
++function reloadOnceForAuction(auctionid) {
++	var key = 'afw-reloaded-' + auctionid;
++	try {
++		if (window.sessionStorage.getItem(key)) {
++			return;
++		}
++		window.sessionStorage.setItem(key, '1');
++	}
++	catch (e) {
++		// Storage unavailable (private mode, disabled site data): reload anyway,
++		// the previous behavior.
++	}
++	location.reload();
++}
++
+ function closeAuction() {
+ 	var auctionid     = jQuery(this).data('auctionid');
+ 	var future        = jQuery(this).hasClass('future') ? 'true' : 'false';
+@@ -161,6 +183,9 @@ function closeAuction() {
+ 		type: "post",
+ 		url: ajaxurl,
+ 		cache: false,
++		// Without a timeout an unanswered request leaves the bid area hidden
++		// for as long as the connection is held open.
++		timeout: 15000,
+ 		data: {
+ 			action: "finish_auction",
+ 			post_id: auctionid,
+@@ -186,15 +211,22 @@ function closeAuction() {
+ 					ajaxcontainer.show();
+ 					ajaxcontainer.parent().children('form.buy-now').show();
+ 				} else {
+-					location.reload();
++					reloadOnceForAuction(auctionid);
+ 				}
+ 			} else {
+-				location.reload();
++				reloadOnceForAuction(auctionid);
+ 			}
+ 
+ 		},
+ 		error: function(){
+-			location.reload();
++			// The auction state could not be confirmed. Leaving the bid area
++			// hidden would take away the only way to bid for the rest of the
++			// visit, and reloading against an unreachable backend replaces the
++			// page with an error page. Put it back and let the price poll pick
++			// the change up.
++			jQuery('.ajax-working').remove();
++			ajaxcontainer.show();
++			ajaxcontainer.parent().children('form.buy-now').show();
+ 		}
+ 	});
+ }
+-- 
+2.41.0
+
