@@ -1,0 +1,126 @@
+From 5fc5f2c21e5e2129bbf26a4418c75eca5dfcce1d Mon Sep 17 00:00:00 2001
+From: Daniel Kudwien <daniel@netzstrategen.com>
+Date: Thu, 26 Nov 2026 12:31:51 +0100
+Subject: [PATCH] fix(sso): OAuth tokens are valid for too long since expiry is
+ in local timezone. (#1405)
+
+wp-oauth-server wrote iat, exp and auth_time of JWT access tokens and ID
+tokens with current_time('timestamp'), which adds the site's UTC offset.
+JWT claims are Unix timestamps in UTC (RFC 7519), so every client read
+the 15-minute access token of the app as valid for 75 minutes and did not
+renew it in time.
+
+The claims are now written with time(). The resource server validates a
+JWT access token against its own exp claim, so it now compares JWT
+tokens with time() as well; the database storage keeps site-local wall
+clock time and is still compared with current_time().
+
+Tokens issued before the deployment keep their shifted expiry and stay
+accepted for at most 75 minutes, as before.
+
+Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../WPOAuth2/Controller/ResourceController.php  | 17 ++++++++++++++++-
+ .../WPOAuth2/OpenID/ResponseType/IdToken.php    |  9 ++++++---
+ .../WPOAuth2/ResponseType/JwtAccessToken.php    | 11 +++++++----
+ 3 files changed, 29 insertions(+), 8 deletions(-)
+
+diff --git a/library/WPOAuth2/Controller/ResourceController.php b/library/WPOAuth2/Controller/ResourceController.php
+index 1a7ab1e07..eadf53555 100644
+--- a/library/WPOAuth2/Controller/ResourceController.php
++++ b/library/WPOAuth2/Controller/ResourceController.php
+@@ -7,6 +7,7 @@ use WPOAuth2\ResponseInterface;
+ use WPOAuth2\Scope;
+ use WPOAuth2\ScopeInterface;
+ use WPOAuth2\Storage\AccessTokenInterface;
++use WPOAuth2\Storage\JwtAccessTokenInterface;
+ use WPOAuth2\TokenType\TokenTypeInterface;
+ 
+ /**
+@@ -84,7 +85,7 @@ class ResourceController implements ResourceControllerInterface {
+ 				$response->setError( 401, 'invalid_token', 'The access token provided is invalid' );
+ 			} elseif ( ! isset( $token['expires'] ) || ! isset( $token['client_id'] ) ) {
+ 				$response->setError( 401, 'malformed_token', 'Malformed token (missing "expires")' );
+-			} elseif ( current_time( 'timestamp' ) > $token['expires'] ) {
++			} elseif ( $this->getCurrentTime() > $token['expires'] ) {
+ 				$response->setError( 401, 'expired_token', 'The access token provided has expired' );
+ 			} else {
+ 
+@@ -110,4 +111,18 @@ class ResourceController implements ResourceControllerInterface {
+ 	public function getToken() {
+ 		return $this->token;
+ 	}
++
++	/**
++	 * Returns the current time on the same clock as the token's expiry.
++	 *
++	 * A JWT access token carries its expiry in the "exp" claim, a Unix
++	 * timestamp in UTC (@see \WPOAuth2\ResponseType\JwtAccessToken::createAccessToken()).
++	 * The database storage keeps site-local wall clock time instead, which
++	 * current_time() matches.
++	 *
++	 * @return int
++	 */
++	protected function getCurrentTime() {
++		return $this->tokenStorage instanceof JwtAccessTokenInterface ? time() : current_time( 'timestamp' );
++	}
+ }
+diff --git a/library/WPOAuth2/OpenID/ResponseType/IdToken.php b/library/WPOAuth2/OpenID/ResponseType/IdToken.php
+index df0798c52..d071d0ff8 100644
+--- a/library/WPOAuth2/OpenID/ResponseType/IdToken.php
++++ b/library/WPOAuth2/OpenID/ResponseType/IdToken.php
+@@ -63,8 +63,10 @@ class IdToken implements IdTokenInterface {
+ 			'iss'       => $this->config['issuer'],
+ 			'sub'       => strval( $user_id ),
+ 			'aud'       => $client_id,
+-			'iat'       => current_time( 'timestamp' ),
+-			'exp'       => current_time( 'timestamp' ) + $this->config['id_lifetime'],
++			// JWT claims are Unix timestamps in UTC (RFC 7519); current_time()
++			// adds the site's UTC offset.
++			'iat'       => time(),
++			'exp'       => time() + $this->config['id_lifetime'],
+ 			'auth_time' => $auth_time,
+ 		);
+ 
+@@ -115,7 +117,8 @@ class IdToken implements IdTokenInterface {
+ 		}
+ 
+ 		if ( is_null( $auth_time ) ) {
+-			$auth_time = current_time( 'timestamp' );
++			// A Unix timestamp in UTC, like the other claims of the token.
++			$auth_time = time();
+ 		}
+ 
+ 		// userInfo is a scalar, and so this is the $user_id. Auth Time is null
+diff --git a/library/WPOAuth2/ResponseType/JwtAccessToken.php b/library/WPOAuth2/ResponseType/JwtAccessToken.php
+index d860f4023..9dd778010 100644
+--- a/library/WPOAuth2/ResponseType/JwtAccessToken.php
++++ b/library/WPOAuth2/ResponseType/JwtAccessToken.php
+@@ -59,8 +59,7 @@ class JwtAccessToken extends AccessToken {
+ 	 * @return void
+ 	 */
+ 	public function createAccessToken( $client_id, $user_id, $scope = null, $includeRefreshToken = true ) {
+-		$expires = current_time( 'timestamp' ) + $this->config['access_lifetime'];
+-		$id      = $this->generateAccessToken();
++		$id = $this->generateAccessToken();
+ 
+ 		$jwtAccessToken = array(
+ 			'id'         => $id, // for BC (see #591)
+@@ -68,8 +67,12 @@ class JwtAccessToken extends AccessToken {
+ 			'iss'        => $this->config['issuer'],
+ 			'aud'        => $client_id,
+ 			'sub'        => $user_id,
+-			'exp'        => $expires,
+-			'iat'        => current_time( 'timestamp' ),
++			// JWT claims are Unix timestamps in UTC (RFC 7519). current_time()
++			// adds the site's UTC offset, so every client saw the token as valid
++			// for one hour (two in summer) longer than it is.
++			// @see \WPOAuth2\Controller\ResourceController::getAccessTokenData()
++			'exp'        => time() + $this->config['access_lifetime'],
++			'iat'        => time(),
+ 			'token_type' => $this->config['token_type'],
+ 			'scope'      => $scope,
+ 		);
+-- 
+2.25.1
+
