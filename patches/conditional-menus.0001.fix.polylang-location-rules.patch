@@ -1,0 +1,42 @@
+From 9335271c527de4b79a8e5693fed96a7bd2da9791 Mon Sep 17 00:00:00 2001
+From: navidabdi <artsanaat@gmail.com>
+Date: Thu, 26 Nov 2026 09:39:26 +0100
+Subject: [PATCH] fix(conditional-menus): Polylang per-language menu rules are
+ ignored.
+
+Since 1.2.9 a location is skipped when its base assignment is not a rule list.
+get_options() merges the plain menu IDs from get_nav_menu_locations(), so a
+location with a normal menu assigned was skipped before its Polylang rules
+(e.g. primary___en) were read, and the default menu was shown instead.
+---
+ init.php | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/init.php b/init.php
+index 08469ed22..75f438051 100644
+--- a/init.php
++++ b/init.php
+@@ -174,7 +174,7 @@ class Themify_Conditional_Menus {
+ 		$hasLng = function_exists( 'pll_current_language' ) && function_exists( 'pll_default_language' );
+ 
+ 		foreach ( $locations as $location => $menu_id ) {
+-			if ( empty( $menu_assignments[ $location ] ) || ! is_array( $menu_assignments[ $location ] ) ) {
++			if ( empty( $menu_assignments[ $location ] ) ) {
+ 				continue;
+ 			}
+ 
+@@ -187,6 +187,11 @@ class Themify_Conditional_Menus {
+ 				}
+ 			}
+ 
++			/* get_options() merges plain menu IDs from get_nav_menu_locations(); only rule lists apply. */
++			if ( ! is_array( $menus ) ) {
++				continue;
++			}
++
+ 			foreach ( $menus as $new_menu ) {
+ 				if ( ! is_array( $new_menu ) || ! isset( $new_menu['menu'], $new_menu['condition'] ) ) {
+ 					continue;
+-- 
+2.54.0 (Apple Git-157)
+
